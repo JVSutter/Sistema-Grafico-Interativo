@@ -5,7 +5,8 @@ from view.bounds import Bounds
 class View:
     """Classe que representa a view da nossa arquitetura MVC."""
 
-    def __init__(self):
+    def __init__(self, controller):
+        self.controller = controller
         self.root = tk.Tk()
         self.root.title("Sistema Gráfico Interativo")
 
@@ -23,7 +24,7 @@ class View:
         tk.Button(left_panel, text="↓").pack(pady=2)
         tk.Button(left_panel, text="←").pack(pady=2)
         tk.Button(left_panel, text="→").pack(pady=2)
-        tk.Button(left_panel, text="Adicionar objeto").pack(pady=2)
+        tk.Button(left_panel, text="Criar objeto", command=self.on_create_object).pack(pady=2)
 
         # Painel direito para o viewport
         right_panel = tk.Frame(top_frame)
@@ -34,3 +35,5 @@ class View:
 
         self.window = Bounds(x_min=-100, x_max=-100, y_min=100, y_max=100)
         self.viewport = Bounds(x_min=0, x_max=500, y_min=0, y_max=500)
+
+    def on_create_object(self):
