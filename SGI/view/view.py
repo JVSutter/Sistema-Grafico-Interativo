@@ -9,7 +9,7 @@ class View:
         self.controller = controller
         self.create_interface()
 
-    def create_interface(self):
+    def create_interface(self) -> None:
         """Cria e inicializa a interface gráfica do programa"""
 
         self.root = tk.Tk()
@@ -41,19 +41,24 @@ class View:
         self.window = Bounds(x_min=-100, x_max=-100, y_min=100, y_max=100)
         self.viewport = Bounds(x_min=0, x_max=500, y_min=0, y_max=500)
 
-    def on_object_creation(self):
+    def on_object_creation(self) -> None:
         """Exibe uma caixa de diálogo para criação de um objeto."""
 
         dialog = tk.Toplevel(self.root)
         dialog.title("Criar objeto")
 
         tk.Label(dialog, text="Insira as coordenadas dos pontos\nFormato esperado: (x1, y1),(x2, y2),...").pack()
-        entry = tk.Entry(dialog)
-        entry.pack()
+        coordinates_entry = tk.Entry(dialog)
+        coordinates_entry.pack()
 
-        def on_ok():
-            input_str = entry.get()
+        tk.Label(dialog, text="Insira o nome do objeto").pack()
+        name_entry = tk.Entry(dialog)
+        name_entry.pack()
+
+        def on_ok() -> None:
+            coordinates_input = coordinates_entry.get()
+            name_input = name_entry.get()
             dialog.destroy()
-            self.controller.handle_coordinate_input(input_str)
+            self.controller.handle_coordinate_input(coordinates_input, name_input)
 
         tk.Button(dialog, text="Ok", command=on_ok).pack()
