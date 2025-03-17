@@ -11,4 +11,10 @@ class Controller:
         """Executa a aplicação."""
         self.view.root.mainloop()
 
-    def on_create_object(self)
+    def handle_coordinate_input(self, coordinate_input: str):  # TODO
+        """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
+
+        try:
+            points = list(eval(coordinate_input))
+        except Exception as e:
+            pass

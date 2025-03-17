@@ -7,6 +7,11 @@ class View:
 
     def __init__(self, controller):
         self.controller = controller
+        self.create_interface()
+
+    def create_interface(self):
+        """Cria e inicializa a interface gráfica do programa"""
+
         self.root = tk.Tk()
         self.root.title("Sistema Gráfico Interativo")
 
@@ -24,7 +29,7 @@ class View:
         tk.Button(left_panel, text="↓").pack(pady=2)
         tk.Button(left_panel, text="←").pack(pady=2)
         tk.Button(left_panel, text="→").pack(pady=2)
-        tk.Button(left_panel, text="Criar objeto", command=self.on_create_object).pack(pady=2)
+        tk.Button(left_panel, text="Criar objeto", command=self.on_object_creation).pack(pady=2)
 
         # Painel direito para o viewport
         right_panel = tk.Frame(top_frame)
@@ -36,4 +41,19 @@ class View:
         self.window = Bounds(x_min=-100, x_max=-100, y_min=100, y_max=100)
         self.viewport = Bounds(x_min=0, x_max=500, y_min=0, y_max=500)
 
-    def on_create_object(self):
+    def on_object_creation(self):
+        """Exibe uma caixa de diálogo para criação de um objeto."""
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Criar objeto")
+
+        tk.Label(dialog, text="Insira as coordenadas dos pontos\nFormato esperado: (x1, y1),(x2, y2),...").pack()
+        entry = tk.Entry(dialog)
+        entry.pack()
+
+        def on_ok():
+            input_str = entry.get()
+            dialog.destroy()
+            self.controller.handle_coordinate_input(input_str)
+
+        tk.Button(dialog, text="Ok", command=on_ok).pack()
