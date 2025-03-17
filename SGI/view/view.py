@@ -1,4 +1,5 @@
 import tkinter as tk
+
 from view.bounds import Bounds
 
 
@@ -29,7 +30,9 @@ class View:
         tk.Button(left_panel, text="↓").pack(pady=2)
         tk.Button(left_panel, text="←").pack(pady=2)
         tk.Button(left_panel, text="→").pack(pady=2)
-        tk.Button(left_panel, text="Criar objeto", command=self.on_object_creation).pack(pady=2)
+        tk.Button(
+            left_panel, text="Criar objeto", command=self.on_object_creation
+        ).pack(pady=2)
 
         # Painel direito para o viewport
         right_panel = tk.Frame(top_frame)
@@ -47,18 +50,21 @@ class View:
         dialog = tk.Toplevel(self.root)
         dialog.title("Criar objeto")
 
-        tk.Label(dialog, text="Insira as coordenadas dos pontos\nFormato esperado: (x1, y1),(x2, y2),...").pack()
-        coordinates_entry = tk.Entry(dialog)
-        coordinates_entry.pack()
+        tk.Label(
+            dialog,
+            text="Insira as coordenadas dos pontos\nFormato esperado: (x1, y1),(x2, y2),...",
+        ).pack()
+        points_entry = tk.Entry(dialog)
+        points_entry.pack()
 
         tk.Label(dialog, text="Insira o nome do objeto").pack()
         name_entry = tk.Entry(dialog)
         name_entry.pack()
 
         def on_ok() -> None:
-            coordinates_input = coordinates_entry.get()
+            points_input = points_entry.get()
             name_input = name_entry.get()
             dialog.destroy()
-            self.controller.handle_coordinate_input(coordinates_input, name_input)
+            self.controller.handle_point_input(points_input, name_input)
 
         tk.Button(dialog, text="Ok", command=on_ok).pack()

@@ -1,6 +1,7 @@
 import logging
-from view.view import View
+
 from model.model import Model
+from view.view import View
 
 
 class Controller:
@@ -13,17 +14,17 @@ class Controller:
         )
 
         self.view = View(controller=self)
-        self.model = Model()
+        self.model = Model(view=self.view)
 
     def run(self) -> None:
         """Executa a aplicação."""
         self.view.root.mainloop()
 
-    def handle_coordinate_input(self, coordinates_input: str, name_input: str) -> None:  # TODO
+    def handle_point_input(self, points_input: str, name_input: str) -> None:  # TODO
         """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
 
         try:
-            coordinates = list(eval(coordinates_input))
-            self.model.add_object(coordinates, name_input)
+            points = list(eval(points_input))
+            self.model.add_object(points, name_input)
         except NameError as e:
             logging.debug(f"Erro ao converter coordenadas: {e}", exc_info=True)

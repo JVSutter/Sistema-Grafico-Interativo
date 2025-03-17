@@ -1,3 +1,6 @@
+from view import bounds
+
+
 class GraphicalObject:
     """Classe pertinente a objetos gráficos pertencentes ao modelo interno"""
 
