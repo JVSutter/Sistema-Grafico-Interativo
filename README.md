@@ -8,12 +8,11 @@ Este repositório contém recursos e tarefas para o curso de **Computação Grá
 
 A seguinte tabela lista todos os exercícios completados durante o curso, em ordem de data de entrega. As tarefas em grupo foram realizadas por [Pedro Henrique Gimenez](https://github.com/pehqge) e [João Vitor Curcio Sutter](https://github.com/JVSutter).
 
-|    Tarefa    |        Descrição         | 
-| :--------: | :------------------------: | 
+|      Tarefa      |        Descrição         | 
+| :--------------: | :----------------------: | 
 | [Trabalho 1.1](https://github.com/JVSutter/computacao-grafica/tree/trabalho-1.1/SGI) | Desenvolvimento de um Sistema Gráfico Interativo 2D com suporte a window, viewport, panning e zooming, permitindo a exibição e manipulação de pontos, segmentos e polígonos. | 
 | [Trabalho 1.2](https://github.com/JVSutter/computacao-grafica/tree/trabalho-1.2/SGI) | Expansão do Sistema Gráfico Interativo 2D para suportar translações, escalonamento e rotações arbitrárias utilizando coordenadas homogêneas e uma matriz de transformação genérica.  | 
 
----
 
 ## Projeto Final - Jogo em Unity
 
