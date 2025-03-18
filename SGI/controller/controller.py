@@ -24,7 +24,9 @@ class Controller:
         """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
 
         try:
-            points = list(eval(points_input))
+            points_input = "[" + points_input + "]"
+            points = eval(points_input)
             self.model.add_object(points, name_input)
+
         except NameError as e:
-            logging.debug(f"Erro ao converter coordenadas: {e}", exc_info=True)
+            logging.debug(f"Erro ao obter os pontos: {e}", exc_info=True)

@@ -41,7 +41,7 @@ class View:
         self.canvas = tk.Canvas(right_panel, width=500, height=500, bg="white")
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
-        self.window = Bounds(x_min=-100, x_max=-100, y_min=100, y_max=100)
+        self.window = Bounds(x_min=-100, x_max=100, y_min=-100, y_max=100)
         self.viewport = Bounds(x_min=0, x_max=500, y_min=0, y_max=500)
 
     def on_object_creation(self) -> None:
@@ -68,3 +68,10 @@ class View:
             self.controller.handle_point_input(points_input, name_input)
 
         tk.Button(dialog, text="Ok", command=on_ok).pack()
+
+    def draw_object(self, points: list) -> None:  # NÃO CONECTA OS PONTOS AINDA
+        """Desenha um objeto gráfico na tela."""
+
+        for point in points:
+            x, y = point
+            self.canvas.create_oval(x - 2, y - 2, x + 2, y + 2, fill="black")
