@@ -1,77 +1,151 @@
-import tkinter as tk
-
-from view.bounds import Bounds
+import sys
+from PyQt6 import QtWidgets, uic
+from view.dialogs import PointDialog, LineDialog, WireframeDialog
+from view.viewport_display import ViewportDisplay
 
 
 class View:
-    """Classe que representa a view da nossa arquitetura MVC."""
-
+    """Classe responsavel por gerenciar a interface grafica da aplicacao"""
+    
     def __init__(self, controller):
         self.controller = controller
-        self.create_interface()
+        self.app = QtWidgets.QApplication(sys.argv)
+        self.window = MainWindow(controller, self)
+        
+    def run(self):
+        """Inicia a execução da interface gráfica."""
+        sys.exit(self.app.exec())
+        
+    def update_viewport(self):
+        """Atualiza o viewport com os objetos atuais."""
+        self.window.update_viewport_display()
+        
 
-    def create_interface(self) -> None:
-        """Cria e inicializa a interface gráfica do programa"""
+class MainWindow(QtWidgets.QMainWindow):
+    """Classe responsavel por gerenciar a janela principal da aplicacao"""
+    
+    def __init__(self, controller, view):
+        super(MainWindow, self).__init__()
+        uic.loadUi("view/screens/main.ui", self) 
+        self.controller = controller
+        self.view = view
+        
+        # Inicializa o viewport
+        self.setup_viewport()
+        
+        self.define_values()
+        self.connect_buttons()
+        self.show()
+        
+    def setup_viewport(self):
+        """Configura o viewport para exibir os objetos gráficos."""
+        self.viewport_display = ViewportDisplay(self.frame)
+        
+        # Adiciona o viewport ao layout do frame
+        layout = QtWidgets.QVBoxLayout(self.frame)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.viewport_display)
+        self.frame.setLayout(layout)
+        
+    def update_viewport_display(self):
+        """Atualiza o viewport com os objetos atuais e as dimensões da window."""
+        # Get the actual GraphicalObject instances, not their string representations
+        objects = self.controller.get_objects()
+        window_bounds = self.controller.get_window_bounds()
+        self.update_object_list()
+        self.viewport_display.update_objects(objects, window_bounds)
+        
+    def define_values(self):
+        """Define os valores iniciais dos widgets"""
+        zoom = 50
+        self.zoomSlider.setValue(zoom)
+        self.zoomSlider.setMinimum(1)
+        self.zoomSlider.setMaximum(100)
+        
+    def connect_buttons(self):
+        """Conecta os botoes da interface com as funcoes correspondentes"""
+        # botoes de alteracao da lista de objetos
+        self.createPoint.clicked.connect(self._create_point)
+        self.createLine.clicked.connect(self._create_line)
+        self.createWireframe.clicked.connect(self._create_wireframe)
+        self.removeObject.clicked.connect(self._remove_object)
 
-        self.root = tk.Tk()
-        self.root.title("Sistema Gráfico Interativo")
+        # botoes de zoom
+        self.zoomInButton.clicked.connect(lambda: self._handle_zoom(self.zoomSlider.value() + 10))
+        self.zoomOutButton.clicked.connect(lambda: self._handle_zoom(self.zoomSlider.value() - 10)) 
+        self.zoomSlider.valueChanged.connect(lambda: self._handle_zoom(self.zoomSlider.value()))
 
-        # Frame superior (divide em esquerdo e direito)
-        top_frame = tk.Frame(self.root)
-        top_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        # Botoes de navegacao
+        self.navUpButton.clicked.connect(lambda: self._handle_pan("up"))
+        self.navDownButton.clicked.connect(lambda: self._handle_pan("down"))
+        self.navLeftButton.clicked.connect(lambda: self._handle_pan("left"))
+        self.navRightButton.clicked.connect(lambda: self._handle_pan("right"))
+        
+    def _handle_object_creation(self, points, name):
+        """Trata a criação de objetos através do controller."""
+        if name is not None:
+            self.controller.handle_object_creation(points, name)
+            self.add_log(f"{points[-1][0]} {name} created: {points}")
+        
+    def update_object_list(self):
+        """Atualiza a lista de objetos da aplicacao."""
+        # Use string representations for the list display
+        object_list = self.controller.get_object_strings()
+        self.objectsList.clear()
+        self.objectsList.addItems(object_list)
+        
+    def add_log(self, message):
+        """Adiciona uma mensagem ao log da aplicacao."""
+        logbox = self.logsBox 
+        logbox.addItem(message)
+        logbox.scrollToBottom()
+        
+    def _handle_zoom(self, value):
+        """Trata as requisições de zoom."""
+        # Evitar recursão infinita
+        if self.zoomSlider.value() != value:
+            self.zoomSlider.setValue(value)
+            return
+            
+        old_value = 1.0  # Valor a ser obtido do controller
+        new_value = value / 50.0  # 50 no slider = fator 1.0
+        
+        # Aplica zoom apenas se houver mudança significativa
+        if abs(new_value - old_value) > 0.01:
+            zoom_factor = new_value / old_value
+            self.controller.handle_zoom(zoom_factor)
+            self.add_log(f"Zoomed: {value} (factor: {new_value:.2f})")
+        
+    def _handle_pan(self, direction):
+        """Trata as requisições de panning."""
+        self.controller.handle_pan(direction)
+        self.add_log(f"Panned {direction}")
 
-        # Painel esquerdo para botões de zoom e navegação
-        left_panel = tk.Frame(top_frame)
-        left_panel.pack(side=tk.LEFT, fill=tk.Y)
+    def _create_point(self):
+        """Cria um ponto."""
+        points, name = PointDialog().create_object()
+        self._handle_object_creation(points, name)
 
-        tk.Button(left_panel, text="Zoom In").pack(pady=2)
-        tk.Button(left_panel, text="Zoom Out").pack(pady=2)
-        tk.Button(left_panel, text="↑").pack(pady=2)
-        tk.Button(left_panel, text="↓").pack(pady=2)
-        tk.Button(left_panel, text="←").pack(pady=2)
-        tk.Button(left_panel, text="→").pack(pady=2)
-        tk.Button(
-            left_panel, text="Criar objeto", command=self.on_object_creation
-        ).pack(pady=2)
+    def _create_line(self):
+        """Cria uma linha."""
+        points, name = LineDialog().create_object()
+        self._handle_object_creation(points, name)
 
-        # Painel direito para o viewport
-        right_panel = tk.Frame(top_frame)
-        right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+    def _create_wireframe(self):
+        """Cria um poligono."""
+        points, name = WireframeDialog().create_object()
+        self._handle_object_creation(points, name)
 
-        self.canvas = tk.Canvas(right_panel, width=500, height=500, bg="white")
-        self.canvas.pack(fill=tk.BOTH, expand=True)
-
-        self.window = Bounds(x_min=-100, x_max=100, y_min=-100, y_max=100)
-        self.viewport = Bounds(x_min=0, x_max=500, y_min=0, y_max=500)
-
-    def on_object_creation(self) -> None:
-        """Exibe uma caixa de diálogo para criação de um objeto."""
-
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Criar objeto")
-
-        tk.Label(
-            dialog,
-            text="Insira as coordenadas dos pontos\nFormato esperado: (x1, y1),(x2, y2),...",
-        ).pack()
-        points_entry = tk.Entry(dialog)
-        points_entry.pack()
-
-        tk.Label(dialog, text="Insira o nome do objeto").pack()
-        name_entry = tk.Entry(dialog)
-        name_entry.pack()
-
-        def on_ok() -> None:
-            points_input = points_entry.get()
-            name_input = name_entry.get()
-            dialog.destroy()
-            self.controller.handle_point_input(points_input, name_input)
-
-        tk.Button(dialog, text="Ok", command=on_ok).pack()
-
-    def draw_object(self, points: list) -> None:  # NÃO CONECTA OS PONTOS AINDA
-        """Desenha um objeto gráfico na tela."""
-
-        for point in points:
-            x, y = point
-            self.canvas.create_oval(x - 2, y - 2, x + 2, y + 2, fill="black")
+    def _remove_object(self):
+        """Remove um objeto da lista de objetos."""
+        # pega o index do item selecionado
+        selected = self.objectsList.currentRow()
+        
+        # se nao tiver selecionado nenhum item
+        if selected == -1:
+            self.add_log(f"You must select an object to remove")
+            return
+        
+        text = self.objectsList.currentItem().text()
+        self.controller.remove_object(index=selected)
+        self.add_log(f"{text} has been removed")
