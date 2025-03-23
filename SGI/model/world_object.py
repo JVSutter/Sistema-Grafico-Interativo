@@ -1,4 +1,5 @@
 from view.bounds import Bounds
+from view.graphical_objects.point import Point
 
 
 class WorldObject:
@@ -11,20 +12,19 @@ class WorldObject:
         window_bounds: Bounds,
         viewport_bounds: Bounds,
     ):
-        self.points = points
+        self.world_points = points
+        self.viewport_points = self.transform_points_to_viewport(
+            viewport_bounds, window_bounds
+        )
+
         if len(points) == 1:
-            self.type = "Point"
+            self.graphical_representation = Point(self.viewport_points)
         elif len(points) == 2:
-            self.type = "Line"
+            self.graphical_representation = "Line"
         else:
-            self.type = "Wireframe"
+            self.graphical_representation = "Wireframe"
 
         self.name = name
-        # self.graphical_representation = obj_type(
-        #     viewport_points=self.transform_points_to_viewport(
-        #         viewport_bounds, window_bounds
-        #     )
-        # )
 
     def transform_points_to_viewport(
         self, viewport_bounds: Bounds, window_bounds: Bounds
@@ -33,7 +33,7 @@ class WorldObject:
 
         transformed_points = []
 
-        for point in self.points:
+        for point in self.world_points:
             x, y = point
 
             x_viewport = (
@@ -52,4 +52,4 @@ class WorldObject:
         return transformed_points
 
     def __str__(self):
-        return f"{self.type} {self.name}: {str(self.points).replace('[', '').replace(']', '')}"
+        return f"{self.graphical_representation} {self.name}: {str(self.world_points).replace('[', '').replace(']', '')}"

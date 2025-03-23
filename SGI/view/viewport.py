@@ -15,16 +15,37 @@ class Viewport(QtWidgets.QWidget):
         palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor(100, 0, 0, 100))
         self.setPalette(palette)
 
-        self.viewport_bounds = Bounds(x_min=0, y_min=0, x_max=100, y_max=100)
-        self.window_bounds = Bounds(x_min=-50, x_max=50, y_min=-50, y_max=50)
+        self.viewport_bounds: Bounds = None  # Será definido automaticamente no evento resizeEvent
+        self.window_bounds = Bounds(x_min=-100, x_max=100, y_min=-100, y_max=100)
+        self.objects = []
 
-    def update(self, objects: list[GraphicalObject]) -> None:
-        """Atualiza o viewport com os objetos gráficos."""
+    def resizeEvent(self, event):
+        """Sobrescreve o método resizeEvent para atualizar os limites do viewport."""
+
+        super().resizeEvent(event)
+        self.viewport_bounds = Bounds(
+            x_min=0,
+            y_min=0,
+            x_max=self.width(),
+            y_max=self.height()
+        )
+
+    def paintEvent(self, event):
+        """Sobrescreve o método paintEvent para desenhar os objetos no viewport."""
 
         painter = QtGui.QPainter(self)
-        painter.fillRect(self.rect(), self.palette().color(QtGui.QPalette.ColorRole.Window))
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
-        for obj in objects:
-            obj.draw(self, painter)
+        # Define a cor e espessura da caneta
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255))
+        pen.setWidth(2)
+        painter.setPen(pen)
 
-        painter.end()
+        # Desenha cada objeto
+        for obj in self.objects:
+            obj.draw(painter)
+
+    def update_viewport(self, objects: list[GraphicalObject]) -> None:
+        """Atualiza o viewport."""
+        self.objects = objects
+        self.update()  # Redesenha o viewport

@@ -1,6 +1,5 @@
 from model.world_object import WorldObject
 from view.view import View
-from view.bounds import Bounds
 
 
 class Model:
@@ -19,6 +18,7 @@ class Model:
 
         self.display_file.append(graphical_object)
         self.view.update_object_list(self.get_object_list())
+        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
 
     def get_object_list(self):
         """Retorna uma representação em string dos objetos do mundo."""

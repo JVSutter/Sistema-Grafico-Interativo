@@ -17,9 +17,6 @@ class Controller:
         """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
         self.model.add_object(points=points_input, name=name_input)
 
-    def get_objects(self):
-        return [str(obj) for obj in self.model.display_file]
-
     def remove_object(self, index):
         self.model.display_file.pop(index)
         self.view.update_viewport()

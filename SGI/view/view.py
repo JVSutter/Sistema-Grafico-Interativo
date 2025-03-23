@@ -2,10 +2,11 @@ import sys
 from PyQt6 import QtWidgets, uic
 from view.dialogs import ObjectDialog, PointDialog, LineDialog, WireframeDialog
 from view.viewport import Viewport
+from view.graphical_objects.graphical_object import GraphicalObject
 
 
 class View(QtWidgets.QMainWindow):
-    """Classe responsavel por gerenciar a interface grafica da aplicacao"""
+    """Classe responsavel por gerenciar a interface grafica da aplicação"""
 
     def __init__(self, controller):
         self.app = QtWidgets.QApplication(sys.argv)  # Necessário estar no começo
@@ -23,8 +24,8 @@ class View(QtWidgets.QMainWindow):
         """Define os valores iniciais dos widgets"""
         self.zoomSlider.setValue(50)
 
-    def connect_buttons(self):
-        """Conecta os botões da interface com os métodos correspondentes"""
+    def connect_buttons(self) -> None:
+        """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 
         # Botões de alteração da lista de objetos
         self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog(), "Point"))
@@ -43,7 +44,7 @@ class View(QtWidgets.QMainWindow):
         self.navLeftButton.clicked.connect(lambda: self.on_pan("left"))
         self.navRightButton.clicked.connect(lambda: self.on_pan("right"))
 
-    def setup_viewport(self):
+    def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
         self.viewport = Viewport(self.frame)
 
@@ -53,34 +54,43 @@ class View(QtWidgets.QMainWindow):
         layout.addWidget(self.viewport)
         self.frame.setLayout(layout)
 
-    def run(self):
-        """Executa a aplicação PyQt"""
+    def run(self) -> None:
+        """Executa a aplicação PyQt."""
         sys.exit(self.app.exec())
 
-    def update_object_list(self, object_list: list):
-        """Atualiza a lista de objetos exibida na interface"""
+    def update_viewport(self, objects_list: list[GraphicalObject]) -> None:
+        """
+        Atualiza o viewport com a lista de objetos. Chamado pelo model quando os
+        objetos são alterados.
+        """
+        self.viewport.update_viewport(objects_list)
+
+    def update_object_list(self, object_list: list) -> None:
+        """
+        Atualiza a lista de objetos exibida na interface.
+        Chamado pelo model quando a lista de objetos é alterada.
+        """
 
         self.objectsList.clear()
         self.objectsList.addItems(object_list)
 
-    def add_log(self, message):
-        """Adiciona uma mensagem ao log da aplicacao"""
+    def add_log(self, message) -> None:
+        """Adiciona uma mensagem ao log da aplicação"""
 
         logbox = self.logsBox  # Pega o objeto que contem o log
         logbox.addItem(message)  # Adiciona a mensagem ao log
         logbox.scrollToBottom()  # Faz o log rolar para baixo para mostrar a mensagem mais recente
 
-    def on_create_object(self, dialog: ObjectDialog, object_type: str):
-        """Cria um objeto usando uma caixa de diálogo"""
+    def on_create_object(self, dialog: ObjectDialog, object_type: str) -> None:
+        """Solicita criação de um objeto usando uma caixa de diálogo."""
 
         points, name = dialog.create_object()
         if name is not None:
             self.controller.handle_point_input(points, name)
-            # self.update_object_list()
             self.add_log(f"{object_type} {name} created: {points}")
 
-    def on_remove_object(self):
-        """Remove um objeto da lista de objetos"""
+    def on_remove_object(self) -> None:
+        """Solicita remoção de um objeto da lista de objetos."""
 
         # pega o index do item selecionado
         selected = self.objectsList.currentRow()
@@ -96,13 +106,13 @@ class View(QtWidgets.QMainWindow):
         self.update_object_list()
         self.add_log(f"{text} has been removed")
 
-    def on_zoom(self, value):  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
+    def on_zoom(self, value) -> None:  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
         """Altera o zoom da window"""
 
         self.zoomSlider.setValue(value)  # Atualiza o valor do slider
         self.add_log(f"Zoomed: {value}")
 
-    def on_pan(self, direction):
+    def on_pan(self, direction) -> None:  # COLOCAR DEPOIS A FUNCAO DE PAN DO CONTROLLER AQUI
         """Move a camera da window"""
 
         self.add_log(f"Panned {direction}")
