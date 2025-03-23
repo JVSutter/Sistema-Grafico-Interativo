@@ -1,4 +1,4 @@
-from model.graphical_object import GraphicalObject
+from model.world_object import WorldObject
 from view.bounds import Bounds
 
 
@@ -12,5 +12,5 @@ class Model:
     def add_object(self, points: list, name: str) -> None:
         """Adiciona um objeto gráfico ao display file."""
 
-        graphical_object = GraphicalObject(points=points, name=name)
+        graphical_object = WorldObject(points=points, name=name)
         self.display_file.append(graphical_object)

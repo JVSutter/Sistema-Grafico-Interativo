@@ -1,19 +1,30 @@
 from view.bounds import Bounds
 
 
-class GraphicalObject:
-    """Classe pertinente a objetos gráficos pertencentes ao modelo interno"""
+class WorldObject:
+    """Classe pertinente a objetos pertencentes ao modelo interno (mundo)"""
 
-    def __init__(self, points: list, name: str):
+    def __init__(
+        self,
+        points: list,
+        name: str,
+        # window_bounds: Bounds,
+        # viewport_bounds: Bounds,
+    ):
         self.points = points
-        self.name = name
-
         if len(points) == 1:
             self.type = "Point"
         elif len(points) == 2:
             self.type = "Line"
         else:
             self.type = "Wireframe"
+
+        self.name = name
+        # self.graphical_representation = obj_type(
+        #     viewport_points=self.transform_points_to_viewport(
+        #         viewport_bounds, window_bounds
+        #     )
+        # )
 
     def transform_points_to_viewport(
         self, viewport_bounds: Bounds, window_bounds: Bounds
@@ -32,7 +43,8 @@ class GraphicalObject:
             )
 
             y_viewport = (
-                1 - (y - window_bounds.y_min) / (window_bounds.y_max - window_bounds.y_min)
+                1 - (y - window_bounds.y_min)
+                / (window_bounds.y_max - window_bounds.y_min)
             ) * (viewport_bounds.y_max - viewport_bounds.y_min)
 
             transformed_points.append((x_viewport, y_viewport))
