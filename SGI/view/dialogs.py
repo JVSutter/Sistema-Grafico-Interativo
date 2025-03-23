@@ -3,29 +3,24 @@ from PyQt6 import QtWidgets, uic
 
 
 class ObjectDialog(QtWidgets.QDialog):
-    """Classe responsavel por gerenciar um popup generico"""
+    """Classe responsável por gerenciar um popup genérico"""
 
     def __init__(self, name: str):
-        super(ObjectDialog, self).__init__()
+        super().__init__()
         uic.loadUi(f"view/screens/{name}.ui", self)
 
     def create_object(self, ask_for_name: bool = True):
         """Cria um objeto"""
 
-        # Mostra a janela de criacao de objeto
         self.show()
-
-        # Executa a janela
         result = self.exec()
 
         # Se o usuário cancelou, retorna None
         if result == QtWidgets.QDialog.DialogCode.Rejected:
             return None, None
 
-        # Pega o(s) ponto(s) 
         self.points = self.get_points()
 
-        # Pega o nome do objeto
         if ask_for_name:
             self.name = NameDialog().name
         else:
@@ -33,16 +28,26 @@ class ObjectDialog(QtWidgets.QDialog):
 
         return self.points, self.name
 
+    def set_field_ranges(self, fields: list):
+        """Define o intervalo dos campos de entrada"""
+
+        for field in fields:
+            field.setRange(-1000.0, 1000.0)
+
     @abstractmethod
     def get_points(self):
-        pass
+        """
+        Método abstrato para obtermos a lista de pontos do objeto
+        É abstrato pois cada objeto requer uma quantidade diferente de pontos
+        """
 
 
 class PointDialog(ObjectDialog):
     """Classe responsavel por gerenciar o popup de criacao de um ponto"""
 
     def __init__(self):
-        super(PointDialog, self).__init__("newPoint")
+        super().__init__("newPoint")
+        self.set_field_ranges([self.xInput, self.yInput])
 
     def get_points(self):
         """Retorna as coordenadas do ponto inseridas pelo usuario"""
@@ -57,6 +62,7 @@ class LineDialog(ObjectDialog):
 
     def __init__(self):
         super(LineDialog, self).__init__("newLine")
+        self.set_field_ranges([self.x1Input, self.y1Input, self.x2Input, self.y2Input])
 
     def get_points(self):
         """Retorna as coordenadas da linha inseridas pelo usuario"""
@@ -72,7 +78,7 @@ class WireframeDialog(ObjectDialog):
     """Classe responsável por gerenciar o popup de criação de um poligono"""
 
     def __init__(self):
-        super(WireframeDialog, self).__init__("newWireframe")
+        super().__init__("newWireframe")
 
         self.points = []
         self.newPointButton.clicked.connect(self.add_point)  # Conecta o botao de adicionar um ponto
