@@ -1,12 +1,10 @@
+from PyQt6 import QtCore, QtGui
+
 from view.graphical_objects.graphical_object import GraphicalObject
-from PyQt6 import QtGui, QtCore
 
 
 class Wireframe(GraphicalObject):
     """Classe que representa um wireframe no viewport."""
-
-    def __init__(self, viewport_points: list):
-        self.viewport_points = viewport_points
 
     def draw(self, painter: QtGui.QPainter) -> None:
         """

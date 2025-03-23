@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 from PyQt6 import QtWidgets, uic
 
 

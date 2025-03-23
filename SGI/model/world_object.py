@@ -1,6 +1,7 @@
+import numpy as np
 from view.bounds import Bounds
-from view.graphical_objects.point import Point
 from view.graphical_objects.line import Line
+from view.graphical_objects.point import Point
 from view.graphical_objects.wireframe import Wireframe
 
 
@@ -14,7 +15,7 @@ class WorldObject:
         window_bounds: Bounds,
         viewport_bounds: Bounds,
     ):
-        self.world_points = points
+        self.world_points = np.array(points)
         self.viewport_points = self.transform_points_to_viewport(
             viewport_bounds, window_bounds
         )
@@ -51,8 +52,8 @@ class WorldObject:
 
             transformed_points.append((x_viewport, y_viewport))
 
-        return transformed_points
+        return np.array(transformed_points)
 
     def __str__(self):
-        points_str = str(self.world_points).replace("[", "").replace("]", "")
-        return f"{self.graphical_representation.__class__.__name__} {self.name}: {points_str}"
+        formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y in self.world_points)
+        return f"{self.graphical_representation.__class__.__name__} {self.name}: {formatted_points}"

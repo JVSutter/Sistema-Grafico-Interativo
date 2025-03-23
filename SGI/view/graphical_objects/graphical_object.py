@@ -1,4 +1,6 @@
+import numpy as np
 from abc import ABC, abstractmethod
+
 from PyQt6 import QtGui
 
 
@@ -9,6 +11,9 @@ class GraphicalObject(ABC):
     gráficas para a View, que por sua vez, desenha os objetos na tela (invocando o método
     draw() de cada objeto gráfico).
     """
+
+    def __init__(self, viewport_points: np.array):
+        self.viewport_points = viewport_points
 
     @abstractmethod
     def draw(self, painter: QtGui.QPainter) -> None:

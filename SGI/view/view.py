@@ -1,8 +1,10 @@
 import sys
+
 from PyQt6 import QtWidgets, uic
-from view.dialogs import ObjectDialog, PointDialog, LineDialog, WireframeDialog
-from view.viewport import Viewport
+
+from view.dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport import Viewport
 
 
 class View(QtWidgets.QMainWindow):
