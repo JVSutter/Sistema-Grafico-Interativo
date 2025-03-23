@@ -1,5 +1,3 @@
-import logging
-
 from model.graphical_object import GraphicalObject
 from view.bounds import Bounds
 
@@ -16,5 +14,3 @@ class Model:
 
         graphical_object = GraphicalObject(points=points, name=name)
         self.display_file.append(graphical_object)
-
-        logging.info(f"Objeto {graphical_object} adicionado ao display file.")
