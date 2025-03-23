@@ -15,13 +15,17 @@ class Wireframe(GraphicalObject):
         path = QtGui.QPainterPath()
 
         # Move para o primeiro ponto
-        path.moveTo(QtCore.QPointF(self.viewport_points[0][0], self.viewport_points[0][1]))
+        path.moveTo(
+            QtCore.QPointF(self.viewport_points[0][0], self.viewport_points[0][1])
+        )
 
         # Adiciona linhas para os pontos restantes
         for point in self.viewport_points[1:]:
             path.lineTo(QtCore.QPointF(point[0], point[1]))
 
         # Retorna ao primeiro ponto para fechar o polígono
-        path.lineTo(QtCore.QPointF(self.viewport_points[0][0], self.viewport_points[0][1]))
+        path.lineTo(
+            QtCore.QPointF(self.viewport_points[0][0], self.viewport_points[0][1])
+        )
 
         painter.drawPath(path)

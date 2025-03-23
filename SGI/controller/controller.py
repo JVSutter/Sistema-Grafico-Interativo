@@ -18,13 +18,13 @@ class Controller:
         self.model.add_object(points=points_input, name=name_input)
 
     def handle_remove_object(self, index: int) -> None:
-        """Lida com as requisições de remoção de objeto."""
+        """Lida com as requisições de remoção de objeto vindas do View."""
         self.model.remove_object(index=index)
 
     def handle_zoom(self, factor: float) -> None:
-        """Lida com as requisições de zoom."""
+        """Lida com as requisições de zoom vindas do View."""
         self.model.zoom(factor)
 
     def handle_pan(self, dx: float, dy: float) -> None:
-        """Lida com as requisições de pan."""
+        """Lida com as requisições de pan vindas do View."""
         self.model.pan(dx, dy)

@@ -82,12 +82,18 @@ class WireframeDialog(ObjectDialog):
         super().__init__("newWireframe")
 
         self.points = []
-        self.newPointButton.clicked.connect(self.add_point)  # Conecta o botao de adicionar um ponto
+        self.newPointButton.clicked.connect(
+            self.add_point
+        )  # Conecta o botao de adicionar um ponto
 
     def add_point(self):
-        point, _ = PointDialog().create_object(ask_for_name=False)  # Abre um popup para inserir as coordenadas do ponto
+        point, _ = PointDialog().create_object(
+            ask_for_name=False
+        )  # Abre um popup para inserir as coordenadas do ponto
         self.points.append(point[0])
-        self.pointsList.addItem(f"Point: {point[0]}")  # Adiciona o ponto a lista de pontos
+        self.pointsList.addItem(
+            f"Point: {point[0]}"
+        )  # Adiciona o ponto a lista de pontos
 
     def get_points(self):
         """Retorna a lista de pontos que formam o polígono"""
@@ -105,7 +111,9 @@ class WireframeDialog(ObjectDialog):
         error_dialog = QtWidgets.QMessageBox()
         error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
         error_dialog.setWindowTitle("Error")
-        error_dialog.setText("It's necessary to have at least 3 points to create a wireframe.")
+        error_dialog.setText(
+            "It's necessary to have at least 3 points to create a wireframe."
+        )
         error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         error_dialog.exec()
 

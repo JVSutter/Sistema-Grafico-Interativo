@@ -30,7 +30,7 @@ class WorldObject:
 
     def transform_points_to_viewport(
         self, viewport_bounds: Bounds, window_bounds: Bounds
-    ) -> list:
+    ) -> list[tuple[float, float]]:
         """Retorna as coordenadas do objeto gráfico para o viewport."""
 
         transformed_points = []
@@ -53,7 +53,7 @@ class WorldObject:
 
         return transformed_points
 
-    def update_representation(self, window_bounds: Bounds, viewport_bounds: Bounds):
+    def update_representation(self, window_bounds: Bounds, viewport_bounds: Bounds) -> None:
         """Atualiza as coordenadas do objeto gráfico para o viewport."""
 
         self.graphical_representation.viewport_points = self.transform_points_to_viewport(

@@ -19,18 +19,15 @@ class Viewport(QtWidgets.QWidget):
         self.viewport_bounds: Bounds = None  # Será definido automaticamente no evento resizeEvent
         self.objects = []
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event) -> None:
         """Sobrescreve o método resizeEvent para atualizar os limites do viewport."""
 
         super().resizeEvent(event)
         self.viewport_bounds = Bounds(
-            x_min=0,
-            y_min=0,
-            x_max=self.width(),
-            y_max=self.height()
+            x_min=0, y_min=0, x_max=self.width(), y_max=self.height()
         )
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) -> None:
         """Sobrescreve o método paintEvent para desenhar os objetos no viewport."""
 
         painter = QtGui.QPainter(self)
