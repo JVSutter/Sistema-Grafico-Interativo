@@ -1,9 +1,11 @@
 from view.bounds import Bounds
 from view.graphical_objects.point import Point
+from view.graphical_objects.line import Line
+from view.graphical_objects.wireframe import Wireframe
 
 
 class WorldObject:
-    """Classe pertinente a objetos pertencentes ao modelo interno (mundo)"""
+    """Classe pertinente a objetos pertencentes ao modelo interno (mundo)."""
 
     def __init__(
         self,
@@ -20,9 +22,9 @@ class WorldObject:
         if len(points) == 1:
             self.graphical_representation = Point(self.viewport_points)
         elif len(points) == 2:
-            self.graphical_representation = "Line"
+            self.graphical_representation = Line(self.viewport_points)
         else:
-            self.graphical_representation = "Wireframe"
+            self.graphical_representation = Wireframe(self.viewport_points)
 
         self.name = name
 
@@ -52,4 +54,5 @@ class WorldObject:
         return transformed_points
 
     def __str__(self):
-        return f"{self.graphical_representation} {self.name}: {str(self.world_points).replace('[', '').replace(']', '')}"
+        points_str = str(self.world_points).replace("[", "").replace("]", "")
+        return f"{self.graphical_representation.__class__.__name__} {self.name}: {points_str}"

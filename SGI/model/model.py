@@ -10,7 +10,7 @@ class Model:
         self.display_file = []
 
     def add_object(self, points: list, name: str) -> None:
-        """Adiciona um objeto gráfico ao display file."""
+        """Adiciona um objeto gráfico ao display file e atualiza a View."""
 
         window_bounds = self.view.viewport.window_bounds
         viewport_bounds = self.view.viewport.viewport_bounds
