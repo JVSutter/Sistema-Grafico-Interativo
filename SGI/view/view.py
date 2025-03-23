@@ -29,7 +29,6 @@ class View(QtWidgets.QMainWindow):
         self.zoomSlider.setMaximum(100)
         self.zoomSlider.setValue(50)
 
-
     def connect_buttons(self) -> None:
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 

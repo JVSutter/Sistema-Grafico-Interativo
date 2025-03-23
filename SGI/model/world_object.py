@@ -33,7 +33,6 @@ class WorldObject:
     ) -> list:
         """Retorna as coordenadas do objeto gráfico para o viewport."""
 
-        print("Window bounds:", window_bounds)
         transformed_points = []
 
         for point in self.world_points:

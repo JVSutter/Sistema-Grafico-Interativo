@@ -8,7 +8,7 @@ class Model:
 
     def __init__(self, view: View):
         self.view = view
-        self.window = Window()
+        self.window = Window(viewport_bounds=view.viewport.viewport_bounds)
         self.display_file = []
 
     def add_object(self, points: list, name: str) -> None:
