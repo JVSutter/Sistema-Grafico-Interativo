@@ -23,3 +23,9 @@ class Model:
     def get_object_list(self):
         """Retorna uma representação em string dos objetos do mundo."""
         return [str(obj) for obj in self.display_file]
+
+    def remove_object(self, index: int) -> None:
+        """Remove um objeto do display file e atualiza a View."""
+        self.display_file.pop(index)
+        self.view.update_object_list(self.get_object_list())
+        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])

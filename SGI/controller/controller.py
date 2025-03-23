@@ -17,6 +17,6 @@ class Controller:
         """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
         self.model.add_object(points=points_input, name=name_input)
 
-    def remove_object(self, index):
-        self.model.display_file.pop(index)
-        self.view.update_viewport()
+    def remove_object(self, index: int) -> None:
+        """Remove um objeto da lista de objetos."""
+        self.model.remove_object(index=index)

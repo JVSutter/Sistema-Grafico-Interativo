@@ -103,7 +103,6 @@ class View(QtWidgets.QMainWindow):
         text = self.objectsList.currentItem().text()
 
         self.controller.remove_object(index=selected)
-        self.update_object_list()
         self.add_log(f"{text} has been removed")
 
     def on_zoom(self, value) -> None:  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
