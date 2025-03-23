@@ -8,8 +8,8 @@ class WorldObject:
         self,
         points: list,
         name: str,
-        # window_bounds: Bounds,
-        # viewport_bounds: Bounds,
+        window_bounds: Bounds,
+        viewport_bounds: Bounds,
     ):
         self.points = points
         if len(points) == 1:

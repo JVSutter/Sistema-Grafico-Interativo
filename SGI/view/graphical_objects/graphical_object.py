@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from PyQt6 import QtGui
 
 
 class GraphicalObject(ABC):
@@ -8,5 +9,5 @@ class GraphicalObject(ABC):
         self.viewport_points = viewport_points
 
     @abstractmethod
-    def draw(self, canvas) -> None:
+    def draw(self, painter: QtGui.QPainter) -> None:
         """Desenha o objeto gráfico na tela."""

@@ -1,6 +1,7 @@
 import sys
 from PyQt6 import QtWidgets, uic
 from view.dialogs import ObjectDialog, PointDialog, LineDialog, WireframeDialog
+from view.viewport import Viewport
 
 
 class View(QtWidgets.QMainWindow):
@@ -15,6 +16,7 @@ class View(QtWidgets.QMainWindow):
 
         self.define_values()
         self.connect_buttons()
+        self.setup_viewport()
         self.show()
 
     def define_values(self):
@@ -25,36 +27,39 @@ class View(QtWidgets.QMainWindow):
         """Conecta os botões da interface com os métodos correspondentes"""
 
         # Botões de alteração da lista de objetos
-        self.createPoint.clicked.connect(lambda: self.create_object(PointDialog(), "Point"))
-        self.createLine.clicked.connect(lambda: self.create_object(LineDialog(), "Line"))
-        self.createWireframe.clicked.connect(lambda: self.create_object(WireframeDialog(), "Wireframe"))
-        self.removeObject.clicked.connect(self.remove_object)
+        self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog(), "Point"))
+        self.createLine.clicked.connect(lambda: self.on_create_object(LineDialog(), "Line"))
+        self.createWireframe.clicked.connect(lambda: self.on_create_object(WireframeDialog(), "Wireframe"))
+        self.removeObject.clicked.connect(self.on_remove_object)
 
         # Botões de zoom
-        self.zoomInButton.clicked.connect(lambda: self.zoom(self.zoomSlider.value() + 10))  # Quando aperta o botao de zoom in
-        self.zoomOutButton.clicked.connect(lambda: self.zoom(self.zoomSlider.value() - 10))
-        self.zoomSlider.valueChanged.connect(lambda: self.zoom(self.zoomSlider.value()))  # Quando altera o valor do zoom pela barra
+        self.zoomInButton.clicked.connect(lambda: self.on_zoom(self.zoomSlider.value() + 10))  # Quando aperta o botao de zoom in
+        self.zoomOutButton.clicked.connect(lambda: self.on_zoom(self.zoomSlider.value() - 10))
+        self.zoomSlider.valueChanged.connect(lambda: self.on_zoom(self.zoomSlider.value()))  # Quando altera o valor do zoom pela barra
 
         # Botões de navegação
-        self.navUpButton.clicked.connect(lambda: self.pan("up"))
-        self.navDownButton.clicked.connect(lambda: self.pan("down"))
-        self.navLeftButton.clicked.connect(lambda: self.pan("left"))
-        self.navRightButton.clicked.connect(lambda: self.pan("right"))
+        self.navUpButton.clicked.connect(lambda: self.on_pan("up"))
+        self.navDownButton.clicked.connect(lambda: self.on_pan("down"))
+        self.navLeftButton.clicked.connect(lambda: self.on_pan("left"))
+        self.navRightButton.clicked.connect(lambda: self.on_pan("right"))
+
+    def setup_viewport(self):
+        """Configura o viewport para exibir os objetos gráficos."""
+        self.viewport = Viewport(self.frame)
+
+        # Adiciona o viewport ao layout do frame
+        layout = QtWidgets.QVBoxLayout(self.frame)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.viewport)
+        self.frame.setLayout(layout)
 
     def run(self):
         """Executa a aplicação PyQt"""
         sys.exit(self.app.exec())
 
-    def add_object(self, points, name):
-        """Adiciona um objeto à lista de objetos da aplicação"""
+    def update_object_list(self, object_list: list):
+        """Atualiza a lista de objetos exibida na interface"""
 
-        self.controller.handle_point_input(points, name)
-        self.update_object_list()  # Adiciona o objeto a lista visual
-
-    def update_object_list(self):
-        """Atualiza a lista de objetos da aplicacao"""
-
-        object_list = self.controller.get_objects()
         self.objectsList.clear()
         self.objectsList.addItems(object_list)
 
@@ -65,15 +70,16 @@ class View(QtWidgets.QMainWindow):
         logbox.addItem(message)  # Adiciona a mensagem ao log
         logbox.scrollToBottom()  # Faz o log rolar para baixo para mostrar a mensagem mais recente
 
-    def create_object(self, dialog: ObjectDialog, object_type: str):
+    def on_create_object(self, dialog: ObjectDialog, object_type: str):
         """Cria um objeto usando uma caixa de diálogo"""
 
         points, name = dialog.create_object()
         if name is not None:
-            self.add_object(points, name)
+            self.controller.handle_point_input(points, name)
+            # self.update_object_list()
             self.add_log(f"{object_type} {name} created: {points}")
 
-    def remove_object(self):
+    def on_remove_object(self):
         """Remove um objeto da lista de objetos"""
 
         # pega o index do item selecionado
@@ -90,13 +96,13 @@ class View(QtWidgets.QMainWindow):
         self.update_object_list()
         self.add_log(f"{text} has been removed")
 
-    def zoom(self, value):  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
+    def on_zoom(self, value):  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
         """Altera o zoom da window"""
 
         self.zoomSlider.setValue(value)  # Atualiza o valor do slider
         self.add_log(f"Zoomed: {value}")
 
-    def pan(self, direction):
+    def on_pan(self, direction):
         """Move a camera da window"""
 
         self.add_log(f"Panned {direction}")
