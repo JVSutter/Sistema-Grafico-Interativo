@@ -1,5 +1,6 @@
 import numpy as np
-from view.bounds import Bounds
+
+from utils.bounds import Bounds
 from view.graphical_objects.line import Line
 from view.graphical_objects.point import Point
 from view.graphical_objects.wireframe import Wireframe

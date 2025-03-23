@@ -1,6 +1,6 @@
 from PyQt6 import QtGui, QtWidgets
 
-from view.bounds import Bounds
+from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
 
@@ -17,7 +17,6 @@ class Viewport(QtWidgets.QWidget):
         self.setPalette(palette)
 
         self.viewport_bounds: Bounds = None  # Será definido automaticamente no evento resizeEvent
-        self.window_bounds = Bounds(x_min=-100, x_max=100, y_min=-100, y_max=100)
         self.objects = []
 
     def resizeEvent(self, event):

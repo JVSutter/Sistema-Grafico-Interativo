@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Bounds:
-    """Classe para armazenar os limites de um elemento gráfico."""
+    """Classe para armaezar os limites de uma área."""
 
     x_min: float
     x_max: float

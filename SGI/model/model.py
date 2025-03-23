@@ -1,3 +1,4 @@
+from model.window import Window
 from model.world_object import WorldObject
 from view.view import View
 
@@ -7,12 +8,13 @@ class Model:
 
     def __init__(self, view: View):
         self.view = view
+        self.window = Window()
         self.display_file = []
 
     def add_object(self, points: list, name: str) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
 
-        window_bounds = self.view.viewport.window_bounds
+        window_bounds = self.window.window_bounds
         viewport_bounds = self.view.viewport.viewport_bounds
         graphical_object = WorldObject(points, name, window_bounds, viewport_bounds)
 
