@@ -31,3 +31,14 @@ class Model:
         self.display_file.pop(index)
         self.view.update_object_list(self.get_object_list())
         self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+
+    def zoom(self, factor: float) -> None:
+        """Aplica um zoom na janela de visualização e atualiza a View."""
+
+        print("Factor:", factor)
+        self.window.apply_zoom(factor)
+        print(self.window.window_bounds)
+        for obj in self.display_file:
+            obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+
+        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])

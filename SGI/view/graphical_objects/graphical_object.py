@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-import numpy as np
 from PyQt6 import QtGui
 
 
@@ -12,7 +11,7 @@ class GraphicalObject(ABC):
     draw() de cada objeto gráfico).
     """
 
-    def __init__(self, viewport_points: np.array):
+    def __init__(self, viewport_points: list):
         self.viewport_points = viewport_points
 
     @abstractmethod

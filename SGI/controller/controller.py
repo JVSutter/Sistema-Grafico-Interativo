@@ -17,6 +17,10 @@ class Controller:
         """Recebe e lida com a entrada do usuário contendo as coordenadas dos pontos."""
         self.model.add_object(points=points_input, name=name_input)
 
-    def remove_object(self, index: int) -> None:
-        """Remove um objeto da lista de objetos."""
+    def handle_remove_object(self, index: int) -> None:
+        """Lida com as requisições de remoção de objeto."""
         self.model.remove_object(index=index)
+
+    def handle_zoom(self, factor: float) -> None:
+        """Lida com as requisições de zoom."""
+        self.model.zoom(factor)

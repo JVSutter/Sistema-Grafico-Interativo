@@ -24,7 +24,11 @@ class View(QtWidgets.QMainWindow):
 
     def define_values(self):
         """Define os valores iniciais dos widgets"""
+        self.zoom_factor = 1.0
+        self.zoomSlider.setMinimum(1)
+        self.zoomSlider.setMaximum(100)
         self.zoomSlider.setValue(50)
+
 
     def connect_buttons(self) -> None:
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
@@ -104,14 +108,26 @@ class View(QtWidgets.QMainWindow):
 
         text = self.objectsList.currentItem().text()
 
-        self.controller.remove_object(index=selected)
+        self.controller.handle_remove_object(index=selected)
         self.add_log(f"{text} has been removed")
 
-    def on_zoom(self, value) -> None:  # COLOCAR DEPOIS A FUNCAO DE ZOOM DO CONTROLLER AQUI
-        """Altera o zoom da window"""
+    def on_zoom(self, value):
+        """Trata as requisições de zoom."""
 
-        self.zoomSlider.setValue(value)  # Atualiza o valor do slider
-        self.add_log(f"Zoomed: {value}")
+        # Evitar recursão infinita
+        if self.zoomSlider.value() != value:
+            self.zoomSlider.setValue(value)
+            return
+
+        old_zoom_factor = self.zoom_factor
+        new_zoom_factor = value / 50.0  # 50 no slider = fator 1.0
+
+        # Aplica zoom apenas se houver mudança significativa
+        if abs(new_zoom_factor - old_zoom_factor) > 0.01:
+            relative_change = new_zoom_factor / old_zoom_factor
+            self.controller.handle_zoom(1 / relative_change)  # Pois o zoom aumenta com a diminuição da Window
+            self.zoom_factor = new_zoom_factor
+            self.add_log(f"Zoomed: {value} (factor: {new_zoom_factor:.2f}%)")
 
     def on_pan(self, direction) -> None:  # COLOCAR DEPOIS A FUNCAO DE PAN DO CONTROLLER AQUI
         """Move a camera da window"""

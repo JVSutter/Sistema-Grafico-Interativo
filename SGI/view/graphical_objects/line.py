@@ -1,4 +1,3 @@
-import numpy as np
 from PyQt6 import QtCore, QtGui
 
 from view.graphical_objects.graphical_object import GraphicalObject
@@ -6,9 +5,6 @@ from view.graphical_objects.graphical_object import GraphicalObject
 
 class Line(GraphicalObject):
     """Classe que representa o segmento de reta no viewport."""
-
-    def __init__(self, viewport_points: np.array):
-        self.viewport_points = viewport_points
 
     def draw(self, painter: QtGui.QPainter) -> None:
         """Desenha o segmento de reta no viewport."""

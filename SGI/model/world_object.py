@@ -1,5 +1,3 @@
-import numpy as np
-
 from utils.bounds import Bounds
 from view.graphical_objects.line import Line
 from view.graphical_objects.point import Point
@@ -16,17 +14,17 @@ class WorldObject:
         window_bounds: Bounds,
         viewport_bounds: Bounds,
     ):
-        self.world_points = np.array(points)
-        self.viewport_points = self.transform_points_to_viewport(
+        self.world_points = points
+        viewport_points = self.transform_points_to_viewport(
             viewport_bounds, window_bounds
         )
 
         if len(points) == 1:
-            self.graphical_representation = Point(self.viewport_points)
+            self.graphical_representation = Point(viewport_points)
         elif len(points) == 2:
-            self.graphical_representation = Line(self.viewport_points)
+            self.graphical_representation = Line(viewport_points)
         else:
-            self.graphical_representation = Wireframe(self.viewport_points)
+            self.graphical_representation = Wireframe(viewport_points)
 
         self.name = name
 
@@ -35,6 +33,7 @@ class WorldObject:
     ) -> list:
         """Retorna as coordenadas do objeto gráfico para o viewport."""
 
+        print("Window bounds:", window_bounds)
         transformed_points = []
 
         for point in self.world_points:
@@ -53,7 +52,14 @@ class WorldObject:
 
             transformed_points.append((x_viewport, y_viewport))
 
-        return np.array(transformed_points)
+        return transformed_points
+
+    def update_representation(self, window_bounds: Bounds, viewport_bounds: Bounds):
+        """Atualiza as coordenadas do objeto gráfico para o viewport."""
+
+        self.graphical_representation.viewport_points = self.transform_points_to_viewport(
+            viewport_bounds, window_bounds
+        )
 
     def __str__(self):
         formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y in self.world_points)
