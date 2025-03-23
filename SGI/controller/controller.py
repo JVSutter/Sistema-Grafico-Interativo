@@ -24,3 +24,7 @@ class Controller:
     def handle_zoom(self, factor: float) -> None:
         """Lida com as requisições de zoom."""
         self.model.zoom(factor)
+
+    def handle_pan(self, dx: float, dy: float) -> None:
+        """Lida com as requisições de pan."""
+        self.model.pan(dx, dy)

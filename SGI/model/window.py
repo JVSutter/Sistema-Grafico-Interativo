@@ -13,3 +13,10 @@ class Window:
         self.window_bounds.x_max *= factor
         self.window_bounds.y_min *= factor
         self.window_bounds.y_max *= factor
+
+    def apply_pan(self, dx: float, dy: float) -> None:
+        """Aplica um pan na janela de visualização."""
+        self.window_bounds.x_min += dx
+        self.window_bounds.x_max += dx
+        self.window_bounds.y_min += dy
+        self.window_bounds.y_max += dy

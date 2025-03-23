@@ -35,9 +35,16 @@ class Model:
     def zoom(self, factor: float) -> None:
         """Aplica um zoom na janela de visualização e atualiza a View."""
 
-        print("Factor:", factor)
         self.window.apply_zoom(factor)
-        print(self.window.window_bounds)
+        for obj in self.display_file:
+            obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+
+        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+
+    def pan(self, dx: float, dy: float) -> None:
+        """Aplica um pan na janela de visualização e atualiza a View."""
+
+        self.window.apply_pan(dx, dy)
         for obj in self.display_file:
             obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 

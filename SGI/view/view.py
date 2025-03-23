@@ -45,10 +45,10 @@ class View(QtWidgets.QMainWindow):
         self.zoomSlider.valueChanged.connect(lambda: self.on_zoom(self.zoomSlider.value()))  # Quando altera o valor do zoom pela barra
 
         # Botões de navegação
-        self.navUpButton.clicked.connect(lambda: self.on_pan("up"))
-        self.navDownButton.clicked.connect(lambda: self.on_pan("down"))
-        self.navLeftButton.clicked.connect(lambda: self.on_pan("left"))
-        self.navRightButton.clicked.connect(lambda: self.on_pan("right"))
+        self.navUpButton.clicked.connect(lambda: self.on_pan(dx=0, dy=10))
+        self.navDownButton.clicked.connect(lambda: self.on_pan(dx=0, dy=-10))
+        self.navLeftButton.clicked.connect(lambda: self.on_pan(dx=-10, dy=0))
+        self.navRightButton.clicked.connect(lambda: self.on_pan(dx=10, dy=0))
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -129,7 +129,8 @@ class View(QtWidgets.QMainWindow):
             self.zoom_factor = new_zoom_factor
             self.add_log(f"Zoomed: {value} (factor: {new_zoom_factor:.2f}%)")
 
-    def on_pan(self, direction) -> None:  # COLOCAR DEPOIS A FUNCAO DE PAN DO CONTROLLER AQUI
-        """Move a camera da window"""
+    def on_pan(self, dx: float, dy: float) -> None:
+        """Trata as requisições de pan."""
 
-        self.add_log(f"Panned {direction}")
+        self.controller.handle_pan(dx, dy)
+        self.add_log(f"Panned by ({dx}, {dy})")
