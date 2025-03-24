@@ -48,6 +48,7 @@ class PointDialog(ObjectDialog):
 
     def __init__(self):
         super().__init__("newPoint")
+        self.type = "Point"
         self.set_field_ranges([self.xInput, self.yInput])
 
     def get_points(self):
@@ -63,6 +64,7 @@ class LineDialog(ObjectDialog):
 
     def __init__(self):
         super(LineDialog, self).__init__("newLine")
+        self.type = "Line"
         self.set_field_ranges([self.x1Input, self.y1Input, self.x2Input, self.y2Input])
 
     def get_points(self):
@@ -81,6 +83,7 @@ class WireframeDialog(ObjectDialog):
     def __init__(self):
         super().__init__("newWireframe")
 
+        self.type = "Wireframe"
         self.points = []
         self.newPointButton.clicked.connect(
             self.add_point
@@ -90,6 +93,12 @@ class WireframeDialog(ObjectDialog):
         point, _ = PointDialog().create_object(
             ask_for_name=False
         )  # Abre um popup para inserir as coordenadas do ponto
+        
+        # Verifica se o ponto já não existe
+        if point[0] in self.points:
+            self.show_error_message("This point already exists.")
+            return
+        
         self.points.append(point[0])
         self.pointsList.addItem(
             f"Point: {point[0]}"
@@ -102,18 +111,18 @@ class WireframeDialog(ObjectDialog):
     def accept(self):
         """Sobrescreve o método accept para validar o número de pontos"""
         if len(self.points) < 3:
-            self.show_error_message()
+            self.show_error_message(
+                "It's necessary to have at least 3 points to create a wireframe."
+            )
         else:
             super().accept()
 
-    def show_error_message(self):
+    def show_error_message(self, message: str = None):
         """Mostra uma mensagem de erro sobre o número mínimo de pontos"""
         error_dialog = QtWidgets.QMessageBox()
         error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
         error_dialog.setWindowTitle("Error")
-        error_dialog.setText(
-            "It's necessary to have at least 3 points to create a wireframe."
-        )
+        error_dialog.setText(message)
         error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         error_dialog.exec()
 
@@ -124,18 +133,28 @@ class NameDialog(QtWidgets.QDialog):
     def __init__(self):
         super(NameDialog, self).__init__()
         uic.loadUi("view/screens/name.ui", self)
-
+        
+        # conectando para ver se o usuario apertou enter
+        self.nameInput.textChanged.connect(self._handle_text_changed)
+        
         self.show()
         self.exec()
+    
+    def _handle_text_changed(self):
+        """Verifica se o usuário clicou em enter"""
+        if "\n" in self.nameInput.toPlainText():
+            
+            # remove o enter
+            text = self.nameInput.toPlainText().replace("\n", "")
+            self.nameInput.setPlainText(text)
+            self.accept()
 
     def accept(self):
         """Retorna o nome inserido pelo usuário"""
-
         self.name = self.nameInput.toPlainText()
         super().accept()
 
     def reject(self):
         """Se cancela a inserção do nome, retorna None (não cria o objeto)"""
-
         self.name = None
         super().reject()

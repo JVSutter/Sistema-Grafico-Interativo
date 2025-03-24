@@ -9,4 +9,4 @@ class Point(GraphicalObject):
     def draw(self, painter: QtGui.QPainter) -> None:
         """Desenha o ponto no viewport."""
         x, y = self.viewport_points[0]
-        painter.drawEllipse(QtCore.QPointF(x, y), 3, 3)
+        painter.drawPoint(QtCore.QPointF(x, y))
