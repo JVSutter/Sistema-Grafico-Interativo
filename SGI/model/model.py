@@ -76,7 +76,10 @@ class Model:
     def scale_object(self, index: int, x_factor: float, y_factor) -> None:
         """Escala um objeto no display file e atualiza a View."""
 
-        print(f"Scaling object {index} by {x_factor}, {y_factor}")
+        world_object = self.display_file[index]
+        scaling_matrix = np.array([[x_factor, 0, 0], [0, y_factor, 0], [0, 0, 1]])
+        world_object.update_coordinates([scaling_matrix])
+        world_object.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 
     def rotate_object(self, index: int, x: float, y: float, angle: float) -> None:
         """Rotaciona um objeto em torno de (x, y) e atualiza a View."""
