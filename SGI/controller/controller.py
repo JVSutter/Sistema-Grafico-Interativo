@@ -52,6 +52,9 @@ class Controller:
         @param transformation_info: Informações da transformação a ser aplicada.
         """
 
+        if transformation_info is None:
+            return
+
         transformation_option = transformation_info["option"]
         x_value = transformation_info["x_value"]
         y_value = transformation_info["y_value"]

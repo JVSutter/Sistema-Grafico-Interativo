@@ -1,3 +1,5 @@
+import numpy as np
+
 from model.window import Window
 from model.world_object import WorldObject
 from view.view import View
@@ -53,7 +55,13 @@ class Model:
     def translate_object(self, index: int, dx: float, dy: float) -> None:
         """Translada um objeto no display file e atualiza a View."""
 
-        print(f"Translating object {index} by ({dx}, {dy})")
+        world_object = self.display_file[index]
+        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
+        world_object.update_coordinates([translation_matrix])
+        world_object.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+
+        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+        self.view.update_object_list(self.get_object_list())
 
     def scale_object(self, index: int, x_factor: float, y_factor) -> None:
         """Escala um objeto no display file e atualiza a View."""

@@ -64,12 +64,35 @@ class WorldObject:
             homogenous_coordinates.append(np.array([x, y, 1]))
         return homogenous_coordinates
 
+    def update_coordinates(self, matrices: list[np.array]) -> None:
+        """
+        Atualiza as coordenadas do objeto no mundo. Atentar para a ordem das operações, visto
+        que isso impactará no resultado final. As multiplicações são feitas na ordem em que as
+        matrizes são passadas.
+        Ex:
+        Suponha que matrices == [T1, T2, T3] e points == [P]
+        Então a nova lista de pontos P' será obtida por P' = P @ T1 @ T2 @ T3
+        """
+
+        for matrix in matrices:
+            self.world_points = [point @ matrix for point in self.world_points]
+
     def update_representation(self, window_bounds: Bounds, viewport_bounds: Bounds) -> None:
         """Atualiza as coordenadas do objeto gráfico para o viewport."""
 
         self.graphical_representation.viewport_points = self.transform_points_to_viewport(
             viewport_bounds, window_bounds
         )
+
+    def get_center(self) -> tuple[float, float]:
+        """Retorna o centro do objeto no mundo."""
+
+        x_sum = sum(point[0] for point in self.world_points)
+        y_sum = sum(point[1] for point in self.world_points)
+        x_center = x_sum / len(self.world_points)
+        y_center = y_sum / len(self.world_points)
+
+        return x_center, y_center
 
     def __str__(self):
         formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y, _ in self.world_points)
