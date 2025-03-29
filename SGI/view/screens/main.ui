@@ -698,6 +698,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="transformObject">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Transform Selected Object</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>

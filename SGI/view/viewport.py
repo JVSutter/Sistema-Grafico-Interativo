@@ -2,7 +2,6 @@ from PyQt6 import QtGui, QtWidgets
 
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
-from view.graphical_objects.line import Line
 
 
 class Viewport(QtWidgets.QWidget):
@@ -14,9 +13,9 @@ class Viewport(QtWidgets.QWidget):
         # Define a cor de fundo do viewport
         self.setAutoFillBackground(True)
         palette = self.palette()
-        palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor(100, 0, 0, 100))
+        palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor(230, 230, 230))
         self.setPalette(palette)
-            
+
         self.viewport_bounds: Bounds = None  # Será definido automaticamente no evento resizeEvent
         self.objects = []
 
@@ -35,7 +34,7 @@ class Viewport(QtWidgets.QWidget):
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
         # Define a cor e espessura da caneta
-        pen = QtGui.QPen(QtGui.QColor(255, 255, 255))
+        pen = QtGui.QPen(QtGui.QColor(0, 0, 0))
         pen.setWidth(3)
         painter.setPen(pen)
 
