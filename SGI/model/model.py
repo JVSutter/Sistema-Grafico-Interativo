@@ -13,6 +13,26 @@ class Model:
         self.window = Window(viewport_bounds=view.viewport.viewport_bounds)
         self.display_file = []
 
+    @staticmethod
+    def update_interface(func: callable) -> callable:
+        """
+        Decorator que atualiza a interface após a execução de um método.
+        """
+
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            self = args[0]
+            self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+            self.view.update_object_list(self.get_object_list())
+            return result
+
+        return wrapper
+
+    def get_object_list(self):
+        """Retorna uma representação em string dos objetos do mundo."""
+        return [str(obj) for obj in self.display_file]
+
+    @update_interface
     def add_object(self, points: list, name: str) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
 
@@ -21,19 +41,13 @@ class Model:
         graphical_object = WorldObject(points, name, window_bounds, viewport_bounds)
 
         self.display_file.append(graphical_object)
-        self.view.update_object_list(self.get_object_list())
-        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
 
-    def get_object_list(self):
-        """Retorna uma representação em string dos objetos do mundo."""
-        return [str(obj) for obj in self.display_file]
-
+    @update_interface
     def remove_object(self, index: int) -> None:
         """Remove um objeto do display file e atualiza a View."""
         self.display_file.pop(index)
-        self.view.update_object_list(self.get_object_list())
-        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
 
+    @update_interface
     def zoom(self, factor: float) -> None:
         """Aplica um zoom na janela de visualização e atualiza a View."""
 
@@ -41,8 +55,7 @@ class Model:
         for obj in self.display_file:
             obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 
-        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
-
+    @update_interface
     def pan(self, dx: float, dy: float) -> None:
         """Aplica um pan na janela de visualização e atualiza a View."""
 
@@ -50,8 +63,7 @@ class Model:
         for obj in self.display_file:
             obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 
-        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
-
+    @update_interface
     def translate_object(self, index: int, dx: float, dy: float) -> None:
         """Translada um objeto no display file e atualiza a View."""
 
@@ -60,9 +72,7 @@ class Model:
         world_object.update_coordinates([translation_matrix])
         world_object.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 
-        self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
-        self.view.update_object_list(self.get_object_list())
-
+    @update_interface
     def scale_object(self, index: int, x_factor: float, y_factor) -> None:
         """Escala um objeto no display file e atualiza a View."""
 

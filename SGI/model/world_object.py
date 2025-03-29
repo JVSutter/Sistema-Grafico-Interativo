@@ -71,7 +71,7 @@ class WorldObject:
         matrizes são passadas.
         Ex:
         Suponha que matrices == [T1, T2, T3] e points == [P]
-        Então a nova lista de pontos P' será obtida por P' = P @ T1 @ T2 @ T3
+        Então a nova lista de pontos P' será obtida por P' = [P @ T1 @ T2 @ T3]
         """
 
         for matrix in matrices:
