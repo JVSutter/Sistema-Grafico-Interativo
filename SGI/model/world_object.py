@@ -1,3 +1,5 @@
+import numpy as np
+
 from utils.bounds import Bounds
 from view.graphical_objects.line import Line
 from view.graphical_objects.point import Point
@@ -14,7 +16,7 @@ class WorldObject:
         window_bounds: Bounds,
         viewport_bounds: Bounds,
     ):
-        self.world_points = points
+        self.world_points: list[np.array] = self.get_homogeneous_coordinates(points)
         viewport_points = self.transform_points_to_viewport(
             viewport_bounds, window_bounds
         )
@@ -36,7 +38,7 @@ class WorldObject:
         transformed_points = []
 
         for point in self.world_points:
-            x, y = point
+            x, y, _ = point  # Ignoramos a coordenada z do sistema de coordenadas homogêneo
 
             x_viewport = (
                 (x - window_bounds.x_min)
@@ -53,6 +55,15 @@ class WorldObject:
 
         return transformed_points
 
+    def get_homogeneous_coordinates(self, points: list[tuple]) -> list[np.array]:
+        """Retorna as coordenadas homogêneas dos pontos do objeto."""
+
+        homogenous_coordinates = []
+        for point in points:
+            x, y = point
+            homogenous_coordinates.append(np.array([x, y, 1]))
+        return homogenous_coordinates
+
     def update_representation(self, window_bounds: Bounds, viewport_bounds: Bounds) -> None:
         """Atualiza as coordenadas do objeto gráfico para o viewport."""
 
@@ -61,5 +72,5 @@ class WorldObject:
         )
 
     def __str__(self):
-        formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y in self.world_points)
+        formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y, _ in self.world_points)
         return f"{self.graphical_representation.__class__.__name__} {self.name}: {formatted_points}"

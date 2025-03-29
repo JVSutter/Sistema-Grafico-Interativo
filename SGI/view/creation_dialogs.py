@@ -59,7 +59,7 @@ class PointDialog(ObjectDialog):
         """Retorna as coordenadas do ponto inseridas pelo usuario"""
 
         x = float(self.xInput.text().replace(",", "."))
-        y = float(self.yInputget_scaling_factor.text().replace(",", "."))
+        y = float(self.yInput.text().replace(",", "."))
         return [(x, y)]
 
 

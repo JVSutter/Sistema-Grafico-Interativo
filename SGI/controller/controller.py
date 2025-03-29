@@ -60,6 +60,6 @@ class Controller:
         if transformation_option == "translation":
             self.model.translate_object(index, x_value, y_value)
         elif transformation_option == "scaling":
-            self.model.scale_object(index, x_value)
+            self.model.scale_object(index, x_value, y_value)
         elif transformation_option == "rotation":
             self.model.rotate_object(index, x_value, y_value, angle)
