@@ -80,16 +80,29 @@ class Model:
             self.window.window_bounds, self.view.viewport.viewport_bounds
         )
 
+        self.view.add_log(f"{world_object.name} translated by ({dx}, {dy})")
+
     @update_interface
     def scale_object(self, index: int, x_factor: float, y_factor) -> None:
         """Escala um objeto no display file e atualiza a View."""
 
         world_object = self.display_file[index]
+        center_x, center_y = world_object.get_center()
+
+        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [-center_x, -center_y, 1]])
         scaling_matrix = np.array([[x_factor, 0, 0], [0, y_factor, 0], [0, 0, 1]])
-        world_object.update_coordinates([scaling_matrix])
+        inverse_translation_matrix = np.array(
+            [[1, 0, 0], [0, 1, 0], [center_x, center_y, 1]]
+        )
+
+        world_object.update_coordinates(
+            [translation_matrix, scaling_matrix, inverse_translation_matrix]
+        )
         world_object.update_representation(
             self.window.window_bounds, self.view.viewport.viewport_bounds
         )
+
+        self.view.add_log(f"{world_object.name} scaled by ({x_factor}, {y_factor})")
 
     @update_interface
     def rotate_object(self, index: int, x: float, y: float, angle: float) -> None:
@@ -97,13 +110,15 @@ class Model:
         Rotaciona um objeto em torno de (x, y) e atualiza a View.
         """
 
-        angle = np.radians(angle)
+        angle_degrees = angle
+        angle_radians = np.radians(angle)
+
         world_object = self.display_file[index]
         translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [-x, -y, 1]])
         rotation_matrix = np.array(
             [
-                [np.cos(angle), -np.sin(angle), 0],
-                [np.sin(angle), np.cos(angle), 0],
+                [np.cos(angle_radians), np.sin(angle_radians), 0],
+                [-np.sin(angle_radians), np.cos(angle_radians), 0],
                 [0, 0, 1],
             ]
         )
@@ -115,3 +130,5 @@ class Model:
         world_object.update_representation(
             self.window.window_bounds, self.view.viewport.viewport_bounds
         )
+
+        self.view.add_log(f"{world_object.name} rotated about ({x}, {y}) by an angle of {angle_degrees}°")

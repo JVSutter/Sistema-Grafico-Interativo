@@ -85,7 +85,7 @@ class WorldObject:
         )
 
     def get_center(self) -> tuple[float, float]:
-        """Retorna o centro do objeto no mundo."""
+        """Retorna o centro geométrico do objeto no mundo."""
 
         x_sum = sum(point[0] for point in self.world_points)
         y_sum = sum(point[1] for point in self.world_points)
