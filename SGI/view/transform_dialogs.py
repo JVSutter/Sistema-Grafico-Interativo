@@ -5,7 +5,7 @@ Módulo que contém classes relativas às caixas de diálogo para transformaçã
 from PyQt6 import QtWidgets, uic
 
 
-class TransformDialog(QtWidgets.QDialog):
+class TransformationDialog(QtWidgets.QDialog):
     """
     Classe que representa uma caixa de diálogo para transformação de objeto. Opções:
     1 - Translação
@@ -17,9 +17,15 @@ class TransformDialog(QtWidgets.QDialog):
         super().__init__()
         uic.loadUi("view/screens/transformObject.ui", self)
 
-        self.translationBtn.clicked.connect(lambda: self.select_option_dialog(TranslationOptionDialog))
-        self.scalingBtn.clicked.connect(lambda: self.select_option_dialog(ScalingOptionDialog))
-        self.rotationBtn.clicked.connect(lambda: self.select_option_dialog(RotationOptionDialog))
+        self.translationBtn.clicked.connect(
+            lambda: self.select_option_dialog(TranslationOptionDialog)
+        )
+        self.scalingBtn.clicked.connect(
+            lambda: self.select_option_dialog(ScalingOptionDialog)
+        )
+        self.rotationBtn.clicked.connect(
+            lambda: self.select_option_dialog(RotationOptionDialog)
+        )
 
         self.option_dialog: QtWidgets.QDialog = None
 
@@ -69,15 +75,15 @@ class OptionDialog(QtWidgets.QDialog):
         if result == QtWidgets.QDialog.DialogCode.Rejected:
             return None
 
-        transform_info = {}
-        return self.read_input(transform_info)
+        transformation_info = {}
+        return self.read_input(transformation_info)
 
-    def read_input(self, transform_info: dict) -> dict:
+    def read_input(self, transformation_info: dict) -> dict:
         """
         Método para leitura da entrada na tela de seleção de opção
         Precisa ser reimplementado nas classes filhas, as quais chamarão super().read_input()
         """
-        transform_info["option"] = self.name
+        transformation_info["option"] = self.name
 
 
 class TranslationOptionDialog(OptionDialog):
@@ -88,13 +94,13 @@ class TranslationOptionDialog(OptionDialog):
         self.xInput.setRange(-1000.0, 1000.0)
         self.yInput.setRange(-1000.0, 1000.0)
 
-    def read_input(self, transform_info: dict) -> dict:
+    def read_input(self, transformation_info: dict) -> dict:
         """Retorna o vetor de translação inserido pelo usuário"""
 
-        super().read_input(transform_info)
-        transform_info["x_value"] = float(self.xInput.text().replace(",", "."))
-        transform_info["y_value"] = float(self.yInput.text().replace(",", "."))
-        return transform_info
+        super().read_input(transformation_info)
+        transformation_info["x_value"] = float(self.xInput.text().replace(",", "."))
+        transformation_info["y_value"] = float(self.yInput.text().replace(",", "."))
+        return transformation_info
 
 
 class ScalingOptionDialog(OptionDialog):
@@ -107,12 +113,12 @@ class ScalingOptionDialog(OptionDialog):
         self.yInput.setRange(0.01, 100.0)
         self.yInput.setValue(1.0)
 
-    def read_input(self, transform_info: dict) -> dict:
+    def read_input(self, transformation_info: dict) -> dict:
         """Retorna o fator de escala inserido pelo usuário"""
-        super().read_input(transform_info)
-        transform_info["x_value"] = float(self.xInput.text().replace(",", "."))
-        transform_info["y_value"] = float(self.yInput.text().replace(",", "."))
-        return transform_info
+        super().read_input(transformation_info)
+        transformation_info["x_value"] = float(self.xInput.text().replace(",", "."))
+        transformation_info["y_value"] = float(self.yInput.text().replace(",", "."))
+        return transformation_info
 
 
 class RotationOptionDialog(OptionDialog):
@@ -120,9 +126,15 @@ class RotationOptionDialog(OptionDialog):
 
     def __init__(self):
         super().__init__(name="rotation")
-        self.originBtn.clicked.connect(lambda: self.set_button_handler(self.select_origin))
-        self.objCenterBtn.clicked.connect(lambda: self.set_button_handler(self.select_obj_center))
-        self.arbitraryBtn.clicked.connect(lambda: self.set_button_handler(self.select_arbitrary))
+        self.originBtn.clicked.connect(
+            lambda: self.set_button_handler(self.select_origin)
+        )
+        self.objCenterBtn.clicked.connect(
+            lambda: self.set_button_handler(self.select_obj_center)
+        )
+        self.arbitraryBtn.clicked.connect(
+            lambda: self.set_button_handler(self.select_arbitrary)
+        )
 
         self.xInput.setRange(-1000.0, 1000.0)
         self.yInput.setRange(-1000.0, 1000.0)
@@ -131,19 +143,19 @@ class RotationOptionDialog(OptionDialog):
         self.chosen_point: tuple[float | str, float | str] = None
         self.button_handler: callable = None
 
-    def read_input(self, transform_info: dict) -> dict:
+    def read_input(self, transformation_info: dict) -> dict:
         """
         Retorna a rotação inserida pelo usuário.
         O diferencial aqui é a inserção de uma nova chave para o ângulo.
         """
 
-        super().read_input(transform_info)
+        super().read_input(transformation_info)
         x_value, y_value = self.chosen_point
-        transform_info["x_value"] = x_value
-        transform_info["y_value"] = y_value
-        transform_info["angle"] = float(self.angleInput.text().replace(",", "."))
+        transformation_info["x_value"] = x_value
+        transformation_info["y_value"] = y_value
+        transformation_info["angle"] = float(self.angleInput.text().replace(",", "."))
 
-        return transform_info
+        return transformation_info
 
     def accept(self) -> None:
         """Só permite aceitar a caixa de diálogo se um ponto de rotação foi escolhido"""

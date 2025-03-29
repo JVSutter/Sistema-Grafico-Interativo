@@ -49,3 +49,18 @@ class Model:
             obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
 
         self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+
+    def translate_object(self, index: int, dx: float, dy: float) -> None:
+        """Translada um objeto no display file e atualiza a View."""
+
+        print(f"Translating object {index} by ({dx}, {dy})")
+
+    def scale_object(self, index: int, x_factor: float, y_factor) -> None:
+        """Escala um objeto no display file e atualiza a View."""
+
+        print(f"Scaling object {index} by {x_factor}, {y_factor}")
+
+    def rotate_object(self, index: int, x: float, y: float, angle: float) -> None:
+        """Rotaciona um objeto em torno de (x, y) e atualiza a View."""
+
+        print(f"Rotating object {index} by {angle}")

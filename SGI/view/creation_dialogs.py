@@ -69,7 +69,9 @@ class LineDialog(ObjectDialog):
     def __init__(self):
         super(LineDialog, self).__init__("newLine")
         self.type = "Line"
-        self.set_point_input_ranges([self.x1Input, self.y1Input, self.x2Input, self.y2Input])
+        self.set_point_input_ranges(
+            [self.x1Input, self.y1Input, self.x2Input, self.y2Input]
+        )
 
     def get_points(self):
         """Retorna as coordenadas da linha inseridas pelo usuario"""

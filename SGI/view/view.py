@@ -2,9 +2,10 @@ import sys
 
 from PyQt6 import QtWidgets, uic
 
-from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
-from view.transform_dialogs import TransformDialog
+from view.creation_dialogs import (LineDialog, ObjectDialog, PointDialog,
+                                   WireframeDialog)
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
 
 
@@ -34,12 +35,8 @@ class View(QtWidgets.QMainWindow):
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 
         # Botões de alteração da lista de objetos
-        self.createPoint.clicked.connect(
-            lambda: self.on_create_object(PointDialog())
-        )
-        self.createLine.clicked.connect(
-            lambda: self.on_create_object(LineDialog())
-        )
+        self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog()))
+        self.createLine.clicked.connect(lambda: self.on_create_object(LineDialog()))
         self.createWireframe.clicked.connect(
             lambda: self.on_create_object(WireframeDialog())
         )
@@ -50,26 +47,16 @@ class View(QtWidgets.QMainWindow):
         self.zoomInButton.clicked.connect(
             lambda: self.on_zoom(mode="in")
         )  # Quando aperta o botao de zoom in
-        self.zoomOutButton.clicked.connect(
-            lambda: self.on_zoom(mode="out")
-        )
+        self.zoomOutButton.clicked.connect(lambda: self.on_zoom(mode="out"))
         self.zoomSlider.valueChanged.connect(
             lambda: self.on_zoom(mode="slider")
         )  # Quando altera o valor do zoom pela barra
 
         # Botões de navegação
-        self.navUpButton.clicked.connect(
-            lambda: self.on_pan(direction="up")
-        )
-        self.navDownButton.clicked.connect(
-            lambda: self.on_pan(direction="down")
-        )
-        self.navLeftButton.clicked.connect(
-            lambda: self.on_pan(direction="left")
-        )
-        self.navRightButton.clicked.connect(
-            lambda: self.on_pan(direction="right")
-        )
+        self.navUpButton.clicked.connect(lambda: self.on_pan(direction="up"))
+        self.navDownButton.clicked.connect(lambda: self.on_pan(direction="down"))
+        self.navLeftButton.clicked.connect(lambda: self.on_pan(direction="left"))
+        self.navRightButton.clicked.connect(lambda: self.on_pan(direction="right"))
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -141,8 +128,10 @@ class View(QtWidgets.QMainWindow):
             self.add_log("You must select an object to transform")
             return
 
-        transform_dialog = TransformDialog()
-        print(transform_dialog.get_transformation())
+        transformation_info = TransformationDialog().get_transformation()
+        self.controller.handle_transformation(
+            index=selected, transformation_info=transformation_info
+        )
 
     def on_zoom(self, mode: str) -> None:
         """
@@ -183,7 +172,12 @@ class View(QtWidgets.QMainWindow):
         """Trata as requisições de pan."""
 
         movement = 10
-        dx, dy = {"up": (0, movement), "down": (0, -movement), "left": (-movement, 0), "right": (movement, 0)}[direction]
+        dx, dy = {
+            "up": (0, movement),
+            "down": (0, -movement),
+            "left": (-movement, 0),
+            "right": (movement, 0),
+        }[direction]
 
         self.controller.handle_pan(dx, dy)
         self.add_log(f"Went {direction} by {dx}, {dy}")

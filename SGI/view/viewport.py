@@ -16,7 +16,9 @@ class Viewport(QtWidgets.QWidget):
         palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor(230, 230, 230))
         self.setPalette(palette)
 
-        self.viewport_bounds: Bounds = None  # Será definido automaticamente no evento resizeEvent
+        self.viewport_bounds: Bounds = (
+            None  # Será definido automaticamente no evento resizeEvent
+        )
         self.objects = []
 
     def resizeEvent(self, event) -> None:
