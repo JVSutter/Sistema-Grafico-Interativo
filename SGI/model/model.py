@@ -22,7 +22,9 @@ class Model:
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
             self = args[0]
-            self.view.update_viewport([obj.graphical_representation for obj in self.display_file])
+            self.view.update_viewport(
+                [obj.graphical_representation for obj in self.display_file]
+            )
             self.view.update_object_list(self.get_object_list())
             return result
 
@@ -53,7 +55,9 @@ class Model:
 
         self.window.apply_zoom(factor)
         for obj in self.display_file:
-            obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+            obj.update_representation(
+                self.window.window_bounds, self.view.viewport.viewport_bounds
+            )
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
@@ -61,7 +65,9 @@ class Model:
 
         self.window.apply_pan(dx, dy)
         for obj in self.display_file:
-            obj.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+            obj.update_representation(
+                self.window.window_bounds, self.view.viewport.viewport_bounds
+            )
 
     @update_interface
     def translate_object(self, index: int, dx: float, dy: float) -> None:
@@ -70,7 +76,9 @@ class Model:
         world_object = self.display_file[index]
         translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
         world_object.update_coordinates([translation_matrix])
-        world_object.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+        world_object.update_representation(
+            self.window.window_bounds, self.view.viewport.viewport_bounds
+        )
 
     @update_interface
     def scale_object(self, index: int, x_factor: float, y_factor) -> None:
@@ -79,9 +87,31 @@ class Model:
         world_object = self.display_file[index]
         scaling_matrix = np.array([[x_factor, 0, 0], [0, y_factor, 0], [0, 0, 1]])
         world_object.update_coordinates([scaling_matrix])
-        world_object.update_representation(self.window.window_bounds, self.view.viewport.viewport_bounds)
+        world_object.update_representation(
+            self.window.window_bounds, self.view.viewport.viewport_bounds
+        )
 
+    @update_interface
     def rotate_object(self, index: int, x: float, y: float, angle: float) -> None:
-        """Rotaciona um objeto em torno de (x, y) e atualiza a View."""
+        """
+        Rotaciona um objeto em torno de (x, y) e atualiza a View.
+        """
 
-        print(f"Rotating object {index} by {angle}")
+        angle = np.radians(angle)
+        world_object = self.display_file[index]
+        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [-x, -y, 1]])
+        rotation_matrix = np.array(
+            [
+                [np.cos(angle), -np.sin(angle), 0],
+                [np.sin(angle), np.cos(angle), 0],
+                [0, 0, 1],
+            ]
+        )
+        inverse_translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [x, y, 1]])
+
+        world_object.update_coordinates(
+            [translation_matrix, rotation_matrix, inverse_translation_matrix]
+        )
+        world_object.update_representation(
+            self.window.window_bounds, self.view.viewport.viewport_bounds
+        )

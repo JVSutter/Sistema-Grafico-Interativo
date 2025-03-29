@@ -2,15 +2,17 @@ import sys
 
 from PyQt6 import QtWidgets, uic
 
-from view.creation_dialogs import (LineDialog, ObjectDialog, PointDialog,
-                                   WireframeDialog)
+from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
 
 
 class View(QtWidgets.QMainWindow):
-    """Classe responsavel por gerenciar a interface grafica da aplicação"""
+    """
+    Classe responsavel por gerenciar a interface grafica da aplicação.
+    Métodos on_* são disparados pelo usuário ao interagir com a interface.
+    """
 
     def __init__(self, controller):
         self.app = QtWidgets.QApplication(sys.argv)  # Necessário estar no começo
@@ -100,7 +102,7 @@ class View(QtWidgets.QMainWindow):
 
         points, name = dialog.create_object()
         if name is not None:
-            self.controller.handle_point_input(points, name)
+            self.controller.handle_create_object(points, name)
             self.add_log(f"{dialog.type} {name} created: {points}")
 
     def on_remove_object(self) -> None:
