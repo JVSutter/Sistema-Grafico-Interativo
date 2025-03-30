@@ -83,7 +83,7 @@ class Model:
         self.view.add_log(f"{world_object.name} translated by ({dx}, {dy})")
 
     @update_interface
-    def scale_object(self, index: int, x_factor: float, y_factor) -> None:
+    def scale_object(self, index: int, x_factor: float, y_factor: float) -> None:
         """Escala um objeto no display file e atualiza a View."""
 
         world_object = self.display_file[index]

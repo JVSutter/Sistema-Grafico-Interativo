@@ -26,7 +26,7 @@ class ObjectDialog(QtWidgets.QDialog):
 
         # Se o usuário cancelou, retorna None
         if result == QtWidgets.QDialog.DialogCode.Rejected:
-            return None, None
+            return None, None, None
 
         self.points = self.get_points()
         self.color = self.get_color()
