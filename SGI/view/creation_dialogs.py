@@ -14,6 +14,10 @@ class ObjectDialog(QtWidgets.QDialog):
         super().__init__()
         uic.loadUi(f"view/screens/{name}.ui", self)
 
+        self.points: list = []
+        self.color: tuple = ()
+        self.name: str | None = None
+
     def create_object(self, ask_for_name: bool = True):
         """Cria um objeto"""
 
@@ -25,13 +29,12 @@ class ObjectDialog(QtWidgets.QDialog):
             return None, None
 
         self.points = self.get_points()
+        self.color = self.get_color()
 
         if ask_for_name:
             self.name = NameDialog().name
-        else:
-            self.name = None
 
-        return self.points, self.name
+        return self.points, self.name, self.color
 
     def set_point_input_ranges(self, fields: list):
         """Define o intervalo dos campos de entrada de pontos"""
@@ -45,6 +48,14 @@ class ObjectDialog(QtWidgets.QDialog):
         Método abstrato para obtermos a lista de pontos do objeto
         É abstrato pois cada objeto requer uma quantidade diferente de pontos
         """
+
+    def get_color(self):
+        """Retorna a cor do objeto"""
+
+        r_value = int(self.rInput.value())
+        g_value = int(self.gInput.value())
+        b_value = int(self.bInput.value())
+        return (r_value, g_value, b_value)
 
 
 class PointDialog(ObjectDialog):
@@ -61,6 +72,10 @@ class PointDialog(ObjectDialog):
         x = float(self.xInput.text().replace(",", "."))
         y = float(self.yInput.text().replace(",", "."))
         return [(x, y)]
+
+    def get_color(self):
+        """Ponto não tem cor, então retorna preto"""
+        return (0, 0, 0)
 
 
 class LineDialog(ObjectDialog):
@@ -96,7 +111,7 @@ class WireframeDialog(ObjectDialog):
         )  # Conecta o botao de adicionar um ponto
 
     def add_point(self):
-        point, _ = PointDialog().create_object(
+        point, _, _ = PointDialog().create_object(
             ask_for_name=False
         )  # Abre um popup para inserir as coordenadas do ponto
 
@@ -108,7 +123,7 @@ class WireframeDialog(ObjectDialog):
         self.points.append(point[0])
         self.pointsList.addItem(
             f"Point: {point[0]}"
-        )  # Adiciona o ponto a lista de pontos
+        )  # Adiciona o ponto à lista de pontos
 
     def get_points(self):
         """Retorna a lista de pontos que formam o polígono"""

@@ -13,6 +13,7 @@ class WorldObject:
         self,
         points: list,
         name: str,
+        color: tuple[int, int, int],
         window_bounds: Bounds,
         viewport_bounds: Bounds,
     ):
@@ -22,11 +23,11 @@ class WorldObject:
         )
 
         if len(points) == 1:
-            self.graphical_representation = Point(viewport_points)
+            self.graphical_representation = Point(viewport_points, color)
         elif len(points) == 2:
-            self.graphical_representation = Line(viewport_points)
+            self.graphical_representation = Line(viewport_points, color)
         else:
-            self.graphical_representation = Wireframe(viewport_points)
+            self.graphical_representation = Wireframe(viewport_points, color)
 
         self.name = name
 

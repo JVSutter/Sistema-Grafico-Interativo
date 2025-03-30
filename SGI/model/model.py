@@ -35,14 +35,14 @@ class Model:
         return [str(obj) for obj in self.display_file]
 
     @update_interface
-    def add_object(self, points: list, name: str) -> None:
+    def add_object(self, points: list, name: str, color: tuple[int, int, int]) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
 
         window_bounds = self.window.window_bounds
         viewport_bounds = self.view.viewport.viewport_bounds
-        graphical_object = WorldObject(points, name, window_bounds, viewport_bounds)
+        world_object = WorldObject(points, name, color, window_bounds, viewport_bounds)
 
-        self.display_file.append(graphical_object)
+        self.display_file.append(world_object)
 
     @update_interface
     def remove_object(self, index: int) -> None:

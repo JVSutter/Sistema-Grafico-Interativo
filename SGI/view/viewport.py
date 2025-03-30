@@ -35,11 +35,6 @@ class Viewport(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
-        # Define a cor e espessura da caneta
-        pen = QtGui.QPen(QtGui.QColor(0, 0, 0))
-        pen.setWidth(3)
-        painter.setPen(pen)
-
         # Desenha cada objeto
         for obj in self.objects:
             obj.draw(painter)

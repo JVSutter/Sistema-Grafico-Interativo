@@ -28,4 +28,5 @@ class Wireframe(GraphicalObject):
             QtCore.QPointF(self.viewport_points[0][0], self.viewport_points[0][1])
         )
 
+        painter.setPen(self.get_pen())
         painter.drawPath(path)

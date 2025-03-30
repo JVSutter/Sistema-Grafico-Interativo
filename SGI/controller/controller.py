@@ -16,14 +16,16 @@ class Controller:
         """Executa a aplicação."""
         self.view.run()
 
-    def handle_create_object(self, points_input: list, name_input: str) -> None:
+    def handle_create_object(
+        self, points_input: list, name_input: str, color_input: tuple[int, int, int]
+    ) -> None:
         """
         Constrói um novo objeto no mundo.
         @param points_input: Lista de pontos que compõem o objeto.
         @param name_input: Nome do objeto
         """
 
-        self.model.add_object(points=points_input, name=name_input)
+        self.model.add_object(points=points_input, name=name_input, color=color_input)
 
     def handle_remove_object(self, index: int) -> None:
         """
