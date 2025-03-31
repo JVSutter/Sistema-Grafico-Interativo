@@ -115,6 +115,9 @@ class WireframeDialog(ObjectDialog):
             ask_for_name=False
         )  # Abre um popup para inserir as coordenadas do ponto
 
+        if point is None:
+            return
+
         # Verifica se o ponto já não existe
         if point[0] in self.points:
             self.show_error_message("This point already exists.")
