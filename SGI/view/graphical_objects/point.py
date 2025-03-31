@@ -9,4 +9,5 @@ class Point(GraphicalObject):
     def draw(self, painter: QtGui.QPainter) -> None:
         """Desenha o ponto no viewport."""
         x, y = self.viewport_points[0]
+        painter.setPen(self.get_pen())
         painter.drawPoint(QtCore.QPointF(x, y))

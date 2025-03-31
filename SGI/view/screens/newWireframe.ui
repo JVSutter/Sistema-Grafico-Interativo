@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>573</width>
-    <height>388</height>
+    <height>415</height>
    </rect>
   </property>
   <property name="palette">
@@ -531,7 +531,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>320</y>
+     <y>360</y>
      <width>151</width>
      <height>32</height>
     </rect>
@@ -546,9 +546,9 @@
   <widget class="QLabel" name="title">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>180</x>
      <y>30</y>
-     <width>161</width>
+     <width>201</width>
      <height>20</height>
     </rect>
    </property>
@@ -580,7 +580,7 @@
     <rect>
      <x>80</x>
      <y>70</y>
-     <width>81</width>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
@@ -601,13 +601,104 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>270</y>
+     <y>310</y>
      <width>131</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
     <string>Add new Point</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>250</y>
+     <width>41</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="rInput">
+   <property name="geometry">
+    <rect>
+     <x>185</x>
+     <y>250</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>255</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="gInput">
+   <property name="geometry">
+    <rect>
+     <x>265</x>
+     <y>250</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>255</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="bInput">
+   <property name="geometry">
+    <rect>
+     <x>345</x>
+     <y>250</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>255</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>250</y>
+     <width>16</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>R</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>250</y>
+     <width>21</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>G</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>250</y>
+     <width>21</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>B</string>
    </property>
   </widget>
  </widget>

@@ -2,13 +2,17 @@ import sys
 
 from PyQt6 import QtWidgets, uic
 
-from view.dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
+from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
 
 
 class View(QtWidgets.QMainWindow):
-    """Classe responsavel por gerenciar a interface grafica da aplicação"""
+    """
+    Classe responsavel por gerenciar a interface grafica da aplicação.
+    Métodos on_* são disparados pelo usuário ao interagir com a interface.
+    """
 
     def __init__(self, controller):
         self.app = QtWidgets.QApplication(sys.argv)  # Necessário estar no começo
@@ -33,41 +37,28 @@ class View(QtWidgets.QMainWindow):
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 
         # Botões de alteração da lista de objetos
-        self.createPoint.clicked.connect(
-            lambda: self.on_create_object(PointDialog())
-        )
-        self.createLine.clicked.connect(
-            lambda: self.on_create_object(LineDialog())
-        )
+        self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog()))
+        self.createLine.clicked.connect(lambda: self.on_create_object(LineDialog()))
         self.createWireframe.clicked.connect(
             lambda: self.on_create_object(WireframeDialog())
         )
         self.removeObject.clicked.connect(self.on_remove_object)
+        self.transformObject.clicked.connect(self.on_transform_object)
 
         # Botões de zoom
         self.zoomInButton.clicked.connect(
             lambda: self.on_zoom(mode="in")
         )  # Quando aperta o botao de zoom in
-        self.zoomOutButton.clicked.connect(
-            lambda: self.on_zoom(mode="out")
-        )
+        self.zoomOutButton.clicked.connect(lambda: self.on_zoom(mode="out"))
         self.zoomSlider.valueChanged.connect(
             lambda: self.on_zoom(mode="slider")
         )  # Quando altera o valor do zoom pela barra
 
         # Botões de navegação
-        self.navUpButton.clicked.connect(
-            lambda: self.on_pan(direction="up")
-        )
-        self.navDownButton.clicked.connect(
-            lambda: self.on_pan(direction="down")
-        )
-        self.navLeftButton.clicked.connect(
-            lambda: self.on_pan(direction="left")
-        )
-        self.navRightButton.clicked.connect(
-            lambda: self.on_pan(direction="right")
-        )
+        self.navUpButton.clicked.connect(lambda: self.on_pan(direction="up"))
+        self.navDownButton.clicked.connect(lambda: self.on_pan(direction="down"))
+        self.navLeftButton.clicked.connect(lambda: self.on_pan(direction="left"))
+        self.navRightButton.clicked.connect(lambda: self.on_pan(direction="right"))
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -109,9 +100,9 @@ class View(QtWidgets.QMainWindow):
     def on_create_object(self, dialog: ObjectDialog) -> None:
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
-        points, name = dialog.create_object()
+        points, name, color = dialog.create_object()
         if name is not None:
-            self.controller.handle_point_input(points, name)
+            self.controller.handle_create_object(points, name, color)
             self.add_log(f"{dialog.type} {name} created: {points}")
 
     def on_remove_object(self) -> None:
@@ -130,6 +121,20 @@ class View(QtWidgets.QMainWindow):
         self.controller.handle_remove_object(index=selected)
         self.add_log(f"{text} has been removed")
 
+    def on_transform_object(self) -> None:
+        """Trata requisições de transformação de objetos no mundo."""
+
+        selected = self.objectsList.currentRow()
+
+        if selected == -1:
+            self.add_log("You must select an object to transform")
+            return
+
+        transformation_info = TransformationDialog().get_transformation()
+        self.controller.handle_transformation(
+            index=selected, transformation_info=transformation_info
+        )
+
     def on_zoom(self, mode: str) -> None:
         """
         Trata as requisições de zoom.
@@ -137,9 +142,9 @@ class View(QtWidgets.QMainWindow):
         Slide no máximo = 100% de zoom (dobro do tamanho original)
         Slide no mínimo = 1% de zoom (1/100 do tamanho original)
         """
-        
+
         value = 10
-        
+
         if mode == "in":
             value += self.zoomSlider.value()
         elif mode == "out":
@@ -167,9 +172,14 @@ class View(QtWidgets.QMainWindow):
 
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
-        
+
         movement = 10
-        dx, dy = {"up": (0, movement), "down": (0, -movement), "left": (-movement, 0), "right": (movement, 0)}[direction]
+        dx, dy = {
+            "up": (0, movement),
+            "down": (0, -movement),
+            "left": (-movement, 0),
+            "right": (movement, 0),
+        }[direction]
 
         self.controller.handle_pan(dx, dy)
         self.add_log(f"Went {direction} by {dx}, {dy}")

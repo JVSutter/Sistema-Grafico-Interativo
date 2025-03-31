@@ -1,14 +1,22 @@
+"""
+Módulo com as classes relativas às caixas de diálogo para criação de objetos
+"""
+
 from abc import abstractmethod
 
 from PyQt6 import QtWidgets, uic
 
 
 class ObjectDialog(QtWidgets.QDialog):
-    """Classe responsável por gerenciar um popup genérico"""
+    """Classe responsável por gerenciar um popup genérico de criação de objeto"""
 
     def __init__(self, name: str):
         super().__init__()
         uic.loadUi(f"view/screens/{name}.ui", self)
+
+        self.points: list = []
+        self.color: tuple = ()
+        self.name: str | None = None
 
     def create_object(self, ask_for_name: bool = True):
         """Cria um objeto"""
@@ -18,19 +26,18 @@ class ObjectDialog(QtWidgets.QDialog):
 
         # Se o usuário cancelou, retorna None
         if result == QtWidgets.QDialog.DialogCode.Rejected:
-            return None, None
+            return None, None, None
 
         self.points = self.get_points()
+        self.color = self.get_color()
 
         if ask_for_name:
             self.name = NameDialog().name
-        else:
-            self.name = None
 
-        return self.points, self.name
+        return self.points, self.name, self.color
 
-    def set_field_ranges(self, fields: list):
-        """Define o intervalo dos campos de entrada"""
+    def set_point_input_ranges(self, fields: list):
+        """Define o intervalo dos campos de entrada de pontos"""
 
         for field in fields:
             field.setRange(-1000.0, 1000.0)
@@ -42,6 +49,14 @@ class ObjectDialog(QtWidgets.QDialog):
         É abstrato pois cada objeto requer uma quantidade diferente de pontos
         """
 
+    def get_color(self):
+        """Retorna a cor do objeto"""
+
+        r_value = int(self.rInput.value())
+        g_value = int(self.gInput.value())
+        b_value = int(self.bInput.value())
+        return (r_value, g_value, b_value)
+
 
 class PointDialog(ObjectDialog):
     """Classe responsavel por gerenciar o popup de criacao de um ponto"""
@@ -49,7 +64,7 @@ class PointDialog(ObjectDialog):
     def __init__(self):
         super().__init__("newPoint")
         self.type = "Point"
-        self.set_field_ranges([self.xInput, self.yInput])
+        self.set_point_input_ranges([self.xInput, self.yInput])
 
     def get_points(self):
         """Retorna as coordenadas do ponto inseridas pelo usuario"""
@@ -58,6 +73,10 @@ class PointDialog(ObjectDialog):
         y = float(self.yInput.text().replace(",", "."))
         return [(x, y)]
 
+    def get_color(self):
+        """Ponto não tem cor, então retorna preto"""
+        return (0, 0, 0)
+
 
 class LineDialog(ObjectDialog):
     """Classe responsavel por gerenciar o popup de criacao de uma linha"""
@@ -65,7 +84,9 @@ class LineDialog(ObjectDialog):
     def __init__(self):
         super(LineDialog, self).__init__("newLine")
         self.type = "Line"
-        self.set_field_ranges([self.x1Input, self.y1Input, self.x2Input, self.y2Input])
+        self.set_point_input_ranges(
+            [self.x1Input, self.y1Input, self.x2Input, self.y2Input]
+        )
 
     def get_points(self):
         """Retorna as coordenadas da linha inseridas pelo usuario"""
@@ -90,19 +111,19 @@ class WireframeDialog(ObjectDialog):
         )  # Conecta o botao de adicionar um ponto
 
     def add_point(self):
-        point, _ = PointDialog().create_object(
+        point, _, _ = PointDialog().create_object(
             ask_for_name=False
         )  # Abre um popup para inserir as coordenadas do ponto
-        
+
         # Verifica se o ponto já não existe
         if point[0] in self.points:
             self.show_error_message("This point already exists.")
             return
-        
+
         self.points.append(point[0])
         self.pointsList.addItem(
             f"Point: {point[0]}"
-        )  # Adiciona o ponto a lista de pontos
+        )  # Adiciona o ponto à lista de pontos
 
     def get_points(self):
         """Retorna a lista de pontos que formam o polígono"""
@@ -131,19 +152,19 @@ class NameDialog(QtWidgets.QDialog):
     """Classe responsável por gerenciar o popup de inserção de nome"""
 
     def __init__(self):
-        super(NameDialog, self).__init__()
+        super().__init__()
         uic.loadUi("view/screens/name.ui", self)
-        
+
         # conectando para ver se o usuario apertou enter
         self.nameInput.textChanged.connect(self._handle_text_changed)
-        
+
         self.show()
         self.exec()
-    
+
     def _handle_text_changed(self):
         """Verifica se o usuário clicou em enter"""
         if "\n" in self.nameInput.toPlainText():
-            
+
             # remove o enter
             text = self.nameInput.toPlainText().replace("\n", "")
             self.nameInput.setPlainText(text)
