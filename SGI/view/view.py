@@ -1,6 +1,7 @@
 import sys
 
 from PyQt6 import QtWidgets, uic
+from PyQt6.QtCore import QTimer
 
 from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
 from view.graphical_objects.graphical_object import GraphicalObject
@@ -32,6 +33,9 @@ class View(QtWidgets.QMainWindow):
         self.zoomSlider.setMinimum(1)
         self.zoomSlider.setMaximum(300)
         self.zoomSlider.setValue(self.zoom_value)
+        
+        # define a label da rotação da janela
+        self.windowRotationLabel.setText(f"{self.windowRotationSlider.value()}º")
 
     def connect_buttons(self) -> None:
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
@@ -52,6 +56,11 @@ class View(QtWidgets.QMainWindow):
         self.zoomOutButton.clicked.connect(lambda: self.on_zoom(mode="out"))
         self.zoomSlider.valueChanged.connect(
             lambda: self.on_zoom(mode="slider")
+        )  # Quando altera o valor do zoom pela barra
+
+        # Botão de rotação da janela
+        self.windowRotationSlider.valueChanged.connect(
+            lambda: self.on_window_rotation()
         )  # Quando altera o valor do zoom pela barra
 
         # Botões de navegação
@@ -169,6 +178,16 @@ class View(QtWidgets.QMainWindow):
 
             self.zoom_value = new_zoom_value
             self.add_log(f"Zoom updated: {new_zoom_value:.2f}%")
+            
+    def on_window_rotation(self) -> None:
+        """Trata as requisições de rotação da janela."""
+        
+        # atualiza a label da rotação da janela
+        self.window_rotation = self.windowRotationSlider.value()
+        self.windowRotationLabel.setText(f"{self.window_rotation}º")
+
+        # self.controller.handle_window_rotation(self.windowRotationSlider.value())
+        # self.add_log(f"Window rotation updated: {self.windowRotationSlider.value()}")
 
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""

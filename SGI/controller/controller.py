@@ -74,3 +74,10 @@ class Controller:
             if x_value == y_value == "obj_center":
                 x_value, y_value = self.model.display_file[index].get_center()
             self.model.rotate_object(index, x_value, y_value, angle)
+
+    def handle_window_rotation(self, angle: float) -> None:
+        """
+        Processa uma rotação da janela de visualização.
+        @param angle: Ângulo de rotação.
+        """
+        self.model.rotate_window(angle)

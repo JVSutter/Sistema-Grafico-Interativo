@@ -132,3 +132,9 @@ class Model:
         )
 
         self.view.add_log(f"{world_object.name} rotated about ({x}, {y}) by an angle of {angle_degrees}°")
+
+    def rotate_window(self, angle: float) -> None:
+        """
+        Rotaciona a janela de visualização.
+        """
+        self.window.apply_rotation(angle)
