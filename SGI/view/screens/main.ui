@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>914</width>
-    <height>590</height>
+    <height>705</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>914</width>
-    <height>590</height>
+    <height>705</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>914</width>
-    <height>590</height>
+    <height>705</height>
    </size>
   </property>
   <property name="palette">
@@ -686,17 +686,22 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="removeObject">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Remove Selected Object</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="importButton">
+          <property name="text">
+           <string>Import .obj</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exportButton">
+          <property name="text">
+           <string>Export .obj</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QPushButton" name="transformObject">
@@ -711,6 +716,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="removeObject">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Remove Selected Object</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -721,7 +739,7 @@
      <x>20</x>
      <y>340</y>
      <width>371</width>
-     <height>231</height>
+     <height>331</height>
     </rect>
    </property>
    <property name="cursor">
@@ -766,24 +784,36 @@
      <property name="cursor">
       <cursorShape>PointingHandCursor</cursorShape>
      </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>300</number>
+     </property>
+     <property name="value">
+      <number>50</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
      </property>
     </widget>
-    <widget class="QPushButton" name="zoomInButton">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>60</y>
-       <width>38</width>
-       <height>38</height>
+       <y>30</y>
+       <width>44</width>
+       <height>151</height>
       </rect>
      </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QPushButton" name="zoomInButton">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
       background: transparent;
       border: none;
   }
@@ -793,38 +823,32 @@
   QPushButton:hover {
       background: transparent;
   }</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../assets/zoomIn.png</normaloff>../assets/zoomIn.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>38</width>
-       <height>38</height>
-      </size>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="zoomOutButton">
-     <property name="geometry">
-      <rect>
-       <x>60</x>
-       <y>110</y>
-       <width>38</width>
-       <height>38</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../assets/zoomIn.png</normaloff>../assets/zoomIn.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>38</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="zoomOutButton">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
       background: transparent;
       border: none;
   }
@@ -834,30 +858,43 @@
   QPushButton:hover {
       background: transparent;
   }</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../assets/zoomOut.png</normaloff>../assets/zoomOut.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>38</width>
-       <height>38</height>
-      </size>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../assets/zoomOut.png</normaloff>../assets/zoomOut.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>38</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="zoomLabel">
+        <property name="text">
+         <string>50%</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QLabel" name="imageNavigation">
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>40</y>
+      <y>50</y>
       <width>171</width>
       <height>171</height>
      </rect>
@@ -873,7 +910,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>30</y>
+      <y>40</y>
       <width>151</width>
       <height>71</height>
      </rect>
@@ -907,7 +944,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>90</y>
+      <y>100</y>
       <width>81</width>
       <height>71</height>
      </rect>
@@ -941,7 +978,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>90</y>
+      <y>100</y>
       <width>91</width>
       <height>71</height>
      </rect>
@@ -981,7 +1018,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>150</y>
+      <y>160</y>
       <width>151</width>
       <height>71</height>
      </rect>
@@ -1011,14 +1048,71 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>240</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Window Rotation Angle</string>
+    </property>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>33</y>
+       <width>291</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QSlider" name="windowRotationSlider">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="pageStep">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TickPosition::NoTicks</enum>
+        </property>
+        <property name="tickInterval">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="windowRotationLabel">
+        <property name="text">
+         <string>0º</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>410</y>
+     <y>480</y>
      <width>481</width>
-     <height>161</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
@@ -1113,7 +1207,7 @@
      <x>410</x>
      <y>10</y>
      <width>481</width>
-     <height>401</height>
+     <height>461</height>
     </rect>
    </property>
    <property name="title">
