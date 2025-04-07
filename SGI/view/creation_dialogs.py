@@ -160,7 +160,7 @@ class NameDialog(QtWidgets.QDialog):
 
         # conectando para ver se o usuario apertou enter
         self.nameInput.textChanged.connect(self._handle_text_changed)
-        
+
         if text:
             self.title.setText(text)
 

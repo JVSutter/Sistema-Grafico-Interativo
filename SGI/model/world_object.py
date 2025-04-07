@@ -1,4 +1,5 @@
 import numpy as np
+
 from utils.bounds import Bounds
 from view.graphical_objects.line import Line
 from view.graphical_objects.point import Point
@@ -15,7 +16,7 @@ class WorldObject:
         color: tuple[int, int, int],
         viewport_bounds: Bounds,
     ):
-        
+
         self.world_points: list[np.array] = self.get_homogeneous_coordinates(points)
         self.normalized_points: list[tuple[float, float]] = []
         self.viewport_bounds: Bounds = viewport_bounds
@@ -28,30 +29,28 @@ class WorldObject:
             self.graphical_representation = Wireframe(color)
 
         self.name = name
-        
+
     def update_normalized_points(self, norm_points: list[tuple[float, float]]):
         """Atualiza as coordenadas normalizadas (SCN) e a representação gráfica."""
-        
+
         self.normalized_points = norm_points
         self.viewport_points = self.transform_normalized_points_to_viewport()
         self.graphical_representation.update_points(self.viewport_points)
 
-    def transform_normalized_points_to_viewport(
-        self
-    ) -> list[tuple[float, float]]:
+    def transform_normalized_points_to_viewport(self) -> list[tuple[float, float]]:
         """Retorna as coordenadas do objeto gráfico para o viewport."""
 
         transformed_points = []
         for point in self.normalized_points:
             nx, ny = point
-            
+
             vp_width = self.viewport_bounds.x_max - self.viewport_bounds.x_min
             vp_height = self.viewport_bounds.y_max - self.viewport_bounds.y_min
 
             vx = (nx + 1) / 2 * vp_width
             vy = (1 - ny) / 2 * vp_height
             transformed_points.append((vx, vy))
-            
+
         return transformed_points
 
     def get_homogeneous_coordinates(self, points: list[tuple]) -> list[np.array]:
@@ -85,7 +84,7 @@ class WorldObject:
         y_center = y_sum / len(self.world_points)
 
         return x_center, y_center
-    
+
     def get_obj_description(self) -> None:
         """Retorna a descrição do objeto em formato .obj"""
 
@@ -93,9 +92,9 @@ class WorldObject:
 
         for point in self.world_points:
             obj_description += f"v {point[0]:.1f} {point[1]:.1f}\n"
-        
+
         obj_description += f"o {self.name}\n"
-        
+
         if len(self.world_points) == 1:
             obj_type = "p"
         elif len(self.world_points) == 2:
@@ -108,6 +107,8 @@ class WorldObject:
         return obj_description
 
     def __str__(self):
-        
-        formatted_points = ", ".join(f"({x:.1f}, {y:.1f})" for x, y, _ in self.world_points)
+
+        formatted_points = ", ".join(
+            f"({x:.1f}, {y:.1f})" for x, y, _ in self.world_points
+        )
         return f"{self.graphical_representation.__class__.__name__} {self.name}: {formatted_points}"

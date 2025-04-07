@@ -27,12 +27,12 @@ class GraphicalObject(ABC):
 
     def get_pen(self) -> QtGui.QPen:
         """Retorna a caneta a ser utilizada para desenhar o objeto."""
-        
+
         pen = QtGui.QPen(QtGui.QColor(*self.color))
         pen.setWidth(3)
         return pen
-    
+
     def update_points(self, points: list[tuple[float, float]]) -> None:
         """Atualiza os pontos do objeto gráfico."""
-        
+
         self.viewport_points = points

@@ -16,7 +16,7 @@ class Controller:
 
     def run(self) -> None:
         """Executa a aplicação."""
-        
+
         self.view.run()
 
     def handle_create_object(
@@ -35,7 +35,7 @@ class Controller:
         Remove um objeto do mundo.
         @param index: Índice do objeto a ser removido.
         """
-        
+
         self.model.remove_object(index=index)
 
     def handle_zoom(self, factor: float) -> None:
@@ -43,7 +43,7 @@ class Controller:
         Processa um zoom out/in da janela de visualização.
         @param factor: Fator de zoom.
         """
-        
+
         self.model.zoom(factor)
 
     def handle_pan(self, dx: float, dy: float) -> None:
@@ -85,21 +85,21 @@ class Controller:
         Processa uma rotação da janela de visualização.
         @param angle: Ângulo de rotação.
         """
-        
+
         self.model.rotate_window(angle)
-        
+
     def handle_import_obj_file(self, filepath: str) -> None:
         """
         Importa um arquivo .obj.
         @param filepath: Caminho do arquivo .obj.
         """
-        
+
         self.model.import_obj_file(filepath)
-        
+
     def handle_export_obj_file(self, filepath: str, name: str) -> None:
         """
         Exporta um arquivo .obj.
         @param filepath: Caminho do arquivo .obj.
         """
-        
+
         self.model.export_obj_file(filepath, name)
