@@ -1,9 +1,9 @@
 import numpy as np
-
+import os
 from model.window import Window
 from model.world_object import WorldObject
 from view.view import View
-
+from utils.obj_handler import ObjHandler
 
 class Model:
     """Classe que representa o modelo da nossa arquitetura MVC."""
@@ -166,3 +166,35 @@ class Model:
                 normalized_coords.append((nx, ny))
 
             obj.update_normalized_points(normalized_coords)
+            
+    def import_obj_file(self, filepath: str) -> None:
+        """Importa um arquivo .obj e adiciona os objetos ao display file."""
+        
+        obj_handler = ObjHandler()
+        objects_list = obj_handler.read_obj_file(filepath)
+        
+        for obj in objects_list:
+            
+            if obj[1] in [[(x, y) for x, y, *_ in objs.world_points] for objs in self.display_file]:
+                self.view.add_log(f"Object {obj[0]} already exists, skipping...")
+                continue
+            
+            self.add_object(points=obj[1], name=obj[0], color=(0, 0, 0))
+            
+        self.view.add_log(f"Objects successfully imported from {filepath}")
+            
+    def export_obj_file(self, filepath: str, name: str) -> None:
+        """Exporta os objetos do display file para um arquivo .obj."""
+        
+        if not name:
+            name = "output"
+            
+        filepath = os.path.join(filepath, f"{name}.obj")
+        
+        obj_handler = ObjHandler()
+        obj_str = obj_handler.generate_obj_str(self.display_file)
+        
+        with open(filepath, 'w') as f:
+            f.write(obj_str)
+        
+        self.view.add_log(f"Objects successfully exported to {filepath}")

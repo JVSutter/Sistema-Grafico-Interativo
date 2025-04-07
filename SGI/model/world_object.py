@@ -85,6 +85,27 @@ class WorldObject:
         y_center = y_sum / len(self.world_points)
 
         return x_center, y_center
+    
+    def get_obj_description(self) -> None:
+        """Retorna a descrição do objeto em formato .obj"""
+
+        obj_description = ""
+
+        for point in self.world_points:
+            obj_description += f"v {point[0]:.1f} {point[1]:.1f}\n"
+        
+        obj_description += f"o {self.name}\n"
+        
+        if len(self.world_points) == 1:
+            obj_type = "p"
+        elif len(self.world_points) == 2:
+            obj_type = "l"
+        else:
+            obj_type = "f"
+
+        obj_description += f"{obj_type} {" ".join(str(i) for i in range(-1, -len(self.world_points) - 1, -1))}\n\n"
+
+        return obj_description
 
     def __str__(self):
         

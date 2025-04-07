@@ -1,7 +1,7 @@
 import sys
 
 from PyQt6 import QtWidgets, uic
-from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog
+from view.creation_dialogs import LineDialog, ObjectDialog, PointDialog, WireframeDialog, NameDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
@@ -55,6 +55,10 @@ class View(QtWidgets.QMainWindow):
         self.navDownButton.clicked.connect(lambda: self.on_pan(direction="down"))
         self.navLeftButton.clicked.connect(lambda: self.on_pan(direction="left"))
         self.navRightButton.clicked.connect(lambda: self.on_pan(direction="right"))
+        
+        # Botões de importação e exportação de arquivos
+        self.importButton.clicked.connect(self.import_obj_file)
+        self.exportButton.clicked.connect(self.export_obj_file)
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -180,3 +184,42 @@ class View(QtWidgets.QMainWindow):
 
         self.controller.handle_pan(dx, dy)
         self.add_log(f"Went {direction} by {dx}, {dy}")
+        
+    def import_obj_file(self) -> None:
+        """Importa um arquivo .obj."""
+        
+        filepath = self.open_import_file_dialog()
+        if filepath:
+            self.controller.handle_import_obj_file(filepath)
+            
+    def export_obj_file(self) -> None:
+        """Exporta um arquivo .obj."""
+        
+        filepath, name = self.open_export_file_dialog()
+        if filepath:
+            self.controller.handle_export_obj_file(filepath, name)
+            
+        
+    def open_import_file_dialog(self) -> str:
+        """Abre um diálogo para selecionar um arquivo."""
+        
+        file_dialog = QtWidgets.QFileDialog()
+        file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.ExistingFile)
+        file_dialog.setNameFilter("*.obj")
+        
+        if file_dialog.exec():
+            return file_dialog.selectedFiles()[0]
+        return None
+    
+    def open_export_file_dialog(self) -> tuple[str, str]:
+        """Abre um diálogo para selecionar uma pasta."""
+
+        file_dialog = QtWidgets.QFileDialog()
+        file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.Directory)
+        
+        name_dialog = NameDialog("Give a name to the file").name
+        
+        if file_dialog.exec():
+            return (file_dialog.selectedFiles()[0], name_dialog)
+        return None
+                

@@ -87,3 +87,19 @@ class Controller:
         """
         
         self.model.rotate_window(angle)
+        
+    def handle_import_obj_file(self, filepath: str) -> None:
+        """
+        Importa um arquivo .obj.
+        @param filepath: Caminho do arquivo .obj.
+        """
+        
+        self.model.import_obj_file(filepath)
+        
+    def handle_export_obj_file(self, filepath: str, name: str) -> None:
+        """
+        Exporta um arquivo .obj.
+        @param filepath: Caminho do arquivo .obj.
+        """
+        
+        self.model.export_obj_file(filepath, name)

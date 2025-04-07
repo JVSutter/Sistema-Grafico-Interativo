@@ -154,12 +154,15 @@ class WireframeDialog(ObjectDialog):
 class NameDialog(QtWidgets.QDialog):
     """Classe responsável por gerenciar o popup de inserção de nome"""
 
-    def __init__(self):
+    def __init__(self, text: str = None):
         super().__init__()
         uic.loadUi("view/screens/name.ui", self)
 
         # conectando para ver se o usuario apertou enter
         self.nameInput.textChanged.connect(self._handle_text_changed)
+        
+        if text:
+            self.title.setText(text)
 
         self.show()
         self.exec()
