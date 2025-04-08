@@ -55,18 +55,12 @@ class WorldObject:
             homogenous_coordinates.append(np.array([x, y, 1]))
         return homogenous_coordinates
 
-    def update_coordinates(self, matrices: list[np.array]) -> None:
+    def update_coordinates(self, composite_matrix: np.ndarray) -> None:
         """
-        Atualiza as coordenadas do objeto no mundo. Atentar para a ordem das operações, visto
-        que isso impactará no resultado final. As multiplicações são feitas na ordem em que as
-        matrizes são passadas.
-        Ex:
-        Suponha que matrices == [T1, T2, T3] e points == [P]
-        Então a nova lista de pontos P' será obtida por P' = [P @ T1 @ T2 @ T3]
+        Atualiza as coordenadas do objeto no mundo aplicando uma matriz de transformação composta.
         """
-
-        for matrix in matrices:
-            self.world_points = [point @ matrix for point in self.world_points]
+        
+        self.world_points = [point @ composite_matrix for point in self.world_points]
 
     def get_center(self) -> tuple[float, float]:
         """Retorna o centro geométrico do objeto no mundo."""

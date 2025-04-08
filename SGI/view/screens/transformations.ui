@@ -553,7 +553,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="translation">
     <attribute name="title">
@@ -591,12 +591,12 @@
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>120</x>
        <y>120</y>
-       <width>88</width>
+       <width>94</width>
        <height>23</height>
       </rect>
      </property>
@@ -613,19 +613,22 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="translationXInput">
+        <property name="minimum">
+         <double>-1000.000000000000000</double>
+        </property>
         <property name="maximum">
-         <double>1000.990000000000009</double>
+         <double>1000.000000000000000</double>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>120</x>
        <y>150</y>
-       <width>88</width>
+       <width>94</width>
        <height>23</height>
       </rect>
      </property>
@@ -642,6 +645,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="translationYInput">
+        <property name="minimum">
+         <double>-1000.000000000000000</double>
+        </property>
         <property name="maximum">
          <double>1000.000000000000000</double>
         </property>
@@ -707,7 +713,7 @@
         <rect>
          <x>60</x>
          <y>20</y>
-         <width>88</width>
+         <width>110</width>
          <height>23</height>
         </rect>
        </property>
@@ -724,8 +730,21 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="scalingXInput">
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
           <property name="maximum">
            <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>%</string>
           </property>
          </widget>
         </item>
@@ -736,7 +755,7 @@
         <rect>
          <x>60</x>
          <y>50</y>
-         <width>88</width>
+         <width>110</width>
          <height>23</height>
         </rect>
        </property>
@@ -753,8 +772,21 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="scalingYInput">
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
           <property name="maximum">
            <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>%</string>
           </property>
          </widget>
         </item>
@@ -765,7 +797,7 @@
       <attribute name="title">
        <string>Proportion</string>
       </attribute>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>60</x>
@@ -869,7 +901,7 @@
        <rect>
         <x>110</x>
         <y>120</y>
-        <width>71</width>
+        <width>94</width>
         <height>23</height>
        </rect>
       </property>
@@ -886,6 +918,12 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="rotationYInput">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimum">
+          <double>-1000.000000000000000</double>
+         </property>
          <property name="maximum">
           <double>1000.000000000000000</double>
          </property>
@@ -898,7 +936,7 @@
        <rect>
         <x>30</x>
         <y>120</y>
-        <width>71</width>
+        <width>94</width>
         <height>23</height>
        </rect>
       </property>
@@ -915,8 +953,14 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="rotationXInput">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimum">
+          <double>-1000.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>1000.990000000000009</double>
+          <double>1000.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -964,11 +1008,14 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="minimum">
+      <double>-360.000000000000000</double>
+     </property>
      <property name="maximum">
       <double>360.000000000000000</double>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>60</x>
