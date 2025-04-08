@@ -114,10 +114,13 @@ class View(QtWidgets.QMainWindow):
             self.add_log("You must select an object to transform")
             return
 
-        transformation_info = TransformationDialog().get_transformation()
-        self.controller.handle_transformation(
-            index=selected, transformation_info=transformation_info
-        )
+        dialog = TransformationDialog()
+        transformations_list = dialog.get_transformations()
+
+        if transformations_list:
+            self.controller.handle_transformations(
+                index=selected, transformations_list=transformations_list
+            )
 
     def on_zoom(self, mode: str) -> None:
         """

@@ -86,69 +86,61 @@ class Model:
         self.window.apply_pan(dx_world, dy_world)
 
     @update_interface
-    def translate_object(self, index: int, dx: float, dy: float) -> None:
-        """Translada um objeto no display file e atualiza a View."""
-
-        world_object = self.display_file[index]
-        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
-        world_object.update_coordinates([translation_matrix])
-
-        self.view.add_log(f"{world_object.name} translated by ({dx}, {dy})")
-
-    @update_interface
-    def scale_object(self, index: int, x_factor: float, y_factor: float) -> None:
-        """Escala um objeto no display file e atualiza a View."""
-
-        world_object = self.display_file[index]
-        center_x, center_y = world_object.get_center()
-
-        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [-center_x, -center_y, 1]])
-        scaling_matrix = np.array([[x_factor, 0, 0], [0, y_factor, 0], [0, 0, 1]])
-        inverse_translation_matrix = np.array(
-            [[1, 0, 0], [0, 1, 0], [center_x, center_y, 1]]
-        )
-
-        world_object.update_coordinates(
-            [translation_matrix, scaling_matrix, inverse_translation_matrix]
-        )
-
-        self.view.add_log(f"{world_object.name} scaled by ({x_factor}, {y_factor})")
-
-    @update_interface
-    def rotate_object(self, index: int, x: float, y: float, angle: float) -> None:
+    def handle_transformations(self, index: int, transformations_list: list[dict]) -> None:
         """
-        Rotaciona um objeto em torno de (x, y) e atualiza a View.
+        Processa uma lista de transformações em um objeto sequencialmente,
+        compondo uma matriz única e aplicando-a ao final.
+        @param index: Índice do objeto a ser transformado.
+        @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         """
 
-        angle_degrees = angle
-        angle_radians = np.radians(angle)
+        if not transformations_list:
+            return
 
-        world_object = self.display_file[index]
-        translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [-x, -y, 1]])
-        rotation_matrix = np.array(
-            [
-                [np.cos(angle_radians), np.sin(angle_radians), 0],
-                [-np.sin(angle_radians), np.cos(angle_radians), 0],
-                [0, 0, 1],
-            ]
-        )
-        inverse_translation_matrix = np.array([[1, 0, 0], [0, 1, 0], [x, y, 1]])
+        # Inicializa a matriz composta como a matriz identidade
+        composite_matrix = np.identity(3)
 
-        world_object.update_coordinates(
-            [translation_matrix, rotation_matrix, inverse_translation_matrix]
-        )
+        obj = self.display_file[index]
 
-        self.view.add_log(
-            f"{world_object.name} rotated about ({x}, {y}) by an angle of {angle_degrees}°"
-        )
+        for transformation in transformations_list:
+            transformation_type = transformation["type"]
+            matrix = np.identity(3)
 
-    @update_interface
-    def rotate_window(self, angle: float) -> None:
-        """Rotaciona a janela de visualização para o ângulo especificado em graus."""
+            if transformation_type == "translation":
+                dx = transformation["dx"]
+                dy = transformation["dy"]
+                matrix = self.get_translation_matrix(dx, dy)
+                self.view.add_log(f"{obj.name}: Translation ({dx}, {dy})")
+            
+            elif transformation_type == "scaling":
+                sx = transformation["sx"]
+                sy = transformation["sy"]
+                center_x, center_y = obj.get_center()
+                center_transformed = np.array([center_x, center_y, 1]) @ composite_matrix
+                cx_current, cy_current = center_transformed[0], center_transformed[1]
+                matrix = self.get_scaling_matrix(sx, sy, cx_current, cy_current)
+                self.view.add_log(f"{obj.name}: Scaling ({sx*100:.1f}%, {sy*100:.1f}%)")
+                
+            elif transformation_type == "rotation":
+                angle = transformation["angle"]
+                cx = transformation["cx"]
+                cy = transformation["cy"]
+                
+                if cx == "obj_center":
+                    center_x, center_y = obj.get_center()
+                    center_transformed = np.array([center_x, center_y, 1]) @ composite_matrix
+                    cx_current, cy_current = center_transformed[0], center_transformed[1]
+                    matrix = self.get_rotation_matrix(angle, cx_current, cy_current)
+                else: # origem ou ponto arbitrario
+                    matrix = self.get_rotation_matrix(angle, float(cx), float(cy))
+                    
+                self.view.add_log(f"{obj.name}: Rotation ({angle}°) around ({cx}, {cy})")
 
-        angle_radians = np.radians(angle)
+            composite_matrix = composite_matrix @ matrix 
 
-        self.window.apply_rotation(angle_radians)
+        obj.update_coordinates(composite_matrix)
+
+        self.view.add_log(f"{obj.name}: Transformations applied.")
 
     def _calculate_and_update_scn(self):
         """Calcula as coordenadas normalizadas para todos os objetos e atualiza a View."""
@@ -227,3 +219,36 @@ class Model:
             f.write(obj_str)
 
         self.view.add_log(f"Objects successfully exported to {filepath}")
+
+    def get_translation_matrix(self, dx: float, dy: float) -> np.ndarray:
+        """Retorna a matriz de translação."""
+        
+        return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
+
+    def get_scaling_matrix(self, sx: float, sy: float, cx: float, cy: float) -> np.ndarray:
+        """Retorna a matriz de escalonamento em torno de (cx, cy)."""
+        
+        translate_to_origin = self.get_translation_matrix(-cx, -cy)
+        scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+        translate_back = self.get_translation_matrix(cx, cy)
+        return translate_to_origin @ scale @ translate_back
+
+    def get_rotation_matrix(self, angle_degrees: float, cx: float, cy: float) -> np.ndarray:
+        """Retorna a matriz de rotação em torno de (cx, cy)."""
+        
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+        
+        translate_to_origin = self.get_translation_matrix(-cx, -cy)
+        rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
+        translate_back = self.get_translation_matrix(cx, cy)
+        return translate_to_origin @ rotate @ translate_back
+
+    @update_interface
+    def rotate_window(self, angle: float) -> None:
+        """Rotaciona a janela de visualização para o ângulo especificado em graus."""
+
+        angle_radians = np.radians(angle)
+
+        self.window.apply_rotation(angle_radians)

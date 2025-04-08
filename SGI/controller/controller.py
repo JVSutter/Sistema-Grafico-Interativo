@@ -54,30 +54,14 @@ class Controller:
 
         self.model.pan(dx, dy)
 
-    def handle_transformation(self, index: int, transformation_info: dict) -> None:
+    def handle_transformations(self, index: int, transformations_list: list[dict]) -> None:
         """
-        Processa alguma transformação em um objeto (translação, escalonamento ou rotação).
+        Processa uma lista de transformações aplicadas a um objeto.
         @param index: Índice do objeto a ser transformado.
-        @param transformation_info: Informações da transformação a ser aplicada.
+        @param transformations_list: Lista de transformações a serem aplicadas.
         """
 
-        if transformation_info is None:
-            return
-
-        transformation_option = transformation_info["option"]
-        x_value = transformation_info["x_value"]
-        y_value = transformation_info["y_value"]
-        angle = transformation_info.get("angle", None)
-
-        if transformation_option == "translation":
-            self.model.translate_object(index, x_value, y_value)
-        elif transformation_option == "scaling":
-            self.model.scale_object(index, x_value, y_value)
-
-        elif transformation_option == "rotation":
-            if x_value == y_value == "obj_center":
-                x_value, y_value = self.model.display_file[index].get_center()
-            self.model.rotate_object(index, x_value, y_value, angle)
+        self.model.handle_transformations(index, transformations_list)
 
     def handle_window_rotation(self, angle: float) -> None:
         """
