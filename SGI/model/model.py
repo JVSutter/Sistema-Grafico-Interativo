@@ -6,7 +6,9 @@ from model.window import Window
 from model.world_object import WorldObject
 from utils.obj_handler import ObjHandler
 from view.view import View
-
+from view.graphical_objects.point import Point
+from view.graphical_objects.line import Line
+from view.graphical_objects.wireframe import Wireframe
 
 class Model:
     """Classe que representa o modelo da nossa arquitetura MVC."""
@@ -35,13 +37,31 @@ class Model:
         return wrapper
 
     @update_interface
-    def add_object(self, points: list, name: str, color: tuple[int, int, int]) -> None:
+    def add_object(self, points: list, name: str, color: tuple) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
+        
+        # Confere se ja nao existe um objeto com os mesmos pontos
+        if any(points == [(x, y) for x, y, *_ in objs.world_points] for objs in self.display_file):
+            self.view.add_log(f"Object {name} already exists, skipping...")
+            return
+        
+        if len(points) == 1:
+            graphical_representation = Point(color)
+        elif len(points) == 2:
+            graphical_representation = Line(color)
+        else:
+            graphical_representation = Wireframe(color)
+            
+        tipo = graphical_representation.__class__.__name__
+        
+        if not name:
+            name = f"{tipo} {len([obj for obj in self.display_file if obj.graphical_representation.__class__.__name__ == tipo]) + 1}"
 
         viewport_bounds = self.view.viewport.viewport_bounds
-        world_object = WorldObject(points, name, color, viewport_bounds)
+        world_object = WorldObject(points, name, viewport_bounds, graphical_representation)
 
         self.display_file.append(world_object)
+        self.view.add_log(f"{tipo} {name} created: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:

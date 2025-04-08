@@ -2,23 +2,24 @@
 Módulo com as classes relativas às caixas de diálogo para criação de objetos
 """
 
-from abc import abstractmethod
-
 from PyQt6 import QtWidgets, uic
 
-
 class ObjectDialog(QtWidgets.QDialog):
-    """Classe responsável por gerenciar um popup genérico de criação de objeto"""
+    """Classe responsável por gerenciar o popup de criação de objeto"""
 
-    def __init__(self, name: str):
+    def __init__(self):
         super().__init__()
-        uic.loadUi(f"view/screens/{name}.ui", self)
+        uic.loadUi("view/screens/newObject.ui", self)
 
         self.points: list = []
-        self.color: tuple = ()
+        self.color: tuple = (0, 0, 0)  # Cor padrão preto
         self.name: str | None = None
 
-    def create_object(self, ask_for_name: bool = True):
+        self.newPointButton.clicked.connect(self.add_point)
+        self.removeButton.clicked.connect(self.remove_selected_point)
+        self.colorButton.clicked.connect(self.choose_color)
+
+    def create_object(self):
         """Cria um objeto"""
 
         self.show()
@@ -28,127 +29,65 @@ class ObjectDialog(QtWidgets.QDialog):
         if result == QtWidgets.QDialog.DialogCode.Rejected:
             return None, None, None
 
-        self.points = self.get_points()
-        self.color = self.get_color()
-
-        if ask_for_name:
-            self.name = NameDialog().name
+        self.name = self.nameInput.text() if self.nameInput.text().strip() else None
 
         return self.points, self.name, self.color
 
-    def set_point_input_ranges(self, fields: list):
-        """Define o intervalo dos campos de entrada de pontos"""
-
-        for field in fields:
-            field.setRange(-1000.0, 1000.0)
-
-    @abstractmethod
-    def get_points(self):
-        """
-        Método abstrato para obtermos a lista de pontos do objeto
-        É abstrato pois cada objeto requer uma quantidade diferente de pontos
-        """
-
-    def get_color(self):
-        """Retorna a cor do objeto"""
-
-        r_value = int(self.rInput.value())
-        g_value = int(self.gInput.value())
-        b_value = int(self.bInput.value())
-        return (r_value, g_value, b_value)
-
-
-class PointDialog(ObjectDialog):
-    """Classe responsavel por gerenciar o popup de criacao de um ponto"""
-
-    def __init__(self):
-        super().__init__("newPoint")
-        self.type = "Point"
-        self.set_point_input_ranges([self.xInput, self.yInput])
-
-    def get_points(self):
-        """Retorna as coordenadas do ponto inseridas pelo usuario"""
-
-        x = float(self.xInput.text().replace(",", "."))
-        y = float(self.yInput.text().replace(",", "."))
-        return [(x, y)]
-
-    def get_color(self):
-        """Ponto não tem cor, então retorna preto"""
-        return (0, 0, 0)
-
-
-class LineDialog(ObjectDialog):
-    """Classe responsavel por gerenciar o popup de criacao de uma linha"""
-
-    def __init__(self):
-        super(LineDialog, self).__init__("newLine")
-        self.type = "Line"
-        self.set_point_input_ranges(
-            [self.x1Input, self.y1Input, self.x2Input, self.y2Input]
-        )
-
-    def get_points(self):
-        """Retorna as coordenadas da linha inseridas pelo usuario"""
-
-        x1 = float(self.x1Input.text().replace(",", "."))
-        y1 = float(self.y1Input.text().replace(",", "."))
-        x2 = float(self.x2Input.text().replace(",", "."))
-        y2 = float(self.y2Input.text().replace(",", "."))
-        return [(x1, y1), (x2, y2)]
-
-
-class WireframeDialog(ObjectDialog):
-    """Classe responsável por gerenciar o popup de criação de um poligono"""
-
-    def __init__(self):
-        super().__init__("newWireframe")
-
-        self.type = "Wireframe"
-        self.points = []
-        self.newPointButton.clicked.connect(
-            self.add_point
-        )  # Conecta o botao de adicionar um ponto
-
     def add_point(self):
-        point, _, _ = PointDialog().create_object(
-            ask_for_name=False
-        )  # Abre um popup para inserir as coordenadas do ponto
+        """Adiciona um novo ponto à lista"""
+        
+        x = float(self.xInput.value())
+        y = float(self.yInput.value())
+        point = (x, y)
 
-        if point is None:
-            return
-
-        # Verifica se o ponto já não existe
-        if point[0] in self.points:
+        # Verifica se o ponto já existe
+        if point in self.points:
             self.show_error_message("This point already exists.")
             return
 
-        self.points.append(point[0])
-        self.pointsList.addItem(
-            f"Point: {point[0]}"
-        )  # Adiciona o ponto à lista de pontos
+        self.points.append(point)
+        self.pointsList.addItem(f"Point: {point}")
 
-    def get_points(self):
-        """Retorna a lista de pontos que formam o polígono"""
-        return self.points
-
-    def accept(self):
-        """Sobrescreve o método accept para validar o número de pontos"""
-        if len(self.points) < 3:
-            self.show_error_message(
-                "It's necessary to have at least 3 points to create a wireframe."
-            )
+    def remove_selected_point(self):
+        """Remove o ponto selecionado da lista"""
+        
+        current_item = self.pointsList.currentItem()
+        if current_item:
+            index = self.pointsList.row(current_item)
+            self.points.pop(index)
+            self.pointsList.takeItem(index)
         else:
-            super().accept()
+            self.show_error_message("You must select a point to remove.")
 
-    def show_error_message(self, message: str = None):
-        """Mostra uma mensagem de erro sobre o número mínimo de pontos"""
+    def choose_color(self):
+        """Abre o diálogo de escolha de cor"""
+        
+        color = QtWidgets.QColorDialog.getColor()
+        if color.isValid():
+            self.color = (color.red(), color.green(), color.blue())
+            self.colorPreview.setStyleSheet(
+                f"border: 2px solid white; border-radius: 16px; background-color: rgb{self.color};"
+            )
+        
+        self.raise_()
+
+    def show_error_message(self, message: str):
+        """Mostra uma mensagem de erro"""
+        
         error_dialog = QtWidgets.QMessageBox()
         error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
-        error_dialog.setWindowTitle("Error")
+        error_dialog.setWindowTitle("Erro")
         error_dialog.setText(message)
         error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         error_dialog.exec()
+
+    def accept(self):
+        """Sobrescreve o método accept para validar o número de pontos"""
+        
+        if len(self.points) < 1:
+            self.show_error_message("É necessário ter pelo menos 1 ponto para criar um objeto.")
+        else:
+            super().accept()
 
 
 class NameDialog(QtWidgets.QDialog):
@@ -170,7 +109,6 @@ class NameDialog(QtWidgets.QDialog):
     def _handle_text_changed(self):
         """Verifica se o usuário clicou em enter"""
         if "\n" in self.nameInput.toPlainText():
-
             # remove o enter
             text = self.nameInput.toPlainText().replace("\n", "")
             self.nameInput.setPlainText(text)

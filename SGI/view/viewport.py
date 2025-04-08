@@ -20,6 +20,14 @@ class Viewport(QtWidgets.QWidget):
             None  # Será definido automaticamente no evento resizeEvent
         )
         self.objects = []
+        
+    def setup_viewport(self):
+        """Configura o viewport."""
+        
+        layout = QtWidgets.QVBoxLayout(self.parent())
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self)
+        self.parent().setLayout(layout)
 
     def resizeEvent(self, event) -> None:
         """Sobrescreve o método resizeEvent para atualizar os limites do viewport."""

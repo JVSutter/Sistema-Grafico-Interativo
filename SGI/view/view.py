@@ -2,8 +2,7 @@ import sys
 
 from PyQt6 import QtWidgets, uic
 
-from view.creation_dialogs import (LineDialog, NameDialog, ObjectDialog,
-                                   PointDialog, WireframeDialog)
+from view.creation_dialogs import NameDialog, ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
@@ -30,11 +29,7 @@ class View(QtWidgets.QMainWindow):
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 
         # Botões de alteração da lista de objetos
-        self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog()))
-        self.createLine.clicked.connect(lambda: self.on_create_object(LineDialog()))
-        self.createWireframe.clicked.connect(
-            lambda: self.on_create_object(WireframeDialog())
-        )
+        self.createObject.clicked.connect(lambda: self.on_create_object(ObjectDialog()))
         self.removeObject.clicked.connect(self.on_remove_object)
         self.transformObject.clicked.connect(self.on_transform_object)
 
@@ -66,10 +61,7 @@ class View(QtWidgets.QMainWindow):
         """Configura o viewport para exibir os objetos gráficos."""
 
         self.viewport = Viewport(self.frame)
-        layout = QtWidgets.QVBoxLayout(self.frame)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.viewport)
-        self.frame.setLayout(layout)
+        self.viewport.setup_viewport()
 
     def run(self) -> None:
         """Executa a aplicação PyQt."""
@@ -96,9 +88,8 @@ class View(QtWidgets.QMainWindow):
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
         points, name, color = dialog.create_object()
-        if name is not None:
+        if points is not None:
             self.controller.handle_create_object(points, name, color)
-            self.add_log(f"{dialog.type} {name} created: {points}")
 
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
@@ -216,6 +207,12 @@ class View(QtWidgets.QMainWindow):
 
     def open_export_file_dialog(self) -> tuple[str, str]:
         """Abre um diálogo para selecionar uma pasta."""
+        
+        display_file = self.controller.get_display_file()
+
+        if len(display_file) == 0:
+            self.add_log("You must create an object to export")
+            return None, None
 
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.Directory)

@@ -1,9 +1,7 @@
 import numpy as np
 
 from utils.bounds import Bounds
-from view.graphical_objects.line import Line
-from view.graphical_objects.point import Point
-from view.graphical_objects.wireframe import Wireframe
+from view.graphical_objects.graphical_object import GraphicalObject
 
 
 class WorldObject:
@@ -13,20 +11,15 @@ class WorldObject:
         self,
         points: list,
         name: str,
-        color: tuple[int, int, int],
         viewport_bounds: Bounds,
+        graphical_representation: GraphicalObject,
     ):
 
         self.world_points: list[np.array] = self.get_homogeneous_coordinates(points)
         self.normalized_points: list[tuple[float, float]] = []
         self.viewport_bounds: Bounds = viewport_bounds
 
-        if len(points) == 1:
-            self.graphical_representation = Point(color)
-        elif len(points) == 2:
-            self.graphical_representation = Line(color)
-        else:
-            self.graphical_representation = Wireframe(color)
+        self.graphical_representation = graphical_representation
 
         self.name = name
 
