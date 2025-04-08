@@ -3,7 +3,6 @@ import numpy as np
 from model.model import Model
 from view.view import View
 
-
 class Controller:
     """
     Classe que representa o controller da nossa arquitetura MVC.
@@ -20,7 +19,7 @@ class Controller:
         self.view.run()
 
     def handle_create_object(
-        self, points_input: list, name_input: str, color_input: tuple[int, int, int]
+        self, points_input: list, name_input: str, color_input: tuple
     ) -> None:
         """
         Constrói um novo objeto no mundo.
@@ -103,3 +102,10 @@ class Controller:
         """
 
         self.model.export_obj_file(filepath, name)
+        
+    def get_display_file(self) -> list:
+        """
+        Retorna a lista de objetos do mundo.
+        """
+
+        return self.model.display_file
