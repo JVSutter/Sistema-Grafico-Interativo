@@ -1,7 +1,6 @@
 import sys
 
 from PyQt6 import QtWidgets, uic
-
 from view.creation_dialogs import NameDialog, ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
@@ -210,7 +209,7 @@ class View(QtWidgets.QMainWindow):
 
     def open_export_file_dialog(self) -> tuple[str, str]:
         """Abre um diálogo para selecionar uma pasta."""
-        
+
         display_file = self.controller.get_display_file()
 
         if len(display_file) == 0:

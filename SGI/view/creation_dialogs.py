@@ -4,6 +4,7 @@ Módulo com as classes relativas às caixas de diálogo para criação de objeto
 
 from PyQt6 import QtWidgets, uic
 
+
 class ObjectDialog(QtWidgets.QDialog):
     """Classe responsável por gerenciar o popup de criação de objeto"""
 
@@ -35,7 +36,7 @@ class ObjectDialog(QtWidgets.QDialog):
 
     def add_point(self):
         """Adiciona um novo ponto à lista"""
-        
+
         x = float(self.xInput.value())
         y = float(self.yInput.value())
         point = (x, y)
@@ -50,7 +51,7 @@ class ObjectDialog(QtWidgets.QDialog):
 
     def remove_selected_point(self):
         """Remove o ponto selecionado da lista"""
-        
+
         current_item = self.pointsList.currentItem()
         if current_item:
             index = self.pointsList.row(current_item)
@@ -61,19 +62,19 @@ class ObjectDialog(QtWidgets.QDialog):
 
     def choose_color(self):
         """Abre o diálogo de escolha de cor"""
-        
+
         color = QtWidgets.QColorDialog.getColor()
         if color.isValid():
             self.color = (color.red(), color.green(), color.blue())
             self.colorPreview.setStyleSheet(
                 f"border: 2px solid white; border-radius: 16px; background-color: rgb{self.color};"
             )
-        
+
         self.raise_()
 
     def show_error_message(self, message: str):
         """Mostra uma mensagem de erro"""
-        
+
         error_dialog = QtWidgets.QMessageBox()
         error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
         error_dialog.setWindowTitle("Erro")
@@ -83,9 +84,11 @@ class ObjectDialog(QtWidgets.QDialog):
 
     def accept(self):
         """Sobrescreve o método accept para validar o número de pontos"""
-        
+
         if len(self.points) < 1:
-            self.show_error_message("É necessário ter pelo menos 1 ponto para criar um objeto.")
+            self.show_error_message(
+                "É necessário ter pelo menos 1 ponto para criar um objeto."
+            )
         else:
             super().accept()
 

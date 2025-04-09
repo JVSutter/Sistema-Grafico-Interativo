@@ -1,5 +1,4 @@
 from PyQt6 import QtGui, QtWidgets
-
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
@@ -20,10 +19,10 @@ class Viewport(QtWidgets.QWidget):
             None  # Será definido automaticamente no evento resizeEvent
         )
         self.objects = []
-        
+
     def setup_viewport(self):
         """Configura o viewport."""
-        
+
         layout = QtWidgets.QVBoxLayout(self.parent())
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self)

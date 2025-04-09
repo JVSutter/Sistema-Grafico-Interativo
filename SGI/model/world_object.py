@@ -1,5 +1,4 @@
 import numpy as np
-
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
@@ -59,7 +58,7 @@ class WorldObject:
         """
         Atualiza as coordenadas do objeto no mundo aplicando uma matriz de transformação composta.
         """
-        
+
         self.world_points = [point @ composite_matrix for point in self.world_points]
 
     def get_center(self) -> tuple[float, float]:

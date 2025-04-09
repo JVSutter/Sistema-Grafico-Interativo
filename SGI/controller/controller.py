@@ -1,7 +1,7 @@
 import numpy as np
-
 from model.model import Model
 from view.view import View
+
 
 class Controller:
     """
@@ -54,7 +54,9 @@ class Controller:
 
         self.model.pan(dx, dy)
 
-    def handle_transformations(self, index: int, transformations_list: list[dict]) -> None:
+    def handle_transformations(
+        self, index: int, transformations_list: list[dict]
+    ) -> None:
         """
         Processa uma lista de transformações aplicadas a um objeto.
         @param index: Índice do objeto a ser transformado.
@@ -86,7 +88,7 @@ class Controller:
         """
 
         self.model.export_obj_file(filepath, name)
-        
+
     def get_display_file(self) -> list:
         """
         Retorna a lista de objetos do mundo.

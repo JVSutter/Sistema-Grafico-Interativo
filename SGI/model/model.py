@@ -1,14 +1,14 @@
 import os
 
 import numpy as np
-
 from model.window import Window
 from model.world_object import WorldObject
 from utils.obj_handler import ObjHandler
-from view.view import View
-from view.graphical_objects.point import Point
 from view.graphical_objects.line import Line
+from view.graphical_objects.point import Point
 from view.graphical_objects.wireframe import Wireframe
+from view.view import View
+
 
 class Model:
     """Classe que representa o modelo da nossa arquitetura MVC."""
@@ -39,26 +39,31 @@ class Model:
     @update_interface
     def add_object(self, points: list, name: str, color: tuple) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
-        
+
         # Confere se ja nao existe um objeto com os mesmos pontos
-        if any(points == [(x, y) for x, y, *_ in objs.world_points] for objs in self.display_file):
+        if any(
+            points == [(x, y) for x, y, *_ in objs.world_points]
+            for objs in self.display_file
+        ):
             self.view.add_log(f"Object {name} already exists, skipping...")
             return
-        
+
         if len(points) == 1:
             graphical_representation = Point(color)
         elif len(points) == 2:
             graphical_representation = Line(color)
         else:
             graphical_representation = Wireframe(color)
-            
+
         tipo = graphical_representation.__class__.__name__
-        
+
         if not name:
             name = f"{tipo} {len([obj for obj in self.display_file if obj.graphical_representation.__class__.__name__ == tipo]) + 1}"
 
         viewport_bounds = self.view.viewport.viewport_bounds
-        world_object = WorldObject(points, name, viewport_bounds, graphical_representation)
+        world_object = WorldObject(
+            points, name, viewport_bounds, graphical_representation
+        )
 
         self.display_file.append(world_object)
         self.view.add_log(f"{tipo} {name} created: {points}")
@@ -86,7 +91,9 @@ class Model:
         self.window.apply_pan(dx_world, dy_world)
 
     @update_interface
-    def handle_transformations(self, index: int, transformations_list: list[dict]) -> None:
+    def handle_transformations(
+        self, index: int, transformations_list: list[dict]
+    ) -> None:
         """
         Processa uma lista de transformações em um objeto sequencialmente,
         compondo uma matriz única e aplicando-a ao final.
@@ -111,32 +118,41 @@ class Model:
                 dy = transformation["dy"]
                 matrix = self.get_translation_matrix(dx, dy)
                 self.view.add_log(f"{obj.name}: Translation ({dx}, {dy})")
-            
+
             elif transformation_type == "scaling":
                 sx = transformation["sx"]
                 sy = transformation["sy"]
                 center_x, center_y = obj.get_center()
-                center_transformed = np.array([center_x, center_y, 1]) @ composite_matrix
+                center_transformed = (
+                    np.array([center_x, center_y, 1]) @ composite_matrix
+                )
                 cx_current, cy_current = center_transformed[0], center_transformed[1]
                 matrix = self.get_scaling_matrix(sx, sy, cx_current, cy_current)
                 self.view.add_log(f"{obj.name}: Scaling ({sx*100:.1f}%, {sy*100:.1f}%)")
-                
+
             elif transformation_type == "rotation":
                 angle = transformation["angle"]
                 cx = transformation["cx"]
                 cy = transformation["cy"]
-                
+
                 if cx == "obj_center":
                     center_x, center_y = obj.get_center()
-                    center_transformed = np.array([center_x, center_y, 1]) @ composite_matrix
-                    cx_current, cy_current = center_transformed[0], center_transformed[1]
+                    center_transformed = (
+                        np.array([center_x, center_y, 1]) @ composite_matrix
+                    )
+                    cx_current, cy_current = (
+                        center_transformed[0],
+                        center_transformed[1],
+                    )
                     matrix = self.get_rotation_matrix(angle, cx_current, cy_current)
-                else: # origem ou ponto arbitrario
+                else:  # origem ou ponto arbitrario
                     matrix = self.get_rotation_matrix(angle, float(cx), float(cy))
-                    
-                self.view.add_log(f"{obj.name}: Rotation ({angle}°) around ({cx}, {cy})")
 
-            composite_matrix = composite_matrix @ matrix 
+                self.view.add_log(
+                    f"{obj.name}: Rotation ({angle}°) around ({cx}, {cy})"
+                )
+
+            composite_matrix = composite_matrix @ matrix
 
         obj.update_coordinates(composite_matrix)
 
@@ -222,24 +238,28 @@ class Model:
 
     def get_translation_matrix(self, dx: float, dy: float) -> np.ndarray:
         """Retorna a matriz de translação."""
-        
+
         return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
 
-    def get_scaling_matrix(self, sx: float, sy: float, cx: float, cy: float) -> np.ndarray:
+    def get_scaling_matrix(
+        self, sx: float, sy: float, cx: float, cy: float
+    ) -> np.ndarray:
         """Retorna a matriz de escalonamento em torno de (cx, cy)."""
-        
+
         translate_to_origin = self.get_translation_matrix(-cx, -cy)
         scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
         translate_back = self.get_translation_matrix(cx, cy)
         return translate_to_origin @ scale @ translate_back
 
-    def get_rotation_matrix(self, angle_degrees: float, cx: float, cy: float) -> np.ndarray:
+    def get_rotation_matrix(
+        self, angle_degrees: float, cx: float, cy: float
+    ) -> np.ndarray:
         """Retorna a matriz de rotação em torno de (cx, cy)."""
-        
+
         angle_radians = np.radians(angle_degrees)
         cos_r = np.cos(angle_radians)
         sin_r = np.sin(angle_radians)
-        
+
         translate_to_origin = self.get_translation_matrix(-cx, -cy)
         rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
         translate_back = self.get_translation_matrix(cx, cy)
