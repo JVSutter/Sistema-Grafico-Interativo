@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+
 from model.window import Window
 from model.world_object import WorldObject
 from utils.obj_handler import ObjHandler

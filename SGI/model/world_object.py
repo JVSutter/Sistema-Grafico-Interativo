@@ -1,4 +1,5 @@
 import numpy as np
+
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
