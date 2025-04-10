@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtGui
 from view.graphical_objects.graphical_object import GraphicalObject
 
 
-class Line(GraphicalObject):
+class GraphicalLine(GraphicalObject):
     """Classe que representa o segmento de reta no viewport."""
 
     def draw(self, painter: QtGui.QPainter) -> None:

@@ -3,12 +3,7 @@ import os
 import numpy as np
 
 from model.window import Window
-from model.world_object import WorldObject
-from utils.obj_handler import ObjHandler
-from view.graphical_objects.graphical_object import GraphicalObject
-from view.graphical_objects.line import Line
-from view.graphical_objects.point import Point
-from view.graphical_objects.wireframe import Wireframe
+from model.world_objects.world_object_factory import WorldObjectFactory
 from view.view import View
 
 
@@ -19,6 +14,7 @@ class Model:
         self.view = view
         self.window = Window(viewport_bounds=view.viewport.viewport_bounds)
         self.display_file = []
+        WorldObjectFactory.viewport_bounds = self.view.viewport.viewport_bounds
 
     @staticmethod
     def update_interface(func: callable) -> callable:
@@ -45,45 +41,27 @@ class Model:
         Retorna as representações gráficas a serem enviadas para o viewport.
         """
 
-        graphical_representations = []
+        representations = []
         for obj in self.display_file:
-            graphical_representation = obj.get_clipped_representation()
-            if graphical_representation is not None:
-                graphical_representations.append(graphical_representation)
+            representations.extend(obj.get_clipped_representation())
 
-        return graphical_representations
+        return representations
 
     @update_interface
     def add_object(self, points: list, name: str, color: tuple) -> None:
         """Adiciona um objeto gráfico ao display file e atualiza a View."""
 
-        # Confere se ja nao existe um objeto com os mesmos pontos
-        if any(
-            points == [(x, y) for x, y, *_ in objs.world_points]
-            for objs in self.display_file
-        ):
+        world_object = WorldObjectFactory.new_world_object(
+            points=points, name=name, color=color, display_file=self.display_file
+        )
+
+        if world_object is None:
             self.view.add_log(f"Object {name} already exists, skipping...")
             return
 
-        if len(points) == 1:
-            graphical_representation = Point(color)
-        elif len(points) == 2:
-            graphical_representation = Line(color)
-        else:
-            graphical_representation = Wireframe(color)
-
-        tipo = graphical_representation.__class__.__name__
-
-        if not name:
-            name = f"{tipo} {len([obj for obj in self.display_file if obj.graphical_representation.__class__.__name__ == tipo]) + 1}"
-
-        viewport_bounds = self.view.viewport.viewport_bounds
-        world_object = WorldObject(
-            points, name, viewport_bounds, graphical_representation
-        )
-
+        obj_type = world_object.__class__.__name__.replace("World", "")
         self.display_file.append(world_object)
-        self.view.add_log(f"{tipo} {name} created: {points}")
+        self.view.add_log(f"{obj_type} {name} created: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -100,12 +78,7 @@ class Model:
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
         """Aplica um pan na janela de visualização e atualiza a View."""
-
-        # Rotaciona dx e dy pelo ângulo atual da window
-        dx_world = dx * np.cos(self.window.angle) - dy * np.sin(self.window.angle)
-        dy_world = dx * np.sin(self.window.angle) + dy * np.cos(self.window.angle)
-
-        self.window.apply_pan(dx_world, dy_world)
+        self.window.apply_pan(dx, dy)
 
     @update_interface
     def handle_transformations(
@@ -222,20 +195,26 @@ class Model:
     def import_obj_file(self, filepath: str) -> None:
         """Importa um arquivo .obj e adiciona os objetos ao display file."""
 
-        obj_handler = ObjHandler()
-        objects_list = obj_handler.read_obj_file(filepath)
+        try:
+            world_objects, skipped_objects = WorldObjectFactory.new_objects_from_file(
+                filepath=filepath, display_file=self.display_file
+            )
 
-        for obj in objects_list:
+            for name in skipped_objects:
+                self.view.add_log(f"Object {name} already exists, skipping...")
 
-            if obj[1] in [
-                [(x, y) for x, y, *_ in objs.world_points] for objs in self.display_file
-            ]:
-                self.view.add_log(f"Object {obj[0]} already exists, skipping...")
-                continue
+            for world_object in world_objects:
+                self.display_file.append(world_object)
+                obj_type = world_object.__class__.__name__.replace("World", "")
+                self.view.add_log(
+                    f"{obj_type} {world_object.name} imported from {filepath}"
+                )
 
-            self.add_object(points=obj[1], name=obj[0], color=(0, 0, 0))
+            if not world_objects and not skipped_objects:
+                self.view.add_log(f"No objects found in {filepath}")
 
-        self.view.add_log(f"Objects successfully imported from {filepath}")
+        except Exception as e:
+            self.view.add_log(f"Error importing file: {e}")
 
     def export_obj_file(self, filepath: str, name: str) -> None:
         """Exporta os objetos do display file para um arquivo .obj."""
@@ -244,10 +223,10 @@ class Model:
             name = "output"
 
         filepath = os.path.join(filepath, f"{name}.obj")
+        obj_str = ""
 
-        obj_handler = ObjHandler()
-        obj_str = obj_handler.generate_obj_str(self.display_file)
-
+        for obj in self.display_file:
+            obj_str += obj.get_obj_description()
         with open(filepath, "w") as f:
             f.write(obj_str)
 

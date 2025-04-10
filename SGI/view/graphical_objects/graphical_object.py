@@ -11,13 +11,17 @@ class GraphicalObject(ABC):
     draw() de cada objeto gráfico).
     """
 
-    def __init__(self, color: tuple[int, int, int]):
+    def __init__(
+        self,
+        viewport_points: list[tuple[float, float, float]],
+        color: tuple[int, int, int],
+    ):
         """
         @param viewport_points: Lista de pontos do objeto NO VIEWPORT (e não no mundo). Pode
         ser uma lista simples, não havendo necessidade de usarmos np.array. Isso porque
         não faremos cálculos com esses pontos, já que isso é responsabilidade do Model.
         """
-        self.viewport_points = []
+        self.viewport_points = viewport_points
         self.color = color
 
     @abstractmethod
@@ -31,8 +35,3 @@ class GraphicalObject(ABC):
         pen = QtGui.QPen(QtGui.QColor(*self.color))
         pen.setWidth(3)
         return pen
-
-    def update_points(self, points: list[tuple[float, float]]) -> None:
-        """Atualiza os pontos do objeto gráfico."""
-
-        self.viewport_points = points

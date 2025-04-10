@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtGui
 from view.graphical_objects.graphical_object import GraphicalObject
 
 
-class Wireframe(GraphicalObject):
+class GraphicalWireframe(GraphicalObject):
     """Classe que representa um wireframe no viewport."""
 
     def draw(self, painter: QtGui.QPainter) -> None:
