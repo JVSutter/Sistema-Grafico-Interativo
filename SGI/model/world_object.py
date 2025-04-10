@@ -30,6 +30,23 @@ class WorldObject:
         self.viewport_points = self.transform_normalized_points_to_viewport()
         self.graphical_representation.update_points(self.viewport_points)
 
+    def get_clipped_representation(self) -> GraphicalObject | None:
+        """
+        Executa algoritmos de clipping para o objeto antes de passar a representação gráfica para
+        o viewport.
+
+        @return: Retorna a representação gráfica do objeto após o clipping. None se o objeto estiver fora
+        do viewport.
+        """
+
+        if len(self.normalized_points) == 1:  # Ponto
+            x, y = self.normalized_points[0]
+            if x < -1 or x > 1 or y < -1 or y > 1:
+                return None
+
+        # TODO: Segmentos de reta e polígonos, separar WorldObject em subclasses
+        return self.graphical_representation
+
     def transform_normalized_points_to_viewport(self) -> list[tuple[float, float]]:
         """Retorna as coordenadas do objeto gráfico para o viewport."""
 
@@ -40,8 +57,8 @@ class WorldObject:
             vp_width = self.viewport_bounds.x_max - self.viewport_bounds.x_min
             vp_height = self.viewport_bounds.y_max - self.viewport_bounds.y_min
 
-            vx = (nx + 1) / 2 * vp_width
-            vy = (1 - ny) / 2 * vp_height
+            vx = (nx + 1) / 2 * vp_width + self.viewport_bounds.x_min
+            vy = (1 - ny) / 2 * vp_height + self.viewport_bounds.y_min
             transformed_points.append((vx, vy))
 
         return transformed_points
@@ -49,11 +66,11 @@ class WorldObject:
     def get_homogeneous_coordinates(self, points: list[tuple]) -> list[np.array]:
         """Retorna as coordenadas homogêneas dos pontos do objeto."""
 
-        homogenous_coordinates = []
+        homogeneous_coordinates = []
         for point in points:
             x, y = point
-            homogenous_coordinates.append(np.array([x, y, 1]))
-        return homogenous_coordinates
+            homogeneous_coordinates.append(np.array([x, y, 1]))
+        return homogeneous_coordinates
 
     def update_coordinates(self, composite_matrix: np.ndarray) -> None:
         """

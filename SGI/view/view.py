@@ -68,14 +68,14 @@ class View(QtWidgets.QMainWindow):
 
         sys.exit(self.app.exec())
 
-    def update_view_objects(self, objects_list: list[GraphicalObject]) -> None:
+    def update_view_objects(
+        self, graphical_objs: list[GraphicalObject], obj_list: list[str]
+    ) -> None:
         """Atualiza a view com a lista de objetos gráficos. Atualizando o viewport e a lista de objetos."""
 
-        self.viewport.update_viewport(
-            [obj.graphical_representation for obj in objects_list]
-        )
+        self.viewport.update_viewport(graphical_objs)
         self.objectsList.clear()
-        self.objectsList.addItems([str(obj) for obj in objects_list])
+        self.objectsList.addItems([str(obj) for obj in obj_list])
 
     def add_log(self, message) -> None:
         """Adiciona uma mensagem ao log da aplicação"""

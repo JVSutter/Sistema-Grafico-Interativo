@@ -37,6 +37,7 @@ class Viewport(QtWidgets.QWidget):
         """
 
         super().resizeEvent(event)
+
         self.viewport_bounds = Bounds(
             x_min=self.viewport_offset,
             x_max=self.width() - self.viewport_offset,

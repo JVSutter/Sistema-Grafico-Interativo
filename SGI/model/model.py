@@ -5,6 +5,7 @@ import numpy as np
 from model.window import Window
 from model.world_object import WorldObject
 from utils.obj_handler import ObjHandler
+from view.graphical_objects.graphical_object import GraphicalObject
 from view.graphical_objects.line import Line
 from view.graphical_objects.point import Point
 from view.graphical_objects.wireframe import Wireframe
@@ -31,11 +32,26 @@ class Model:
             self._calculate_and_update_scn()
 
             # Atualiza a View
-            self.view.update_view_objects(self.display_file)
+            graphical_representations = self.get_graphical_representations()
+            obj_list = [str(obj) for obj in self.display_file]
+            self.view.update_view_objects(graphical_representations, obj_list)
 
             return result
 
         return wrapper
+
+    def get_graphical_representations(self) -> list:
+        """
+        Retorna as representações gráficas a serem enviadas para o viewport.
+        """
+
+        graphical_representations = []
+        for obj in self.display_file:
+            graphical_representation = obj.get_clipped_representation()
+            if graphical_representation is not None:
+                graphical_representations.append(graphical_representation)
+
+        return graphical_representations
 
     @update_interface
     def add_object(self, points: list, name: str, color: tuple) -> None:
