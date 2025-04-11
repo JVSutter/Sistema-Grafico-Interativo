@@ -65,10 +65,10 @@ class Window:
         self.window_bounds.y_min += dy_world
         self.window_bounds.y_max += dy_world
 
-    def apply_rotation(self, angle_rad: float) -> None:
+    def apply_rotation(self, angle_degrees: float) -> None:
         """Aplica uma rotação na janela de visualização."""
 
-        self.angle = angle_rad
+        self.angle = np.radians(angle_degrees)
 
         # Rotaciona o vup para o novo ângulo
         rotation_matrix = np.array(

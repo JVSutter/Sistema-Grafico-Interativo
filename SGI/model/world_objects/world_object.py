@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from utils.bounds import Bounds
-from view.graphical_objects.graphical_object import GraphicalObject
 
 
 class WorldObject(ABC):
@@ -26,7 +25,7 @@ class WorldObject(ABC):
         self.color = color
 
     def update_normalized_points(self, norm_points: list[tuple[float, float]]):
-        """Atualiza as coordenadas normalizadas (SCN)"""
+        """Atualiza as coordenadas normalizadas (NCS)"""
 
         self.normalized_points = norm_points
         self.viewport_points = self.transform_normalized_points_to_viewport()

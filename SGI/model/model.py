@@ -1,10 +1,7 @@
 import os
 
-import numpy as np
-
+from model.display_file_manager import DisplayFileManager
 from model.window import Window
-from model.world_objects.world_object import WorldObject
-from model.world_objects.world_object_factory import WorldObjectFactory
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.view import View
 
@@ -15,8 +12,9 @@ class Model:
     def __init__(self, view: View):
         self.view = view
         self.window = Window(viewport_bounds=view.viewport.viewport_bounds)
-        self.display_file: list[WorldObject] = []
-        WorldObjectFactory.viewport_bounds = self.view.viewport.viewport_bounds
+        self.display_file_manager = DisplayFileManager(
+            self.view.viewport.viewport_bounds
+        )
 
     @staticmethod
     def update_interface(func: callable) -> callable:
@@ -27,11 +25,11 @@ class Model:
             result = func(*args, **kwargs)
 
             # Recalcula as coordenadas normalizadas para todos os objetos
-            self._calculate_and_update_scn()
+            self._calculate_and_update_ncs()
 
             # Atualiza a View
             graphical_representations = self.get_graphical_representations()
-            obj_list = [str(obj) for obj in self.display_file]
+            obj_list = self.display_file_manager.get_objs_as_strings()
             self.view.update_view_objects(graphical_representations, obj_list)
 
             return result
@@ -40,32 +38,20 @@ class Model:
 
     def get_graphical_representations(self) -> list[GraphicalObject]:
         """
-        Retorna as representações gráficas a serem enviadas para o viewport desenhar.
-        @return: Lista de representações gráficas após o clipping.
+        Retorna as representações gráficas de todos os objetos gráficos a serem mostrados no Viewport
         """
 
-        representations = []
-        for obj in self.display_file:
-            representations.extend(obj.get_clipped_representation())
-
-        return representations
+        return self.display_file_manager.get_clipped_representations()
 
     @update_interface
     def add_object(self, points: list, name: str, color: tuple) -> None:
-        """Adiciona um objeto gráfico ao display file e atualiza a View."""
+        """Adiciona um objeto gráfico ao mundo."""
 
-        world_object = WorldObjectFactory.new_world_object(
-            points=points, name=name, color=color, display_file=self.display_file
-        )
-
-        if world_object is None:
-            self.view.add_log("Object already exists, skipping...")
+        if self.display_file_manager.add_object(points=points, name=name, color=color):
+            self.view.add_log(f"Object {name} added: {points}")
             return
 
-        self.display_file.append(world_object)
-
-        obj_type = world_object.__class__.__name__.replace("World", "")
-        self.view.add_log(f"{obj_type} {world_object.name} created: {points}")
+        self.view.add_log("Object already exists, skipping...")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -74,7 +60,7 @@ class Model:
         @param index: Índice do objeto a ser removido. Coincide com o índice na lista de objetos da interface.
         """
 
-        self.display_file.pop(index)
+        self.display_file_manager.remove_object(index)
 
     @update_interface
     def zoom(self, factor: float) -> None:
@@ -82,7 +68,6 @@ class Model:
         Aplica um zoom na janela de visualização e atualiza a View.
         @factor: Fator de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
         """
-
         self.window.apply_zoom(factor)
 
     @update_interface
@@ -95,7 +80,9 @@ class Model:
 
     @update_interface
     def handle_transformations(
-        self, index: int, transformations_list: list[dict]
+        self,
+        index: int,
+        transformations_list: list[dict],
     ) -> None:
         """
         Processa uma lista de transformações em um objeto sequencialmente,
@@ -104,134 +91,63 @@ class Model:
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         """
 
-        if not transformations_list:
-            return
-
-        # Inicializa a matriz composta como a matriz identidade
-        composite_matrix = np.identity(3)
-
-        obj = self.display_file[index]
-
         for transformation in transformations_list:
-            transformation_type = transformation["type"]
-            matrix = np.identity(3)
-
-            if transformation_type == "translation":
-                dx = transformation["dx"]
-                dy = transformation["dy"]
-                matrix = self.get_translation_matrix(dx, dy)
-                self.view.add_log(f"{obj.name}: Translation ({dx}, {dy})")
-
-            elif transformation_type == "scaling":
-                sx = transformation["sx"]
-                sy = transformation["sy"]
-                center_x, center_y = obj.get_center()
-                center_transformed = (
-                    np.array([center_x, center_y, 1]) @ composite_matrix
-                )
-                cx_current, cy_current = center_transformed[0], center_transformed[1]
-                matrix = self.get_scaling_matrix(sx, sy, cx_current, cy_current)
-                self.view.add_log(f"{obj.name}: Scaling ({sx*100:.1f}%, {sy*100:.1f}%)")
-
-            elif transformation_type == "rotation":
-                angle = transformation["angle"]
-                cx = transformation["cx"]
-                cy = transformation["cy"]
-
-                if cx == "obj_center":
-                    center_x, center_y = obj.get_center()
-                    center_transformed = (
-                        np.array([center_x, center_y, 1]) @ composite_matrix
-                    )
-                    cx_current, cy_current = (
-                        center_transformed[0],
-                        center_transformed[1],
-                    )
-                    matrix = self.get_rotation_matrix(angle, cx_current, cy_current)
-                else:  # origem ou ponto arbitrario
-                    matrix = self.get_rotation_matrix(angle, float(cx), float(cy))
-
+            if transformation["type"] == "scale":
                 self.view.add_log(
-                    f"{obj.name}: Rotation ({angle}°) around ({cx}, {cy})"
+                    f"Scaling object {index} by factors {transformation['sx']}, {transformation['sy']}"
+                )
+            elif transformation["type"] == "translate":
+                self.view.add_log(
+                    f"Translating object {index} by ({transformation['dx']}, {transformation['dy']})"
+                )
+            elif transformation["type"] == "rotate":
+                self.view.add_log(
+                    f"Rotating object {index} by {transformation['angle']} degrees"
                 )
 
-            composite_matrix = composite_matrix @ matrix
-
-        obj.update_coordinates(composite_matrix)
-
+        obj = self.display_file_manager.display_file[index]
         self.view.add_log(f"{obj.name}: Transformations applied.")
 
-    def _calculate_and_update_scn(self) -> None:
+    def _calculate_and_update_ncs(self) -> None:
         """Calcula as coordenadas normalizadas para todos os objetos."""
 
-        # 0. Obtem os parametros da window
-        wcx, wcy = self.window.get_center()  # centro da window
-        win_width, win_height = (
-            self.window.get_width_height()
-        )  # largura e altura da window
+        window_cx, window_cy = self.window.get_center()
+        window_width, window_height = self.window.get_width_height()
+        window_vup = self.window.vup
 
-        # 1. Translada Wc para origem
-        translate_to_origin = np.array([[1, 0, 0], [0, 1, 0], [-wcx, -wcy, 1]])
-        transformations = translate_to_origin
-
-        # 2. Determina vup e o angulo entre ele e o eixo y
-        vup = self.window.vup
-        angle_vup_y = np.arctan2(vup[1], vup[0]) - np.pi / 2
-        rotation_angle_rad = -angle_vup_y
-
-        # 3. Rotaciona o mundo para alinhar vup com o eixo y
-        cos_r = np.cos(rotation_angle_rad)
-        sin_r = np.sin(rotation_angle_rad)
-        rotate_align_y = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        transformations = transformations @ rotate_align_y
-
-        # 4. Normaliza as coordenadas, realizando um escalonamento
-        scale_x = 2.0 / win_width if win_width != 0 else 1.0
-        scale_y = 2.0 / win_height if win_height != 0 else 1.0
-        scale_to_scn = np.array([[scale_x, 0, 0], [0, scale_y, 0], [0, 0, 1]])
-        transformations = transformations @ scale_to_scn
-
-        # 5. Calcula a SCN e armazena no display file de cada objeto
-        for obj in self.display_file:
-            normalized_coords = []
-
-            for point_wc in obj.world_points:
-                point_scn = point_wc @ transformations  # Transforma o ponto WC para SCN
-
-                nx = point_scn[0]
-                ny = point_scn[1]
-
-                normalized_coords.append((nx, ny))
-
-            obj.update_normalized_points(normalized_coords)
+        self.display_file_manager.update_ncs_coordinates(
+            window_cx=window_cx,
+            window_cy=window_cy,
+            window_height=window_height,
+            window_width=window_width,
+            window_vup=window_vup,
+        )
 
     @update_interface
     def import_obj_file(self, filepath: str) -> None:
         """
-        Importa um arquivo .obj e adiciona os objetos ao display file.
+        Importa um arquivo .obj para o display file.
         @param filepath: Caminho do arquivo .obj a ser importado.
         """
 
         try:
-            world_objects, skipped_objects = WorldObjectFactory.new_objects_from_file(
-                filepath=filepath, display_file=self.display_file
+            world_objects, skipped_objects = (
+                self.display_file_manager.import_file_to_display_file(filepath=filepath)
             )
 
-            for _ in skipped_objects:
-                self.view.add_log("Object already exists, skipping...")
-
             for world_object in world_objects:
-                self.display_file.append(world_object)
-                obj_type = world_object.__class__.__name__.replace("World", "")
                 self.view.add_log(
-                    f"{obj_type} {world_object.name} imported from {filepath}"
+                    f"Object {world_object.name} imported: {world_object.world_points}"
                 )
+            if skipped_objects:
+                self.view.add_log(f"Skipped objects: {skipped_objects}")
 
-            if not world_objects and not skipped_objects:
-                self.view.add_log(f"No objects found in {filepath}")
-
+        except FileNotFoundError:
+            self.view.add_log(f"File not found: {filepath}")
+            return
         except Exception as e:
             self.view.add_log(f"Error importing file: {e}")
+            return
 
     def export_obj_file(self, filepath: str, name: str) -> None:
         """
@@ -244,58 +160,12 @@ class Model:
             name = "output"
 
         filepath = os.path.join(filepath, f"{name}.obj")
-        obj_str = ""
+        obj_str = self.display_file_manager.convert_display_file_to_obj()
 
-        for obj in self.display_file:
-            obj_str += obj.get_obj_description()
         with open(filepath, "w") as f:
             f.write(obj_str)
 
         self.view.add_log(f"Objects successfully exported to {filepath}")
-
-    def get_translation_matrix(self, dx: float, dy: float) -> np.ndarray:
-        """
-        Retorna a matriz de translação.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
-        """
-
-        return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
-
-    def get_scaling_matrix(
-        self, sx: float, sy: float, cx: float, cy: float
-    ) -> np.ndarray:
-        """
-        Retorna a matriz de escalonamento.
-        @param sx: Fator de escalonamento em x.
-        @param sy: Fator de escalonamento em y.
-        @param cx: Coordenada x do centro de escalonamento.
-        @param cy: Coordenada y do centro de escalonamento.
-        """
-
-        translate_to_origin = self.get_translation_matrix(-cx, -cy)
-        scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        translate_back = self.get_translation_matrix(cx, cy)
-        return translate_to_origin @ scale @ translate_back
-
-    def get_rotation_matrix(
-        self, angle_degrees: float, cx: float, cy: float
-    ) -> np.ndarray:
-        """
-        Retorna a matriz de rotação em torno de (cx, cy).
-        @param angle_degrees: Ângulo de rotação em graus.
-        @param cx: Coordenada x do centro de rotação.
-        @param cy: Coordenada y do centro de rotação.
-        """
-
-        angle_radians = np.radians(angle_degrees)
-        cos_r = np.cos(angle_radians)
-        sin_r = np.sin(angle_radians)
-
-        translate_to_origin = self.get_translation_matrix(-cx, -cy)
-        rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        translate_back = self.get_translation_matrix(cx, cy)
-        return translate_to_origin @ rotate @ translate_back
 
     @update_interface
     def rotate_window(self, angle: float) -> None:
@@ -304,6 +174,4 @@ class Model:
         @param angle: Ângulo de rotação em graus.
         """
 
-        angle_radians = np.radians(angle)
-
-        self.window.apply_rotation(angle_radians)
+        self.window.apply_rotation(angle)
