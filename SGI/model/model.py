@@ -3,7 +3,9 @@ import os
 import numpy as np
 
 from model.window import Window
+from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
+from view.graphical_objects.graphical_object import GraphicalObject
 from view.view import View
 
 
@@ -13,7 +15,7 @@ class Model:
     def __init__(self, view: View):
         self.view = view
         self.window = Window(viewport_bounds=view.viewport.viewport_bounds)
-        self.display_file = []
+        self.display_file: list[WorldObject] = []
         WorldObjectFactory.viewport_bounds = self.view.viewport.viewport_bounds
 
     @staticmethod
@@ -36,9 +38,10 @@ class Model:
 
         return wrapper
 
-    def get_graphical_representations(self) -> list:
+    def get_graphical_representations(self) -> list[GraphicalObject]:
         """
-        Retorna as representações gráficas a serem enviadas para o viewport.
+        Retorna as representações gráficas a serem enviadas para o viewport desenhar.
+        @return: Lista de representações gráficas após o clipping.
         """
 
         representations = []
@@ -59,25 +62,35 @@ class Model:
             self.view.add_log("Object already exists, skipping...")
             return
 
-        obj_type = world_object.__class__.__name__.replace("World", "")
         self.display_file.append(world_object)
+
+        obj_type = world_object.__class__.__name__.replace("World", "")
         self.view.add_log(f"{obj_type} {world_object.name} created: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
-        """Remove um objeto do display file e atualiza a View."""
+        """
+        Remove um objeto do display file e atualiza a View.
+        @param index: Índice do objeto a ser removido. Coincide com o índice na lista de objetos da interface.
+        """
 
         self.display_file.pop(index)
 
     @update_interface
     def zoom(self, factor: float) -> None:
-        """Aplica um zoom na janela de visualização e atualiza a View."""
+        """
+        Aplica um zoom na janela de visualização e atualiza a View.
+        @factor: Fator de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
+        """
 
         self.window.apply_zoom(factor)
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
-        """Aplica um pan na janela de visualização e atualiza a View."""
+        """Aplica um pan na janela de visualização e atualiza a View.
+        @param dx: Deslocamento em x.
+        @param dy: Deslocamento em y.
+        """
         self.window.apply_pan(dx, dy)
 
     @update_interface
@@ -148,8 +161,8 @@ class Model:
 
         self.view.add_log(f"{obj.name}: Transformations applied.")
 
-    def _calculate_and_update_scn(self):
-        """Calcula as coordenadas normalizadas para todos os objetos e atualiza a View."""
+    def _calculate_and_update_scn(self) -> None:
+        """Calcula as coordenadas normalizadas para todos os objetos."""
 
         # 0. Obtem os parametros da window
         wcx, wcy = self.window.get_center()  # centro da window
@@ -194,7 +207,10 @@ class Model:
 
     @update_interface
     def import_obj_file(self, filepath: str) -> None:
-        """Importa um arquivo .obj e adiciona os objetos ao display file."""
+        """
+        Importa um arquivo .obj e adiciona os objetos ao display file.
+        @param filepath: Caminho do arquivo .obj a ser importado.
+        """
 
         try:
             world_objects, skipped_objects = WorldObjectFactory.new_objects_from_file(
@@ -218,7 +234,11 @@ class Model:
             self.view.add_log(f"Error importing file: {e}")
 
     def export_obj_file(self, filepath: str, name: str) -> None:
-        """Exporta os objetos do display file para um arquivo .obj."""
+        """
+        Exporta os objetos do display file para um arquivo .obj.
+        @param filepath: Caminho do diretório onde o arquivo .obj será salvo.
+        @param name: Nome do arquivo .obj a ser salvo.
+        """
 
         if not name:
             name = "output"
@@ -234,14 +254,24 @@ class Model:
         self.view.add_log(f"Objects successfully exported to {filepath}")
 
     def get_translation_matrix(self, dx: float, dy: float) -> np.ndarray:
-        """Retorna a matriz de translação."""
+        """
+        Retorna a matriz de translação.
+        @param dx: Deslocamento em x.
+        @param dy: Deslocamento em y.
+        """
 
         return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
 
     def get_scaling_matrix(
         self, sx: float, sy: float, cx: float, cy: float
     ) -> np.ndarray:
-        """Retorna a matriz de escalonamento em torno de (cx, cy)."""
+        """
+        Retorna a matriz de escalonamento.
+        @param sx: Fator de escalonamento em x.
+        @param sy: Fator de escalonamento em y.
+        @param cx: Coordenada x do centro de escalonamento.
+        @param cy: Coordenada y do centro de escalonamento.
+        """
 
         translate_to_origin = self.get_translation_matrix(-cx, -cy)
         scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
@@ -251,7 +281,12 @@ class Model:
     def get_rotation_matrix(
         self, angle_degrees: float, cx: float, cy: float
     ) -> np.ndarray:
-        """Retorna a matriz de rotação em torno de (cx, cy)."""
+        """
+        Retorna a matriz de rotação em torno de (cx, cy).
+        @param angle_degrees: Ângulo de rotação em graus.
+        @param cx: Coordenada x do centro de rotação.
+        @param cy: Coordenada y do centro de rotação.
+        """
 
         angle_radians = np.radians(angle_degrees)
         cos_r = np.cos(angle_radians)
@@ -264,7 +299,10 @@ class Model:
 
     @update_interface
     def rotate_window(self, angle: float) -> None:
-        """Rotaciona a janela de visualização para o ângulo especificado em graus."""
+        """
+        Rotaciona a janela de visualização para o ângulo especificado em graus.
+        @param angle: Ângulo de rotação em graus.
+        """
 
         angle_radians = np.radians(angle)
 

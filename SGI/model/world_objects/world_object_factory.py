@@ -78,7 +78,7 @@ class WorldObjectFactory:
                             )
 
                         current_object_name = (
-                            parts[1]
+                            " ".join(parts[1:])
                             if len(parts) > 1
                             else f"Object {len(objects_list) + 1}"
                         )

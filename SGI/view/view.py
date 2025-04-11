@@ -71,7 +71,11 @@ class View(QtWidgets.QMainWindow):
     def update_view_objects(
         self, graphical_objs: list[GraphicalObject], obj_list: list[str]
     ) -> None:
-        """Atualiza a view com a lista de objetos gráficos. Atualizando o viewport e a lista de objetos."""
+        """
+        Atualiza a view com a lista de objetos gráficos.
+        @param graphical_objs: Lista de objetos gráficos a serem exibidos após o clipping.
+        @param obj_list: Lista de objetos a serem exibidos na lista de objetos lateral.
+        """
 
         self.viewport.update_viewport(graphical_objs)
         self.objectsList.clear()
@@ -80,8 +84,8 @@ class View(QtWidgets.QMainWindow):
     def add_log(self, message) -> None:
         """Adiciona uma mensagem ao log da aplicação"""
 
-        logbox = self.logsBox  # Pega o objeto que contem o log
-        logbox.addItem(message)  # Adiciona a mensagem ao log
+        logbox = self.logsBox
+        logbox.addItem(message)
         logbox.scrollToBottom()  # Faz o log rolar para baixo para mostrar a mensagem mais recente
 
     def on_create_object(self, dialog: ObjectDialog) -> None:

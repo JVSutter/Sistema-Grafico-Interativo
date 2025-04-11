@@ -20,17 +20,24 @@ class GraphicalObject(ABC):
         @param viewport_points: Lista de pontos do objeto NO VIEWPORT (e não no mundo). Pode
         ser uma lista simples, não havendo necessidade de usarmos np.array. Isso porque
         não faremos cálculos com esses pontos, já que isso é responsabilidade do Model.
+        @param color: Cor do objeto gráfico. Deve ser uma tupla com três valores inteiros: (R, G, B)
         """
+
         self.viewport_points = viewport_points
         self.color = color
 
     @abstractmethod
     def draw(self, painter: QtGui.QPainter) -> None:
-        """Desenha o objeto gráfico na tela."""
-        pass
+        """
+        Desenha o objeto gráfico na tela.
+        @param painter: O pintor que desenhará o objeto gráfico.
+        """
 
     def get_pen(self) -> QtGui.QPen:
-        """Retorna a caneta a ser utilizada para desenhar o objeto."""
+        """
+        Retorna a caneta a ser utilizada para desenhar o objeto.
+        @return: Caneta com a cor do objeto.
+        """
 
         pen = QtGui.QPen(QtGui.QColor(*self.color))
         pen.setWidth(3)

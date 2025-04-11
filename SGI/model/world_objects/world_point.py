@@ -1,5 +1,4 @@
 from model.world_objects.world_object import WorldObject
-from view.graphical_objects.graphical_object import GraphicalObject
 from view.graphical_objects.graphical_point import GraphicalPoint
 
 
