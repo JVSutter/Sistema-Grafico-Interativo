@@ -56,12 +56,12 @@ class Model:
         )
 
         if world_object is None:
-            self.view.add_log(f"Object {name} already exists, skipping...")
+            self.view.add_log("Object already exists, skipping...")
             return
 
         obj_type = world_object.__class__.__name__.replace("World", "")
         self.display_file.append(world_object)
-        self.view.add_log(f"{obj_type} {name} created: {points}")
+        self.view.add_log(f"{obj_type} {world_object.name} created: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -192,6 +192,7 @@ class Model:
 
             obj.update_normalized_points(normalized_coords)
 
+    @update_interface
     def import_obj_file(self, filepath: str) -> None:
         """Importa um arquivo .obj e adiciona os objetos ao display file."""
 
@@ -200,8 +201,8 @@ class Model:
                 filepath=filepath, display_file=self.display_file
             )
 
-            for name in skipped_objects:
-                self.view.add_log(f"Object {name} already exists, skipping...")
+            for _ in skipped_objects:
+                self.view.add_log("Object already exists, skipping...")
 
             for world_object in world_objects:
                 self.display_file.append(world_object)

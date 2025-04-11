@@ -33,7 +33,7 @@ class WorldObjectFactory:
             obj_type = WorldWireframe
 
         if not name:
-            obj_type_name = obj_type.__class__.__name__.replace("World", "")
+            obj_type_name = obj_type.__name__.replace("World", "")
             objects_with_same_type = [
                 obj
                 for obj in display_file
