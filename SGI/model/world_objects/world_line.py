@@ -21,11 +21,13 @@ class WorldLine(WorldObject):
         self.top = 0b1000
 
     def get_clipped_representation(self) -> GraphicalLine | None:
-        clipped_points = self.cohen_sutherland_clipping()
+        clipped_points = self.liang_barsky_clipping()
 
         if clipped_points is None:
+            print("Linha fora do viewport")
             return None
 
+        print("Clipping realizado com sucesso")
         viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
         graphical_representation = GraphicalLine(viewport_points, self.color)
         return graphical_representation
@@ -109,3 +111,49 @@ class WorldLine(WorldObject):
         if accepted:
             return [(x1, y1), (x2, y2)]
         return None
+
+    def liang_barsky_clipping(self) -> tuple | None:
+        """
+        Algoritmo de Liang-Barsky para recorte de linhas.
+        @return: Tupla com os pontos recortados da linha em coordenadas normalizadas ou None se a linha
+        estiver fora do Viewport.
+        """
+
+        x_min, x_max = -1, 1
+        y_min, y_max = -1, 1
+
+        start_x, start_y = self.normalized_points[0]
+        end_x, end_y = self.normalized_points[1]
+
+        print(f"Start: ({start_x}, {start_y}), End: ({end_x}, {end_y})")
+        delta_x = end_x - start_x
+        delta_y = end_y - start_y
+
+        # Componentes de direção e distâncias até as bordas
+        directions = [-delta_x, delta_x, -delta_y, delta_y]
+        distances = [start_x - x_min, x_max - start_x, start_y - y_min, y_max - start_y]
+
+        t_enter = 0.0  # Limite inferior máximo para t
+        t_exit = 1.0  # Limite superior mínimo para t
+
+        for direction_component, distance_to_edge in zip(directions, distances):
+            if direction_component == 0:
+                if distance_to_edge < 0:
+                    return None  # Linha paralela e fora do limite, deve ser descartada
+            else:
+                t = distance_to_edge / direction_component
+                if direction_component < 0:
+                    t_enter = max(t_enter, t)  # Atualiza limite inferior
+                else:
+                    t_exit = min(t_exit, t)  # Atualiza limite superior
+
+        if t_enter > t_exit:
+            print("t_enter > t_exit, linha fora do viewport")
+            return None
+
+        clipped_start_x = start_x + t_enter * delta_x
+        clipped_start_y = start_y + t_enter * delta_y
+        clipped_end_x = start_x + t_exit * delta_x
+        clipped_end_y = start_y + t_exit * delta_y
+
+        return [(clipped_start_x, clipped_start_y), (clipped_end_x, clipped_end_y)]
