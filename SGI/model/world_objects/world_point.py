@@ -5,14 +5,14 @@ from view.graphical_objects.graphical_point import GraphicalPoint
 class WorldPoint(WorldObject):
     """Classe pertinente a pontos no mundo."""
 
-    def get_clipped_representation(self) -> None:
+    def get_clipped_representation(self) -> GraphicalPoint | None:
         """
         Apenda o ponto apenas se estiver dentro dos limites do Viewport
         """
 
         x, y = self.normalized_points[0]
         if x < -1 or x > 1 or y < -1 or y > 1:
-            return []
+            return None
 
         graphical_representation = GraphicalPoint(self.viewport_points, self.color)
         return graphical_representation

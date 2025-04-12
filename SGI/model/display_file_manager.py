@@ -1,6 +1,6 @@
 import numpy as np
 
-from model.graphical_algorithms import GraphicalAlgorithms
+from model.transformation_manager import TransformationManager
 from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
 from utils.bounds import Bounds
@@ -24,7 +24,11 @@ class DisplayFileManager:
 
         representations = []
         for obj in self.display_file:
-            representations.append(obj.get_clipped_representation())
+            representation = obj.get_clipped_representation()
+            if representation is None:
+                continue
+
+            representations.append(representation)
         return representations
 
     def get_obj_name(self, index: int) -> str:
@@ -91,7 +95,7 @@ class DisplayFileManager:
 
         obj = self.display_file[index]
         obj_center = obj.get_center()
-        transformation_mtx = GraphicalAlgorithms.get_transformation_matrix(
+        transformation_mtx = TransformationManager.get_transformation_matrix(
             transformations_list=transformations_list, obj_center=obj_center
         )
 
@@ -116,7 +120,7 @@ class DisplayFileManager:
         @param window_vup: Vetor de direção para cima da janela.
         """
 
-        ncs_conversion_mtx = GraphicalAlgorithms.get_ncs_transformation_matrix(
+        ncs_conversion_mtx = TransformationManager.get_ncs_transformation_matrix(
             window_cx=window_cx,
             window_cy=window_cy,
             window_vup=window_vup,
