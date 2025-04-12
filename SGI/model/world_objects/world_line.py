@@ -24,10 +24,8 @@ class WorldLine(WorldObject):
         clipped_points = self.liang_barsky_clipping()
 
         if clipped_points is None:
-            print("Linha fora do viewport")
             return None
 
-        print("Clipping realizado com sucesso")
         viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
         graphical_representation = GraphicalLine(viewport_points, self.color)
         return graphical_representation
@@ -125,7 +123,6 @@ class WorldLine(WorldObject):
         start_x, start_y = self.normalized_points[0]
         end_x, end_y = self.normalized_points[1]
 
-        print(f"Start: ({start_x}, {start_y}), End: ({end_x}, {end_y})")
         delta_x = end_x - start_x
         delta_y = end_y - start_y
 
@@ -148,7 +145,6 @@ class WorldLine(WorldObject):
                     t_exit = min(t_exit, t)  # Atualiza limite superior
 
         if t_enter > t_exit:
-            print("t_enter > t_exit, linha fora do viewport")
             return None
 
         clipped_start_x = start_x + t_enter * delta_x
