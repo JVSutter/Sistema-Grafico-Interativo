@@ -28,17 +28,20 @@ class DisplayFileManager:
 
         return representations
 
-    def add_object(self, points: list, name: str, color: tuple) -> bool:
-        """Adiciona um objeto gráfico ao display file e atualiza a View."""
+    def add_object(self, points: list, name: str, color: tuple) -> str | None:
+        """
+        Adiciona um objeto gráfico ao display file e atualiza a View.
+        @return: Retorna uma string com o nome do objeto adicionado ou None se o objeto já existir.
+        """
 
         world_object = WorldObjectFactory.new_world_object(
             points=points, name=name, color=color, display_file=self.display_file
         )
 
         if world_object is None:
-            return False
+            return None
         self.display_file.append(world_object)
-        return True
+        return world_object.name
 
     def remove_object(self, index: int) -> None:
         """Remove um objeto gráfico do display file."""
@@ -64,11 +67,12 @@ class DisplayFileManager:
         """
 
         obj = self.display_file[index]
+        obj_center = obj.get_center()
         transformation_mtx = GraphicalAlgorithms.get_transformation_matrix(
             transformations_list=transformations_list, obj_center=obj_center
         )
 
-        if not transformation_mtx:
+        if transformation_mtx is None:
             return
         obj.update_coordinates(transformation_mtx)
 
@@ -123,4 +127,4 @@ class DisplayFileManager:
         for world_object in world_objects:
             self.display_file.append(world_object)
 
-        return world_objects, skipped_objects
+        return skipped_objects

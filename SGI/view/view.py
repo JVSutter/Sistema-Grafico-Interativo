@@ -215,9 +215,7 @@ class View(QtWidgets.QMainWindow):
     def open_export_file_dialog(self) -> tuple[str, str]:
         """Abre um diálogo para selecionar uma pasta."""
 
-        display_file = self.controller.get_display_file()
-
-        if len(display_file) == 0:
+        if self.objectsList.count() == 0:
             self.add_log("You must create an object to export")
             return None, None
 

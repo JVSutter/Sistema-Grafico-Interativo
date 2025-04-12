@@ -87,10 +87,3 @@ class Controller:
         """
 
         self.model.export_obj_file(filepath, name)
-
-    def get_display_file(self) -> list:
-        """
-        Retorna a lista de objetos do mundo.
-        """
-
-        return self.model.display_file

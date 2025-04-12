@@ -47,11 +47,14 @@ class Model:
     def add_object(self, points: list, name: str, color: tuple) -> None:
         """Adiciona um objeto gráfico ao mundo."""
 
-        if self.display_file_manager.add_object(points=points, name=name, color=color):
-            self.view.add_log(f"Object {name} added: {points}")
+        obj_name = self.display_file_manager.add_object(
+            points=points, name=name, color=color
+        )
+        if obj_name is None:
+            self.view.add_log("Object already exists, skipping...")
             return
 
-        self.view.add_log("Object already exists, skipping...")
+        self.view.add_log(f"Object {obj_name} added: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -91,18 +94,23 @@ class Model:
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         """
 
+        self.display_file_manager.apply_transformation(
+            index=index,
+            transformations_list=transformations_list,
+        )
+
         for transformation in transformations_list:
-            if transformation["type"] == "scale":
+            if transformation["type"] == "scaling":
                 self.view.add_log(
-                    f"Scaling object {index} by factors {transformation['sx']}, {transformation['sy']}"
+                    f"Scaling object by factors {transformation['sx']}, {transformation['sy']}"
                 )
-            elif transformation["type"] == "translate":
+            elif transformation["type"] == "translation":
                 self.view.add_log(
-                    f"Translating object {index} by ({transformation['dx']}, {transformation['dy']})"
+                    f"Translating object by ({transformation['dx']}, {transformation['dy']})"
                 )
-            elif transformation["type"] == "rotate":
+            elif transformation["type"] == "rotation":
                 self.view.add_log(
-                    f"Rotating object {index} by {transformation['angle']} degrees"
+                    f"Rotating object by {transformation['angle']} degrees"
                 )
 
         obj = self.display_file_manager.display_file[index]
@@ -131,16 +139,13 @@ class Model:
         """
 
         try:
-            world_objects, skipped_objects = (
+            skipped_objects = (
                 self.display_file_manager.import_file_to_display_file(filepath=filepath)
             )
 
-            for world_object in world_objects:
-                self.view.add_log(
-                    f"Object {world_object.name} imported: {world_object.world_points}"
-                )
+            self.view.add_log(f"Objects successfully imported from {filepath}")
             if skipped_objects:
-                self.view.add_log(f"Skipped objects: {skipped_objects}")
+                self.view.add_log(f"Skipped objects: {", ".join(skipped_objects)}")
 
         except FileNotFoundError:
             self.view.add_log(f"File not found: {filepath}")

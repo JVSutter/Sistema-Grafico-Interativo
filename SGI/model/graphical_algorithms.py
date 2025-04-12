@@ -59,15 +59,16 @@ class GraphicalAlgorithms:
     @classmethod
     def get_transformation_matrix(
         cls, transformations_list: list[dict], obj_center: tuple[float, float]
-    ) -> np.ndarray:
+    ) -> np.ndarray | None:
         """
         Método para obtenção de uma matriz de transformação composta.
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         @return: Matriz que produzirá uma transformação equivalente a todas as transformações individuais.
+        None se a lista estiver vazia.
         """
 
         if not transformations_list:
-            return
+            return None
 
         # Inicializa a matriz composta como a matriz identidade
         composite_matrix = np.identity(3)
