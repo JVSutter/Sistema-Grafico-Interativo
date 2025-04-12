@@ -3,11 +3,12 @@ import numpy as np
 
 class GraphicalAlgorithms:
     """
-    Classe responsável por aplicar algoritmos de computação gráfica para propósitos diversos
+    Classe responsável por aplicar algoritmos de computação gráfica.
+    Algoritmos complexos devem ser implementados como métodos de classe desta classe.
     """
 
     @classmethod
-    def get_translation_matrix(cls, dx: float, dy: float) -> np.ndarray:
+    def _get_translation_matrix(cls, dx: float, dy: float) -> np.ndarray:
         """
         Obtém a matriz de translação.
         @param dx: Deslocamento em x.
@@ -18,7 +19,7 @@ class GraphicalAlgorithms:
         return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
 
     @classmethod
-    def get_scaling_matrix(
+    def _get_scaling_matrix(
         cls, sx: float, sy: float, cx: float, cy: float
     ) -> np.ndarray:
         """
@@ -30,13 +31,13 @@ class GraphicalAlgorithms:
         @return: Matriz de escalonamento.
         """
 
-        translate_to_origin = cls.get_translation_matrix(-cx, -cy)
+        translate_to_origin = cls._get_translation_matrix(-cx, -cy)
         scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        translate_back = cls.get_translation_matrix(cx, cy)
+        translate_back = cls._get_translation_matrix(cx, cy)
         return translate_to_origin @ scale @ translate_back
 
     @classmethod
-    def get_rotation_matrix(
+    def _get_rotation_matrix(
         cls, angle_degrees: float, cx: float, cy: float
     ) -> np.ndarray:
         """
@@ -51,9 +52,9 @@ class GraphicalAlgorithms:
         cos_r = np.cos(angle_radians)
         sin_r = np.sin(angle_radians)
 
-        translate_to_origin = cls.get_translation_matrix(-cx, -cy)
+        translate_to_origin = cls._get_translation_matrix(-cx, -cy)
         rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        translate_back = cls.get_translation_matrix(cx, cy)
+        translate_back = cls._get_translation_matrix(cx, cy)
         return translate_to_origin @ rotate @ translate_back
 
     @classmethod
@@ -63,6 +64,7 @@ class GraphicalAlgorithms:
         """
         Método para obtenção de uma matriz de transformação composta.
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
+        @param obj_center: Centro do objeto a ser transformado. Usado no escalonamento e na rotação.
         @return: Matriz que produzirá uma transformação equivalente a todas as transformações individuais.
         None se a lista estiver vazia.
         """
@@ -80,7 +82,7 @@ class GraphicalAlgorithms:
             if transformation_type == "translation":
                 dx = transformation["dx"]
                 dy = transformation["dy"]
-                matrix = cls.get_translation_matrix(dx, dy)
+                matrix = cls._get_translation_matrix(dx, dy)
 
             elif transformation_type == "scaling":
                 sx = transformation["sx"]
@@ -90,7 +92,7 @@ class GraphicalAlgorithms:
                     np.array([center_x, center_y, 1]) @ composite_matrix
                 )
                 cx_current, cy_current = center_transformed[0], center_transformed[1]
-                matrix = cls.get_scaling_matrix(sx, sy, cx_current, cy_current)
+                matrix = cls._get_scaling_matrix(sx, sy, cx_current, cy_current)
 
             elif transformation_type == "rotation":
                 angle = transformation["angle"]
@@ -106,9 +108,9 @@ class GraphicalAlgorithms:
                         center_transformed[0],
                         center_transformed[1],
                     )
-                    matrix = cls.get_rotation_matrix(angle, cx_current, cy_current)
+                    matrix = cls._get_rotation_matrix(angle, cx_current, cy_current)
                 else:  # origem ou ponto arbitrario
-                    matrix = cls.get_rotation_matrix(angle, float(cx), float(cy))
+                    matrix = cls._get_rotation_matrix(angle, float(cx), float(cy))
 
             composite_matrix = composite_matrix @ matrix
 
@@ -127,7 +129,7 @@ class GraphicalAlgorithms:
         Retorna a matriz de transformação para coordenadas normalizadas.
         @param window_cx: Coordenada x do centro da janela.
         @param window_cy: Coordenada y do centro da janela.
-        @param window_vup: Vetor de up da janela.
+        @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
         @return: Matriz de transformação para coordenadas normalizadas.
         """
 
@@ -154,3 +156,15 @@ class GraphicalAlgorithms:
         transformations = transformations @ scale_to_ncs
 
         return transformations
+
+    @classmethod
+    def cohen_sutherland_clipping(
+        cls, p1: tuple[float, float], p2: tuple[float, float]
+    ) -> tuple[tuple[float, float], tuple[float, float]]:
+        """
+        Algoritmo de Cohen-Sutherland para recorte de linhas.
+        @param p1: Ponto 1 da linha em coordenadas normalizadas.
+        @param p2: Ponto 2 da linha em coordenadas normalizadas.
+        @return: Tupla com os pontos recortados da linha em coordenadas normalizadas.
+        """
+        # TODO

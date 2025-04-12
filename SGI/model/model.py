@@ -28,7 +28,9 @@ class Model:
             self._calculate_and_update_ncs()
 
             # Atualiza a View
-            graphical_representations = self.get_graphical_representations()
+            graphical_representations = (
+                self.display_file_manager.get_clipped_representations()
+            )
             obj_list = self.display_file_manager.get_objs_as_strings()
             self.view.update_view_objects(graphical_representations, obj_list)
 
@@ -36,16 +38,14 @@ class Model:
 
         return wrapper
 
-    def get_graphical_representations(self) -> list[GraphicalObject]:
-        """
-        Retorna as representações gráficas de todos os objetos gráficos a serem mostrados no Viewport
-        """
-
-        return self.display_file_manager.get_clipped_representations()
-
     @update_interface
     def add_object(self, points: list, name: str, color: tuple) -> None:
-        """Adiciona um objeto gráfico ao mundo."""
+        """
+        Adiciona um objeto gráfico ao mundo.
+        @param points: Lista de pontos que representam o objeto.
+        @param name: Nome do objeto.
+        @param color: Cor do objeto.
+        """
 
         obj_name = self.display_file_manager.add_object(
             points=points, name=name, color=color
@@ -75,7 +75,8 @@ class Model:
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
-        """Aplica um pan na janela de visualização e atualiza a View.
+        """
+        Aplica um pan na janela de visualização.
         @param dx: Deslocamento em x.
         @param dy: Deslocamento em y.
         """
@@ -88,8 +89,7 @@ class Model:
         transformations_list: list[dict],
     ) -> None:
         """
-        Processa uma lista de transformações em um objeto sequencialmente,
-        compondo uma matriz única e aplicando-a ao final.
+        Aplica uma lista de transformações a um determinado objeto gráfico.
         @param index: Índice do objeto a ser transformado.
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         """
@@ -113,8 +113,8 @@ class Model:
                     f"Rotating object by {transformation['angle']} degrees"
                 )
 
-        obj = self.display_file_manager.display_file[index]
-        self.view.add_log(f"{obj.name}: Transformations applied.")
+        obj_name = self.display_file_manager.get_obj_name(index)
+        self.view.add_log(f"{obj_name}: Transformations applied.")
 
     def _calculate_and_update_ncs(self) -> None:
         """Calcula as coordenadas normalizadas para todos os objetos."""
@@ -126,8 +126,8 @@ class Model:
         self.display_file_manager.update_ncs_coordinates(
             window_cx=window_cx,
             window_cy=window_cy,
-            window_height=window_height,
             window_width=window_width,
+            window_height=window_height,
             window_vup=window_vup,
         )
 
@@ -139,8 +139,8 @@ class Model:
         """
 
         try:
-            skipped_objects = (
-                self.display_file_manager.import_file_to_display_file(filepath=filepath)
+            skipped_objects = self.display_file_manager.import_file_to_display_file(
+                filepath=filepath
             )
 
             self.view.add_log(f"Objects successfully imported from {filepath}")

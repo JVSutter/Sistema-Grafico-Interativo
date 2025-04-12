@@ -18,20 +18,32 @@ class DisplayFileManager:
 
     def get_clipped_representations(self) -> list[GraphicalObject]:
         """
-        Retorna as representações gráficas a serem enviadas para o viewport desenhar.
+        Retorna as representações gráficas a serem enviadas para o Viewport desenhar.
         @return: Lista de representações gráficas após o clipping.
         """
 
         representations = []
         for obj in self.display_file:
             representations.extend(obj.get_clipped_representation())
-
         return representations
+
+    def get_obj_name(self, index: int) -> str:
+        """
+        Retorna o nome do objeto gráfico no índice especificado.
+        @param index: Índice do objeto no display file.
+        @return: Nome do objeto gráfico.
+        """
+        return self.display_file[index].name
 
     def add_object(self, points: list, name: str, color: tuple) -> str | None:
         """
-        Adiciona um objeto gráfico ao display file e atualiza a View.
+        Adiciona um objeto gráfico ao display file.
+
+        @param points: Lista de pontos que representam o objeto.
+        @param name: Nome do objeto.
+        @param color: Cor do objeto.
         @return: Retorna uma string com o nome do objeto adicionado ou None se o objeto já existir.
+        Por 'já existir' entende-se que já existe um objeto com as mesmas coordenadas.
         """
 
         world_object = WorldObjectFactory.new_world_object(
@@ -44,25 +56,36 @@ class DisplayFileManager:
         return world_object.name
 
     def remove_object(self, index: int) -> None:
-        """Remove um objeto gráfico do display file."""
+        """
+        Remove um objeto gráfico do display file.
+        @param index: Índice do objeto a ser removido.
+        """
         self.display_file.pop(index)
 
     def convert_display_file_to_obj(self) -> str:
-        """Retorna uma string com o conteúdo do display file em formato OBJ."""
+        """
+        Converte o conteúdo do display file para o formato OBJ.
+        @return: String com os objetos do display file no formato OBJ.
+        """
 
         obj_str = ""
         for obj in self.display_file:
             obj_str += obj.get_obj_description()
         return obj_str
 
-    def get_objs_as_strings(self) -> str:
+    def get_objs_as_strings(self) -> list[str]:
+        """
+        Retorna a representação em string dos objetos no display file.
+        @return: Lista de strings representando os objetos no display file.
+        """
         return [str(obj) for obj in self.display_file]
 
     def apply_transformation(
         self, index: int, transformations_list: list[dict]
     ) -> None:
         """
-        Aplica uma transformação matricial a todos os objetos do display file.
+        Aplica uma transformação matricial a um objeto do display file.
+        @param index: Índice do objeto a ser transformado.
         @param transformations_list: Lista de dicionários, cada um representando uma transformação.
         """
 
@@ -80,14 +103,16 @@ class DisplayFileManager:
         self,
         window_cx: float,
         window_cy: float,
-        window_height: float,
         window_width: float,
+        window_height: float,
         window_vup: np.ndarray,
     ) -> None:
         """
         Atualiza as coordenadas do display file para o sistema de coordenadas da janela.
         @param window_cx: Coordenada x do centro da janela.
         @param window_cy: Coordenada y do centro da janela.
+        @param window_width: Largura da janela.
+        @param window_height: Altura da janela.
         @param window_vup: Vetor de direção para cima da janela.
         """
 
