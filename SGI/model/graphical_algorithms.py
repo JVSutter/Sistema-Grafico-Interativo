@@ -7,6 +7,13 @@ class GraphicalAlgorithms:
     Algoritmos complexos devem ser implementados como métodos de classe desta classe.
     """
 
+    # Códigos de região para o algoritmo de Cohen-Sutherland
+    INSIDE = 0b0000
+    LEFT = 0b0001
+    RIGHT = 0b0010
+    BOTTOM = 0b0100
+    TOP = 0b1000
+
     @classmethod
     def _get_translation_matrix(cls, dx: float, dy: float) -> np.ndarray:
         """
@@ -158,6 +165,30 @@ class GraphicalAlgorithms:
         return transformations
 
     @classmethod
+    def _get_region_code(
+        cls, x: float, y: float, x_min: float, y_min: float, x_max: float, y_max: float
+    ) -> int:
+        """
+        Retorna o código da região para o ponto (x, y).
+        @param x: Coordenada x do ponto.
+        @param y: Coordenada y do ponto.
+        @return: Código da região.
+        """
+
+        code = cls.INSIDE
+
+        if x < x_min:
+            code |= cls.LEFT
+        elif x > x_max:
+            code |= cls.RIGHT
+        if y < y_min:
+            code |= cls.BOTTOM
+        elif y > y_max:
+            code |= cls.TOP
+
+        return code
+
+    @classmethod
     def cohen_sutherland_clipping(
         cls, p1: tuple[float, float], p2: tuple[float, float]
     ) -> tuple[tuple[float, float], tuple[float, float]]:
@@ -167,4 +198,50 @@ class GraphicalAlgorithms:
         @param p2: Ponto 2 da linha em coordenadas normalizadas.
         @return: Tupla com os pontos recortados da linha em coordenadas normalizadas.
         """
-        # TODO
+
+        y_min, y_max = -1, 1
+        x_min, x_max = -1, 1
+        x1, y1 = p1
+        x2, y2 = p2
+
+        code1 = cls._get_region_code(x1, y1, x_min, y_min, x_max, y_max)
+        code2 = cls._get_region_code(x2, y2, x_min, y_min, x_max, y_max)
+
+        accepted = False  # Inicialmente, a linha é considerada fora do viewport
+
+        while True:
+            if code1 == 0 and code2 == 0:  # Ambos os pontos estão dentro do viewport
+                accepted = True
+                break
+
+            if code1 & code2 != 0:  # Ambos os pontos estão fora do viewport
+                break
+
+            # É possível que a linha intercepte a borda do viewport
+            code_outside = code1 if code1 != 0 else code2
+            intersection_x = 0.0
+            intersection_y = 0.0
+
+            if code_outside & cls.TOP:
+                intersection_x = x1 + (x2 - x1) * (y_max - y1) / (y2 - y1)
+                intersection_y = y_max
+            elif code_outside & cls.BOTTOM:
+                intersection_x = x1 + (x2 - x1) * (y_min - y1) / (y2 - y1)
+                intersection_y = y_min
+            elif code_outside & cls.RIGHT:
+                intersection_y = y1 + (y2 - y1) * (x_max - x1) / (x2 - x1)
+                intersection_x = x_max
+            elif code_outside & cls.LEFT:
+                intersection_y = y1 + (y2 - y1) * (x_min - x1) / (x2 - x1)
+                intersection_x = x_min
+
+            if code_outside == code1:
+                x1, y1 = intersection_x, intersection_y
+                code1 = cls._get_region_code(x1, y1, x_min, y_min, x_max, y_max)
+            else:
+                x2, y2 = intersection_x, intersection_y
+                code2 = cls._get_region_code(x2, y2, x_min, y_min, x_max, y_max)
+
+        if accepted:
+            return [(x1, y1), (x2, y2)]
+        return None  # Linha completamente fora do viewport
