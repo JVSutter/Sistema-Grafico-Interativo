@@ -15,4 +15,4 @@ class WorldPoint(WorldObject):
             return []
 
         graphical_representation = GraphicalPoint(self.viewport_points, self.color)
-        return [graphical_representation]
+        return graphical_representation
