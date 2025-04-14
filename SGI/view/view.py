@@ -2,8 +2,7 @@ import sys
 
 from PyQt6 import QtWidgets, uic
 
-from view.creation_dialogs import (LineDialog, NameDialog, ObjectDialog,
-                                   PointDialog, WireframeDialog)
+from view.creation_dialogs import ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
 from view.viewport import Viewport
@@ -30,11 +29,7 @@ class View(QtWidgets.QMainWindow):
         """Conecta os botões da interface com os callbacks correspondentes (on_*)."""
 
         # Botões de alteração da lista de objetos
-        self.createPoint.clicked.connect(lambda: self.on_create_object(PointDialog()))
-        self.createLine.clicked.connect(lambda: self.on_create_object(LineDialog()))
-        self.createWireframe.clicked.connect(
-            lambda: self.on_create_object(WireframeDialog())
-        )
+        self.createObject.clicked.connect(lambda: self.on_create_object(ObjectDialog()))
         self.removeObject.clicked.connect(self.on_remove_object)
         self.transformObject.clicked.connect(self.on_transform_object)
 
@@ -62,43 +57,51 @@ class View(QtWidgets.QMainWindow):
         self.importButton.clicked.connect(self.import_obj_file)
         self.exportButton.clicked.connect(self.export_obj_file)
 
+        # Botoes de clipping
+        self.cohenSutherlandRadioButton.clicked.connect(
+            lambda: self.on_clipping(mode="cohen_sutherland")
+        )
+        self.liangBarskyRadioButton.clicked.connect(
+            lambda: self.on_clipping(mode="liang_barsky")
+        )
+
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
 
         self.viewport = Viewport(self.frame)
-        layout = QtWidgets.QVBoxLayout(self.frame)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.viewport)
-        self.frame.setLayout(layout)
+        self.viewport.setup_viewport()
 
     def run(self) -> None:
         """Executa a aplicação PyQt."""
 
         sys.exit(self.app.exec())
 
-    def update_view_objects(self, objects_list: list[GraphicalObject]) -> None:
-        """Atualiza a view com a lista de objetos gráficos. Atualizando o viewport e a lista de objetos."""
+    def update_view_objects(
+        self, graphical_objs: list[GraphicalObject], obj_list: list[str]
+    ) -> None:
+        """
+        Atualiza a view com a lista de objetos gráficos.
+        @param graphical_objs: Lista de objetos gráficos a serem exibidos após o clipping.
+        @param obj_list: Lista de objetos a serem exibidos na lista de objetos lateral.
+        """
 
-        self.viewport.update_viewport(
-            [obj.graphical_representation for obj in objects_list]
-        )
+        self.viewport.update_viewport(graphical_objs)
         self.objectsList.clear()
-        self.objectsList.addItems([str(obj) for obj in objects_list])
+        self.objectsList.addItems([str(obj) for obj in obj_list])
 
     def add_log(self, message) -> None:
         """Adiciona uma mensagem ao log da aplicação"""
 
-        logbox = self.logsBox  # Pega o objeto que contem o log
-        logbox.addItem(message)  # Adiciona a mensagem ao log
+        logbox = self.logsBox
+        logbox.addItem(message)
         logbox.scrollToBottom()  # Faz o log rolar para baixo para mostrar a mensagem mais recente
 
     def on_create_object(self, dialog: ObjectDialog) -> None:
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
-        points, name, color = dialog.create_object()
-        if name is not None:
-            self.controller.handle_create_object(points, name, color)
-            self.add_log(f"{dialog.type} {name} created: {points}")
+        points, name, color, is_filled = dialog.create_object()
+        if points is not None:
+            self.controller.handle_create_object(points, name, color, is_filled)
 
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
@@ -123,10 +126,13 @@ class View(QtWidgets.QMainWindow):
             self.add_log("You must select an object to transform")
             return
 
-        transformation_info = TransformationDialog().get_transformation()
-        self.controller.handle_transformation(
-            index=selected, transformation_info=transformation_info
-        )
+        dialog = TransformationDialog()
+        transformations_list = dialog.get_transformations()
+
+        if transformations_list:
+            self.controller.handle_transformations(
+                index=selected, transformations_list=transformations_list
+            )
 
     def on_zoom(self, mode: str) -> None:
         """
@@ -187,7 +193,6 @@ class View(QtWidgets.QMainWindow):
         }[direction]
 
         self.controller.handle_pan(dx, dy)
-        self.add_log(f"Went {direction} by {dx}, {dy}")
 
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""
@@ -199,9 +204,9 @@ class View(QtWidgets.QMainWindow):
     def export_obj_file(self) -> None:
         """Exporta um arquivo .obj."""
 
-        filepath, name = self.open_export_file_dialog()
+        filepath = self.open_export_file_dialog()
         if filepath:
-            self.controller.handle_export_obj_file(filepath, name)
+            self.controller.handle_export_obj_file(filepath)
 
     def open_import_file_dialog(self) -> str:
         """Abre um diálogo para selecionar um arquivo."""
@@ -217,11 +222,26 @@ class View(QtWidgets.QMainWindow):
     def open_export_file_dialog(self) -> tuple[str, str]:
         """Abre um diálogo para selecionar uma pasta."""
 
-        file_dialog = QtWidgets.QFileDialog()
-        file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.Directory)
+        if self.objectsList.count() == 0:
+            self.add_log("You must create an object to export")
+            return None, None
 
-        name_dialog = NameDialog("Give a name to the file").name
+        filepath, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Export Object as OBJ",
+            "export.obj",  # Sugere 'export.obj' no diretório que o diálogo abrir
+            "OBJ Files (*.obj);;All Files (*)",  # Filtros de arquivo
+        )
 
-        if file_dialog.exec():
-            return (file_dialog.selectedFiles()[0], name_dialog)
-        return None, None
+        if not filepath:
+            return None
+
+        if not filepath.lower().endswith(".obj"):
+            filepath += ".obj"
+
+        return filepath
+
+    def on_clipping(self, mode: str) -> None:
+        """Muda o modo de clipping."""
+
+        self.controller.handle_clipping_change(mode)

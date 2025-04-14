@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>914</width>
-    <height>705</height>
+    <width>912</width>
+    <height>777</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,14 +21,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>914</width>
-    <height>705</height>
+    <width>912</width>
+    <height>777</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>914</width>
-    <height>705</height>
+    <width>912</width>
+    <height>777</height>
    </size>
   </property>
   <property name="palette">
@@ -609,12 +609,12 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="createPoint">
+         <widget class="QPushButton" name="createObject">
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="text">
-           <string>New Point</string>
+           <string>New Object</string>
           </property>
           <property name="checkable">
            <bool>false</bool>
@@ -634,70 +634,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="createLine">
+         <widget class="QPushButton" name="removeObject">
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
-          <property name="text">
-           <string>New Line</string>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="createWireframe">
-          <property name="cursor">
-           <cursorShape>PointingHandCursor</cursorShape>
+          <property name="styleSheet">
+           <string notr="true"/>
           </property>
           <property name="text">
-           <string>New Wireframe</string>
-          </property>
-          <property name="checkable">
-           <bool>false</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QPushButton" name="importButton">
-          <property name="text">
-           <string>Import .obj</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="exportButton">
-          <property name="text">
-           <string>Export .obj</string>
+           <string>Remove Object</string>
           </property>
          </widget>
         </item>
@@ -717,17 +662,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="removeObject">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Remove Selected Object</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="importButton">
+          <property name="text">
+           <string>Import .obj</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exportButton">
+          <property name="text">
+           <string>Export .obj</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -797,7 +747,7 @@
       <enum>Qt::Orientation::Vertical</enum>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -1060,7 +1010,7 @@
     <property name="title">
      <string>Window Rotation Angle</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -1110,9 +1060,9 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>480</y>
+     <y>542</y>
      <width>481</width>
-     <height>191</height>
+     <height>209</height>
     </rect>
    </property>
    <property name="title">
@@ -1207,7 +1157,7 @@
      <x>410</x>
      <y>10</y>
      <width>481</width>
-     <height>461</height>
+     <height>523</height>
     </rect>
    </property>
    <property name="title">
@@ -1228,6 +1178,66 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QGroupBox" name="clippingGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>680</y>
+     <width>371</width>
+     <height>69</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>69</height>
+    </size>
+   </property>
+   <property name="title">
+    <string>Line Clipping Algorithm</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <widget class="QWidget" name="layoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>41</x>
+      <y>33</y>
+      <width>291</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QRadioButton" name="cohenSutherlandRadioButton">
+       <property name="text">
+        <string>Cohen-Sutherland</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="liangBarskyRadioButton">
+       <property name="layoutDirection">
+        <enum>Qt::LayoutDirection::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>Liang-Barsky</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources/>
