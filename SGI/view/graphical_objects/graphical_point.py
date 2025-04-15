@@ -3,7 +3,7 @@ from PyQt6 import QtCore, QtGui
 from view.graphical_objects.graphical_object import GraphicalObject
 
 
-class Point(GraphicalObject):
+class GraphicalPoint(GraphicalObject):
     """Classe que representa um ponto no viewport."""
 
     def draw(self, painter: QtGui.QPainter) -> None:

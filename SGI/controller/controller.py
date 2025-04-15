@@ -20,15 +20,19 @@ class Controller:
         self.view.run()
 
     def handle_create_object(
-        self, points_input: list, name_input: str, color_input: tuple[int, int, int]
+        self, points_input: list, name_input: str, color_input: tuple, is_filled: bool
     ) -> None:
         """
         Constrói um novo objeto no mundo.
         @param points_input: Lista de pontos que compõem o objeto.
         @param name_input: Nome do objeto
+        @param color_input: Cor do objeto
+        @param is_filled: Se o objeto é preenchido ou não
         """
 
-        self.model.add_object(points=points_input, name=name_input, color=color_input)
+        self.model.add_object(
+            points=points_input, name=name_input, color=color_input, is_filled=is_filled
+        )
 
     def handle_remove_object(self, index: int) -> None:
         """
@@ -55,30 +59,16 @@ class Controller:
 
         self.model.pan(dx, dy)
 
-    def handle_transformation(self, index: int, transformation_info: dict) -> None:
+    def handle_transformations(
+        self, index: int, transformations_list: list[dict]
+    ) -> None:
         """
-        Processa alguma transformação em um objeto (translação, escalonamento ou rotação).
+        Processa uma lista de transformações aplicadas a um objeto.
         @param index: Índice do objeto a ser transformado.
-        @param transformation_info: Informações da transformação a ser aplicada.
+        @param transformations_list: Lista de transformações a serem aplicadas.
         """
 
-        if transformation_info is None:
-            return
-
-        transformation_option = transformation_info["option"]
-        x_value = transformation_info["x_value"]
-        y_value = transformation_info["y_value"]
-        angle = transformation_info.get("angle", None)
-
-        if transformation_option == "translation":
-            self.model.translate_object(index, x_value, y_value)
-        elif transformation_option == "scaling":
-            self.model.scale_object(index, x_value, y_value)
-
-        elif transformation_option == "rotation":
-            if x_value == y_value == "obj_center":
-                x_value, y_value = self.model.display_file[index].get_center()
-            self.model.rotate_object(index, x_value, y_value, angle)
+        self.model.handle_transformations(index, transformations_list)
 
     def handle_window_rotation(self, angle: float) -> None:
         """
@@ -96,10 +86,18 @@ class Controller:
 
         self.model.import_obj_file(filepath)
 
-    def handle_export_obj_file(self, filepath: str, name: str) -> None:
+    def handle_export_obj_file(self, filepath: str) -> None:
         """
         Exporta um arquivo .obj.
         @param filepath: Caminho do arquivo .obj.
         """
 
-        self.model.export_obj_file(filepath, name)
+        self.model.export_obj_file(filepath)
+
+    def handle_clipping_change(self, mode: str) -> None:
+        """
+        Muda o modo de clipping.
+        @param mode: Modo de clipping.
+        """
+
+        self.model.change_clipping_mode(mode)

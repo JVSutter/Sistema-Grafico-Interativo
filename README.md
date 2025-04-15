@@ -10,8 +10,10 @@ A seguinte tabela lista todos os exercícios completados durante o curso, em ord
 
 |      Tarefa      |        Descrição         | 
 | :--------------: | :----------------------: | 
-| [Trabalho 1.1](https://github.com/JVSutter/computacao-grafica/releases/tag/v1.1) | Desenvolvimento de um Sistema Gráfico Interativo 2D com suporte a window, viewport, panning e zooming, permitindo a exibição e manipulação de pontos, segmentos e polígonos. | 
-| [Trabalho 1.2](https://github.com/JVSutter/computacao-grafica/tree/trabalho-1.2/SGI) | Expansão do Sistema Gráfico Interativo 2D para suportar translações, escalonamento e rotações arbitrárias utilizando coordenadas homogêneas e uma matriz de transformação genérica.  | 
+| [Trabalho 1.1](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.1) | Desenvolvimento de um Sistema Gráfico Interativo 2D com suporte a window, viewport, panning e zooming, permitindo a exibição e manipulação de pontos, segmentos e polígonos. | 
+| [Trabalho 1.2](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.2) | Expansão do Sistema Gráfico Interativo 2D para suportar translações, escalonamento e rotações arbitrárias utilizando coordenadas homogêneas e uma matriz de transformação genérica.  |
+| [Trabalho 1.3](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.3) | Expansão do Sistema Gráfico Interativo 2D para suportar rotação da janela de visualização e importação e exportação de arquivos .obj.  |
+| [Trabalho 1.4](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.4) | Expansão do Sistema Gráfico Interativo 2D para suportar clipping de polígonos e criação de polígonos aramados ou preenchidos.  |
 
 
 ## Projeto Final - Jogo em Unity

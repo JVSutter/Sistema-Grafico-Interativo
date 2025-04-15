@@ -3,8 +3,17 @@ from PyQt6 import QtCore, QtGui
 from view.graphical_objects.graphical_object import GraphicalObject
 
 
-class Wireframe(GraphicalObject):
+class GraphicalWireframe(GraphicalObject):
     """Classe que representa um wireframe no viewport."""
+
+    def __init__(
+        self,
+        viewport_points: list[tuple[float, float, float]],
+        color: tuple[int, int, int],
+        is_filled: bool,
+    ):
+        super().__init__(viewport_points, color)
+        self.is_filled = is_filled
 
     def draw(self, painter: QtGui.QPainter) -> None:
         """
@@ -29,4 +38,13 @@ class Wireframe(GraphicalObject):
         )
 
         painter.setPen(self.get_pen())
+
+        if self.is_filled:
+            color = QtGui.QColor(*self.color)
+            color.setAlpha(100)
+            painter.setBrush(QtGui.QBrush(color))
+
         painter.drawPath(path)
+
+        # reseta o brush
+        painter.setBrush(QtGui.QBrush(QtGui.QColor(0, 0, 0, 0)))

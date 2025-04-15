@@ -56,15 +56,19 @@ class Window:
     def apply_pan(self, dx: float, dy: float) -> None:
         """Aplica um pan na janela de visualização."""
 
-        self.window_bounds.x_min += dx
-        self.window_bounds.x_max += dx
-        self.window_bounds.y_min += dy
-        self.window_bounds.y_max += dy
+        # Rotaciona dx e dy pelo ângulo atual da window
+        dx_world = dx * np.cos(self.angle) - dy * np.sin(self.angle)
+        dy_world = dx * np.sin(self.angle) + dy * np.cos(self.angle)
 
-    def apply_rotation(self, angle_rad: float) -> None:
+        self.window_bounds.x_min += dx_world
+        self.window_bounds.x_max += dx_world
+        self.window_bounds.y_min += dy_world
+        self.window_bounds.y_max += dy_world
+
+    def apply_rotation(self, angle_degrees: float) -> None:
         """Aplica uma rotação na janela de visualização."""
 
-        self.angle = angle_rad
+        self.angle = np.radians(angle_degrees)
 
         # Rotaciona o vup para o novo ângulo
         rotation_matrix = np.array(
