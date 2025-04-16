@@ -47,7 +47,7 @@ class ObjectDialog(QtWidgets.QDialog):
 
         self.points.append(point)
         self.pointsList.addItem(f"Point: {point}")
-        self._update_fill_checkbox_visibility()
+        self._update_interface()
 
     def remove_selected_point(self):
         """Remove o ponto selecionado da lista"""
@@ -57,7 +57,7 @@ class ObjectDialog(QtWidgets.QDialog):
             index = self.pointsList.row(current_item)
             self.points.pop(index)
             self.pointsList.takeItem(index)
-            self._update_fill_checkbox_visibility()
+            self._update_interface()
         else:
             self.show_error_message("You must select a point to remove.")
 
@@ -88,7 +88,13 @@ class ObjectDialog(QtWidgets.QDialog):
 
         if len(self.points) < 1:
             self.show_error_message(
-                "É necessário ter pelo menos 1 ponto para criar um objeto."
+                "There must be at least 1 point to create an object."
+            )
+        elif self.curveRadio.isChecked() and (len(self.points)-1) % 3 != 0:
+            self.show_error_message(
+                """The number of points must be 4 plus a multiple of 3 for a curve.
+                Example: 4, 7, 10, 13, etc.
+                """
             )
         else:
             super().accept()
@@ -107,3 +113,47 @@ class ObjectDialog(QtWidgets.QDialog):
             self.fill_state = self.fillCheckBox.isChecked()  # Salva o estado atual
             self.fillCheckBox.setChecked(False)
             self.fillCheckBox.setEnabled(False)
+    
+    def _update_object_type(self):
+        """Atualiza o tipo de objeto baseado no número de pontos"""
+
+        num_points = len(self.points)
+        
+        if num_points == 0: # desabilita ponto
+            self.pointRadio.setChecked(False)
+            self.pointRadio.setEnabled(False)
+
+        if num_points == 1: # habilita ponto
+            self.pointRadio.setChecked(True)
+            self.pointRadio.setEnabled(True)
+            self.lineRadio.setEnabled(False)
+        
+        if num_points == 2: # habilita linha
+            self.lineRadio.setChecked(True)
+            self.lineRadio.setEnabled(True)
+            self.pointRadio.setEnabled(False)
+            self.wireframeRadio.setEnabled(False)
+
+        if num_points == 3: # habilita wireframe
+            self.wireframeRadio.setChecked(True)
+            self.wireframeRadio.setEnabled(True)
+            self.lineRadio.setEnabled(False)
+            self.pointRadio.setEnabled(False)
+            self.curveRadio.setEnabled(False)
+            self.curveRadio.setChecked(False)
+
+        if num_points > 3: # habilita curva
+            self.curveRadio.setEnabled(True)
+            
+    def _update_points_number(self):
+        """Atualiza o número de pontos"""
+
+        num_points = len(self.points)
+        self.numPoints.setText(f'<html><head/><body><p><span style=" font-weight:700;">Number of points:</span> {num_points}</p></body></html>')
+
+    def _update_interface(self):
+        """Atualiza a interface baseado no tipo de objeto selecionado"""
+
+        self._update_fill_checkbox_visibility()
+        self._update_object_type()
+        self._update_points_number()
