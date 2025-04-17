@@ -37,7 +37,7 @@ class Model:
 
     @update_interface
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool
+        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
     ) -> None:
         """
         Adiciona um objeto gráfico ao mundo.
@@ -45,16 +45,17 @@ class Model:
         @param name: Nome do objeto.
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
+        @param object_type: Tipo de objeto.
         """
 
         obj_name = self.display_file_manager.add_object(
-            points=points, name=name, color=color, is_filled=is_filled
+            points=points, name=name, color=color, is_filled=is_filled, object_type=object_type
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")
             return
 
-        self.view.add_log(f"Object {obj_name} added: {points}")
+        self.view.add_log(f"{object_type} {obj_name} added: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -66,12 +67,12 @@ class Model:
         self.display_file_manager.remove_object(index)
 
     @update_interface
-    def zoom(self, factor: float) -> None:
+    def zoom(self, new_zoom_value: float) -> None:
         """
         Aplica um zoom na janela de visualização e atualiza a View.
-        @factor: Fator de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
+        @new_zoom_value: Novo valor de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
         """
-        self.window.apply_zoom(factor)
+        self.window.apply_zoom(new_zoom_value)
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:

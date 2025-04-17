@@ -41,7 +41,7 @@ class DisplayFileManager:
         return self.display_file[index].name
 
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool
+        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.
@@ -50,6 +50,7 @@ class DisplayFileManager:
         @param name: Nome do objeto.
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
+        @param object_type: Tipo de objeto.
         @return: Retorna uma string com o nome do objeto adicionado ou None se o objeto já existir.
         Por 'já existir' entende-se que já existe um objeto com as mesmas coordenadas.
         """
@@ -60,6 +61,7 @@ class DisplayFileManager:
             color=color,
             display_file=self.display_file,
             is_filled=is_filled,
+            object_type=object_type
         )
 
         if world_object is None:

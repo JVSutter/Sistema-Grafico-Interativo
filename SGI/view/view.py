@@ -34,6 +34,8 @@ class View(QtWidgets.QMainWindow):
         self.transformObject.clicked.connect(self.on_transform_object)
 
         # Botões de zoom
+        max_zoom = 200
+        self.zoomSlider.setMaximum(max_zoom)
         self.zoomInButton.clicked.connect(
             lambda: self.on_zoom(mode="in")
         )  # Quando aperta o botao de zoom in
@@ -99,9 +101,9 @@ class View(QtWidgets.QMainWindow):
     def on_create_object(self, dialog: ObjectDialog) -> None:
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
-        points, name, color, is_filled = dialog.create_object()
+        points, name, color, is_filled, object_type = dialog.create_object()
         if points is not None:
-            self.controller.handle_create_object(points, name, color, is_filled)
+            self.controller.handle_create_object(points, name, color, is_filled, object_type)
 
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
@@ -165,10 +167,7 @@ class View(QtWidgets.QMainWindow):
 
         # Aplica zoom apenas se houver mudança significativa
         if abs(new_zoom_value - old_zoom_value) > 0.01:
-            relative_change = new_zoom_value / old_zoom_value
-            self.controller.handle_zoom(
-                1 / relative_change  # Pois o zoom aumenta com a diminuição da Window
-            )
+            self.controller.handle_zoom(new_zoom_value)
 
             self.zoomLabel.setText(f"{new_zoom_value}%")
             self.zoom_value = new_zoom_value
@@ -184,7 +183,7 @@ class View(QtWidgets.QMainWindow):
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
 
-        movement = 10
+        movement = 100/self.zoomSlider.value()
         dx, dy = {
             "up": (0, movement),
             "down": (0, -movement),

@@ -2,6 +2,7 @@
 Módulo com as classes relativas às caixas de diálogo para criação de objetos
 """
 
+import re
 from PyQt6 import QtWidgets, uic
 
 
@@ -20,7 +21,18 @@ class ObjectDialog(QtWidgets.QDialog):
         self.newPointButton.clicked.connect(self.add_point)
         self.removeButton.clicked.connect(self.remove_selected_point)
         self.colorButton.clicked.connect(self.choose_color)
-
+        self.bulkPointsButton.clicked.connect(self.handle_add_bulk_points)
+        self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
+        
+        # Criando o grupo de botões de tipo de objeto
+        self.objectType = QtWidgets.QButtonGroup()
+        self.objectType.addButton(self.pointRadio)
+        self.objectType.addButton(self.lineRadio)
+        self.objectType.addButton(self.wireframeRadio)
+        self.objectType.addButton(self.curveRadio)
+        
+        self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
+        
     def create_object(self):
         """Cria um objeto"""
 
@@ -29,14 +41,17 @@ class ObjectDialog(QtWidgets.QDialog):
 
         # Se o usuário cancelou, retorna None para todos os valores
         if result == QtWidgets.QDialog.DialogCode.Rejected:
-            return None, None, None, None
+            return None, None, None, None, None
 
         self.name = self.nameInput.text() if self.nameInput.text().strip() else None
+        
         is_filled = (
             self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
         )
+        
+        object_type = self.objectType.checkedButton().text()
 
-        return self.points, self.name, self.color, is_filled
+        return self.points, self.name, self.color, is_filled, object_type
 
     def add_point(self):
         """Adiciona um novo ponto à lista"""
@@ -60,6 +75,42 @@ class ObjectDialog(QtWidgets.QDialog):
             self._update_interface()
         else:
             self.show_error_message("You must select a point to remove.")
+            
+    def handle_add_bulk_points(self):
+        """Adiciona um conjunto de pontos à lista por meio de um input de texto"""
+
+        try:
+            # tratamento do texto inserido
+            text = self.bulkPointsInput.text()
+            text = re.sub(r'[^0-9.,() ]', '', text)
+            points = text.replace(",", " ").split()
+            
+            new_points = []
+            coordinates = []
+            for point in points:
+                if point[0] == "(": # começo de uma coordenada
+                    coordinates.append(float(point[1:]))
+                elif point[-1] == ")": # fim de uma coordenada
+                    coordinates.append(float(point[:-1]))
+                    new_points.append(coordinates)
+                    coordinates = []
+                elif coordinates: # adiciona um numero a coordenada apenas se houver uma coordenada iniciada
+                    coordinates.append(float(point))
+
+        except ValueError:
+            self.show_error_message("Invalid input. Please enter valid coordinates.")
+            return
+                
+        # Conferindo se há mais de 2 coordenadas
+        for point in new_points:
+            if len(point) > 2:
+                self.show_error_message("Points with more than 2 coordinates are not supported yet.")
+                return
+            
+        for point in new_points:
+            self.points.append(tuple(point))
+            self.pointsList.addItem(f"Point: {point}")
+            self._update_interface()
 
     def choose_color(self):
         """Abre o diálogo de escolha de cor"""
@@ -105,45 +156,61 @@ class ObjectDialog(QtWidgets.QDialog):
         """
 
         num_points = len(self.points)
-        if num_points >= 3:
+        if num_points >= 3 and self.wireframeRadio.isChecked():
             self.fillCheckBox.setEnabled(True)
-            self.fillCheckBox.setChecked(self.fill_state)  # Restaura o estado salvo
+            self.fillCheckBox.setChecked(self.fill_state)
 
         else:
-            self.fill_state = self.fillCheckBox.isChecked()  # Salva o estado atual
             self.fillCheckBox.setChecked(False)
             self.fillCheckBox.setEnabled(False)
+            
+    def _handle_fill_checkbox(self):
+        """Gerencia o estado do checkbox 'Filled'"""
+
+        if self.wireframeRadio.isChecked():
+            if self.fillCheckBox.isChecked():
+                self.fill_state = True
+            else:
+                self.fill_state = False
     
     def _update_object_type(self):
         """Atualiza o tipo de objeto baseado no número de pontos"""
 
         num_points = len(self.points)
+        radio_buttons = [self.pointRadio, self.lineRadio, self.wireframeRadio, self.curveRadio]
         
-        if num_points == 0: # desabilita ponto
-            self.pointRadio.setChecked(False)
-            self.pointRadio.setEnabled(False)
+        if num_points == 0: # desabilita todos os botões
+            for button in radio_buttons:
+                button.setChecked(False)
+                button.setEnabled(False)
 
-        if num_points == 1: # habilita ponto
-            self.pointRadio.setChecked(True)
+        if num_points == 1: # habilita apenas ponto
+            for button in radio_buttons:
+                button.setEnabled(False)
+                                
             self.pointRadio.setEnabled(True)
-            self.lineRadio.setEnabled(False)
+            self.pointRadio.setChecked(True)
         
         if num_points == 2: # habilita linha
-            self.lineRadio.setChecked(True)
+            for button in radio_buttons:
+                button.setEnabled(False)
+                
             self.lineRadio.setEnabled(True)
-            self.pointRadio.setEnabled(False)
-            self.wireframeRadio.setEnabled(False)
+            self.lineRadio.setChecked(True)
 
         if num_points == 3: # habilita wireframe
-            self.wireframeRadio.setChecked(True)
+            for button in radio_buttons:
+                button.setEnabled(False)
+                
             self.wireframeRadio.setEnabled(True)
-            self.lineRadio.setEnabled(False)
-            self.pointRadio.setEnabled(False)
-            self.curveRadio.setEnabled(False)
-            self.curveRadio.setChecked(False)
+            self.wireframeRadio.setChecked(True)
 
-        if num_points > 3: # habilita curva
+        if num_points > 3: # habilita curva e wireframe
+            for button in radio_buttons:
+                button.setEnabled(False)
+                
             self.curveRadio.setEnabled(True)
+            self.wireframeRadio.setEnabled(True)
             
     def _update_points_number(self):
         """Atualiza o número de pontos"""
@@ -154,6 +221,6 @@ class ObjectDialog(QtWidgets.QDialog):
     def _update_interface(self):
         """Atualiza a interface baseado no tipo de objeto selecionado"""
 
-        self._update_fill_checkbox_visibility()
         self._update_object_type()
         self._update_points_number()
+        self._update_fill_checkbox_visibility()

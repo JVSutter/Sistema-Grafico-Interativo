@@ -1,6 +1,7 @@
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
+from model.world_objects.world_curve import WorldCurve
 from utils.bounds import Bounds
 
 
@@ -13,7 +14,7 @@ class WorldObjectFactory:
 
     @classmethod
     def new_world_object(
-        cls, points: list, name: str, color: tuple, display_file: list, is_filled: bool
+        cls, points: list, name: str, color: tuple, display_file: list, is_filled: bool, object_type: str
     ):
         """
         Cria um novo objeto do mundo a partir de uma lista de pontos.
@@ -31,13 +32,17 @@ class WorldObjectFactory:
             "viewport_bounds": cls.viewport_bounds,
         }
 
-        if len(points) == 1:
+        if object_type == "Point":
             obj_type = WorldPoint
-        elif len(points) == 2:
+        elif object_type == "Line":
             obj_type = WorldLine
-        else:
+        elif object_type == "Wireframe":
             obj_type = WorldWireframe
             kwargs["is_filled"] = is_filled
+        elif object_type == "Curve":
+            obj_type = WorldCurve
+        else:
+            raise ValueError(f"Tipo de objeto inválido: {object_type}")
 
         if not name:
             obj_type_name = obj_type.__name__.replace("World", "")
@@ -59,6 +64,34 @@ class WorldObjectFactory:
         @param filepath: Caminho do arquivo OBJ a ser lido.
         @return: Lista de objetos lidos do arquivo OBJ. Formato: [nome: str, pontos: list, preenchimento: bool].
         """
+        
+        def add_object():
+            if current_object_points:  # Adiciona o último objeto lido se ele tiver pontos
+                            
+                tam = len(current_object_points)
+                
+                if tam == 2:
+                    obj_type = "Line"
+                elif tam > 2:
+                    obj_type = "Wireframe"
+                else:
+                    obj_type = "Point"
+
+                if (
+                    obj_type == "Wireframe"
+                    and not current_fill_state
+                    and current_object_points[0] == current_object_points[-1]
+                ):  # Se o objeto não for preenchido, remove o último ponto
+                    current_object_points.pop()
+
+                objects_list.append(
+                    [
+                        current_object_name,
+                        current_object_points,
+                        current_fill_state,
+                        obj_type,
+                    ]
+                )
 
         vertices = []  # Armazena todos os vértices (x, y) lidos
         objects_list = []  # Lista final [nome, [(x,y), ...]]
@@ -84,34 +117,11 @@ class WorldObjectFactory:
 
                     elif command == "o":  # Define um novo objeto
 
-                        if (
-                            current_object_points
-                        ):  # Adiciona o último objeto lido se ele tiver pontos
-
-                            if (
-                                len(current_object_points) > 2
-                                and not current_fill_state
-                                and current_object_points[0]
-                                == current_object_points[-1]
-                            ):  # Se o objeto não for preenchido, remove o último ponto
-                                current_object_points.pop()
-
-                            objects_list.append(
-                                [
-                                    current_object_name,
-                                    current_object_points,
-                                    current_fill_state,
-                                ]
-                            )
+                        add_object()
+                        
+                        current_object_name = (" ".join(parts[1:]) if len(parts) > 1 else f"Object {len(objects_list) + 1}")
 
                         current_fill_state = False
-
-                        current_object_name = (
-                            " ".join(parts[1:])
-                            if len(parts) > 1
-                            else f"Object {len(objects_list) + 1}"
-                        )
-
                         current_object_points = []
 
                     elif command in (
@@ -145,18 +155,7 @@ class WorldObjectFactory:
                             current_object_points.append(vertices[vertex_index])
 
             # Adiciona o último objeto lido se ele tiver pontos
-            if current_object_points:
-
-                if (
-                    len(current_object_points) > 2
-                    and not current_fill_state
-                    and current_object_points[0] == current_object_points[-1]
-                ):  # Se o objeto não for preenchido, remove o último ponto
-                    current_object_points.pop()
-
-                objects_list.append(
-                    [current_object_name, current_object_points, current_fill_state]
-                )
+            add_object()
 
         except FileNotFoundError:
             raise FileNotFoundError(f"Arquivo não encontrado: {filepath}")
@@ -184,6 +183,7 @@ class WorldObjectFactory:
             obj_name = obj_data[0]
             obj_points = obj_data[1]
             obj_is_filled = obj_data[2]
+            obj_type = obj_data[3]
 
             world_object = cls.new_world_object(
                 points=obj_points,
@@ -191,6 +191,7 @@ class WorldObjectFactory:
                 color=(0, 0, 0),
                 display_file=display_file,
                 is_filled=obj_is_filled,
+                object_type=obj_type,
             )
 
             if world_object is None:

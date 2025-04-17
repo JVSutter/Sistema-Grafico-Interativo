@@ -741,7 +741,7 @@
       <number>300</number>
      </property>
      <property name="value">
-      <number>50</number>
+      <number>100</number>
      </property>
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -830,7 +830,7 @@
       <item>
        <widget class="QLabel" name="zoomLabel">
         <property name="text">
-         <string>50%</string>
+         <string>100%</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
