@@ -46,7 +46,7 @@ class View(QtWidgets.QMainWindow):
 
         # Botão de rotação da janela
         self.windowRotationSlider.valueChanged.connect(
-            lambda: self.on_window_rotation()
+            lambda: self.on_window_rotation(mode="slider")
         )
 
         # Botões de navegação
@@ -182,12 +182,26 @@ class View(QtWidgets.QMainWindow):
             self.zoomLabel.setText(f"{new_zoom_value}%")
             self.zoom_value = new_zoom_value
 
-    def on_window_rotation(self) -> None:
+    def on_window_rotation(self, mode: str) -> None:
         """Trata as requisições de rotação da janela."""
 
-        self.window_rotation = self.windowRotationSlider.value()
-        self.windowRotationLabel.setText(f"{self.window_rotation}º")
+        rotation_step = 10
+        window_rotation = self.windowRotationSlider.value()
+        min_rotation = 0
+        max_rotation = 360
 
+        if mode == "slider":
+            self.window_rotation = window_rotation
+        elif mode == "right" and window_rotation + rotation_step <= max_rotation:
+            self.window_rotation = window_rotation + rotation_step
+            self.windowRotationSlider.setValue(self.window_rotation)
+        elif mode == "left" and window_rotation - rotation_step >= min_rotation:    
+            self.window_rotation = window_rotation - rotation_step
+            self.windowRotationSlider.setValue(self.window_rotation)
+        else:
+            return
+
+        self.windowRotationLabel.setText(f"{self.window_rotation}º")
         self.controller.handle_window_rotation(self.window_rotation)
 
     def on_pan(self, direction: str) -> None:
@@ -270,6 +284,7 @@ class View(QtWidgets.QMainWindow):
 
         key = event.key()
 
+        # Movimentação da janela
         if key == QtCore.Qt.Key.Key_Up:
             self.on_pan(direction="up")
         elif key == QtCore.Qt.Key.Key_Down:
@@ -278,5 +293,17 @@ class View(QtWidgets.QMainWindow):
             self.on_pan(direction="left")
         elif key == QtCore.Qt.Key.Key_Right:
             self.on_pan(direction="right")
+            
+        # Zoom (command+ ou command-) ou (ctrl+ ou ctrl-)
+        elif key == QtCore.Qt.Key.Key_Equal or key == QtCore.Qt.Key.Key_Plus:
+            self.on_zoom(mode="in")
+        elif key == QtCore.Qt.Key.Key_Minus:
+            self.on_zoom(mode="out")
+            
+        # Rotação da janela ([ ou ])
+        elif key == QtCore.Qt.Key.Key_BracketLeft:
+            self.on_window_rotation(mode="left")
+        elif key == QtCore.Qt.Key.Key_BracketRight:
+            self.on_window_rotation(mode="right")
         else:
             super().keyPressEvent(event) 

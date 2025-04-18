@@ -38,9 +38,6 @@ class WorldLine(WorldObject):
         if mode == "cohen_sutherland":
             self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
         elif mode == "liang_barsky":
-            print(
-                "Modo de clipping Liang-Barsky não implementado. Usando Cohen-Sutherland."
-            )
             self.clipping_mode = ClippingAlgorithms.liang_barsky_clipping
         else:
             raise ValueError(f"Modo de clipping inválido: {mode}")
