@@ -66,7 +66,6 @@ class Viewport(QtWidgets.QWidget):
             self.viewport_bounds.y_max - self.viewport_bounds.y_min,
         )
 
-
     def update_viewport(self, objects: list[GraphicalObject]) -> None:
         """Atualiza o viewport."""
         self.graphical_objects = objects

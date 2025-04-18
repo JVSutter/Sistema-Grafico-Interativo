@@ -7,14 +7,14 @@ from view.graphical_objects.graphical_curve import GraphicalCurve
 class WorldCurve(WorldObject):
     """Classe pertinente a curvas de Bézier cúbicas no mundo."""
 
-    def update_normalized_points(self, norm_control_points: list[tuple[float, float]]):
+    def update_normalized_points(self, norm_points: list[tuple[float, float]]):
         """
         Atualiza as coordenadas normalizadas (NCS) dos PONTOS DE CONTROLE do objeto
         e recalcula os pontos da curva para o viewport.
-        @param norm_control_points: Lista de pontos de controle normalizados.
+        @param norm_points: Lista de pontos de controle normalizados.
         """
 
-        self.normalized_points = norm_control_points
+        self.normalized_points = norm_points
 
         generated_norm_points = self._generate_curve_points_normalized()
 
