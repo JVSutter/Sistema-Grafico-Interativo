@@ -48,14 +48,14 @@ class Window:
 
     def apply_zoom(self, zoom_level: float) -> None:
         """Aplica um zoom na janela de visualização baseado no nível de zoom."""
-        
+
         zoom_level /= 100
 
         relative_change = zoom_level / self.zoom_level
         self.zoom_level = zoom_level
-        
+
         scaling_factor = 1 / relative_change
-        
+
         self.window_bounds.x_min *= scaling_factor
         self.window_bounds.x_max *= scaling_factor
         self.window_bounds.y_min *= scaling_factor

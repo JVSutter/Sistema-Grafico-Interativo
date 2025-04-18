@@ -1,7 +1,7 @@
+from model.world_objects.world_curve import WorldCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from model.world_objects.world_curve import WorldCurve
 from utils.bounds import Bounds
 
 
@@ -14,7 +14,13 @@ class WorldObjectFactory:
 
     @classmethod
     def new_world_object(
-        cls, points: list, name: str, color: tuple, display_file: list, is_filled: bool, object_type: str
+        cls,
+        points: list,
+        name: str,
+        color: tuple,
+        display_file: list,
+        is_filled: bool,
+        object_type: str,
     ):
         """
         Cria um novo objeto do mundo a partir de uma lista de pontos.
@@ -64,12 +70,14 @@ class WorldObjectFactory:
         @param filepath: Caminho do arquivo OBJ a ser lido.
         @return: Lista de objetos lidos do arquivo OBJ. Formato: [nome: str, pontos: list, preenchimento: bool].
         """
-        
+
         def add_object():
-            if current_object_points:  # Adiciona o último objeto lido se ele tiver pontos
-                            
+            if (
+                current_object_points
+            ):  # Adiciona o último objeto lido se ele tiver pontos
+
                 tam = len(current_object_points)
-                
+
                 if tam == 2:
                     obj_type = "Line"
                 elif tam > 2:
@@ -118,8 +126,12 @@ class WorldObjectFactory:
                     elif command == "o":  # Define um novo objeto
 
                         add_object()
-                        
-                        current_object_name = (" ".join(parts[1:]) if len(parts) > 1 else f"Object {len(objects_list) + 1}")
+
+                        current_object_name = (
+                            " ".join(parts[1:])
+                            if len(parts) > 1
+                            else f"Object {len(objects_list) + 1}"
+                        )
 
                         current_fill_state = False
                         current_object_points = []

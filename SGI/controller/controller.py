@@ -20,7 +20,12 @@ class Controller:
         self.view.run()
 
     def handle_create_object(
-        self, points_input: list, name_input: str, color_input: tuple, is_filled: bool, object_type: str
+        self,
+        points_input: list,
+        name_input: str,
+        color_input: tuple,
+        is_filled: bool,
+        object_type: str,
     ) -> None:
         """
         Constrói um novo objeto no mundo.
@@ -32,7 +37,11 @@ class Controller:
         """
 
         self.model.add_object(
-            points=points_input, name=name_input, color=color_input, is_filled=is_filled, object_type=object_type
+            points=points_input,
+            name=name_input,
+            color=color_input,
+            is_filled=is_filled,
+            object_type=object_type,
         )
 
     def handle_remove_object(self, index: int) -> None:
@@ -102,12 +111,12 @@ class Controller:
         """
 
         self.model.change_clipping_mode(mode)
-        
+
     def handle_add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
 
         self.model.add_test_objects()
-        
+
     def handle_remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
 

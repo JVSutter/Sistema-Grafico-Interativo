@@ -66,7 +66,7 @@ class View(QtWidgets.QMainWindow):
         self.liangBarskyRadioButton.clicked.connect(
             lambda: self.on_clipping(mode="liang_barsky")
         )
-        
+
         # Botões de teste
         self.addTestButton.clicked.connect(self.add_test_objects)
         self.removeTestButton.clicked.connect(self.remove_test_objects)
@@ -107,7 +107,9 @@ class View(QtWidgets.QMainWindow):
 
         points, name, color, is_filled, object_type = dialog.create_object()
         if points is not None:
-            self.controller.handle_create_object(points, name, color, is_filled, object_type)
+            self.controller.handle_create_object(
+                points, name, color, is_filled, object_type
+            )
 
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
@@ -118,7 +120,7 @@ class View(QtWidgets.QMainWindow):
         if selected == []:
             self.add_log("You must select an object to remove")
             return
-        
+
         count = 0
         for index in selected:
             index -= count
@@ -191,7 +193,7 @@ class View(QtWidgets.QMainWindow):
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
 
-        movement = 100/self.zoomSlider.value()
+        movement = 100 / self.zoomSlider.value()
         dx, dy = {
             "up": (0, movement),
             "down": (0, -movement),
@@ -252,12 +254,12 @@ class View(QtWidgets.QMainWindow):
         """Muda o modo de clipping."""
 
         self.controller.handle_clipping_change(mode)
-        
+
     def add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
-        
+
         self.controller.handle_add_test_objects()
-        
+
     def remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
 

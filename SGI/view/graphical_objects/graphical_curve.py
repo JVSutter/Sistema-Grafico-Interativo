@@ -10,7 +10,7 @@ class GraphicalCurve(GraphicalObject):
         """
         Desenha a curva como uma sequência de linhas conectando os pontos calculados.
         """
-        
+
         path = QtGui.QPainterPath()
 
         path.moveTo(
@@ -19,6 +19,6 @@ class GraphicalCurve(GraphicalObject):
 
         for point in self.viewport_points[1:]:
             path.lineTo(QtCore.QPointF(point[0], point[1]))
-            
+
         painter.setPen(self.get_pen())
         painter.drawPath(path)

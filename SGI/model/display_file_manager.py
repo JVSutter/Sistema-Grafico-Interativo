@@ -61,7 +61,7 @@ class DisplayFileManager:
             color=color,
             display_file=self.display_file,
             is_filled=is_filled,
-            object_type=object_type
+            object_type=object_type,
         )
 
         if world_object is None:
@@ -181,29 +181,29 @@ class DisplayFileManager:
         for obj in self.display_file:
             if isinstance(obj, WorldLine):
                 obj.change_clipping_mode(mode)
-                
+
     def add_test_objects(self) -> None:
         """Adiciona objetos de teste ao display file com arte tangram e curvas artísticas."""
         # Tangram-style triangles espalhados pelos quadrantes
         tangram_triangles = [
-            [(-4, 4), (4, 4), (0, 0)],         
-            [(4, -4), (0, 0), (4, 4)],         
-            [(-4, -4), (0, 0), (-4, 4)]        
+            [(-4, 4), (4, 4), (0, 0)],
+            [(4, -4), (0, 0), (4, 4)],
+            [(-4, -4), (0, 0), (-4, 4)],
         ]
         colors = [
-            (255, 99, 71),    # tomate
-            (65, 105, 225),   # azul real
+            (255, 99, 71),  # tomate
+            (65, 105, 225),  # azul real
             (238, 130, 238),  # violeta
-            (255, 215, 0),    # ouro
-            (0, 191, 255),    # azul turquesa
+            (255, 215, 0),  # ouro
+            (0, 191, 255),  # azul turquesa
         ]
         for i, pts in enumerate(tangram_triangles):
             self.add_object(
                 points=pts,
                 name=f"Test Triangle {i+1}",
                 color=colors[i],
-                is_filled=True if i%2 == 0 else False,
-                object_type="Wireframe"
+                is_filled=True if i % 2 == 0 else False,
+                object_type="Wireframe",
             )
 
         # Linha diagonal decorativa
@@ -212,43 +212,65 @@ class DisplayFileManager:
             name="Test Line",
             color=(70, 100, 255),
             is_filled=False,
-            object_type="Line"
+            object_type="Line",
         )
 
         # Curva artística 1 (13 pontos para 3n+1)
         curve1 = [
-            (-18, -10), (-14, -4), (-10, 2), (-6, 8),
-            (-2, 12), (4, 16), (10, 12), (14, 6),
-            (18, 2), (14, -4), (10, -8), (4, -12), (20, -16)
+            (-18, -10),
+            (-14, -4),
+            (-10, 2),
+            (-6, 8),
+            (-2, 12),
+            (4, 16),
+            (10, 12),
+            (14, 6),
+            (18, 2),
+            (14, -4),
+            (10, -8),
+            (4, -12),
+            (20, -16),
         ]
         self.add_object(
             points=curve1,
             name="Test Curve I",
             color=(255, 20, 147),  # deep pink
             is_filled=False,
-            object_type="Curve"
+            object_type="Curve",
         )
 
         # Curva artística 2 (16 pontos para 3n+1)
         curve2 = [
-            (-20, 0), (-16, 4), (-12, 8), (-8, 12),
-            (-4, 16), (0, 12), (4, 8), (8, 4),
-            (12, 0), (8, -4), (4, -8), (0, -12),
-            (-4, -16), (-8, -12), (-12, -8), (10, -4)
+            (-20, 0),
+            (-16, 4),
+            (-12, 8),
+            (-8, 12),
+            (-4, 16),
+            (0, 12),
+            (4, 8),
+            (8, 4),
+            (12, 0),
+            (8, -4),
+            (4, -8),
+            (0, -12),
+            (-4, -16),
+            (-8, -12),
+            (-12, -8),
+            (10, -4),
         ]
         self.add_object(
             points=curve2,
             name="Test Curve II",
             color=(0, 206, 209),  # dark turquoise
             is_filled=False,
-            object_type="Curve"
+            object_type="Curve",
         )
 
         # Pontos decorativos centrais
         decorative_points = [
             ((0, 0), (255, 255, 255)),
             ((10, 10), (128, 0, 128)),
-            ((-10, -10), (0, 128, 128))
+            ((-10, -10), (0, 128, 128)),
         ]
         for coord, col in decorative_points:
             self.add_object(
@@ -256,15 +278,14 @@ class DisplayFileManager:
                 name=f"Test Point {coord}",
                 color=col,
                 is_filled=False,
-                object_type="Point"
+                object_type="Point",
             )
 
-        
     def remove_test_objects(self) -> None:
         """Remove objetos de teste do display file."""
-        
+
         display_file_copy = self.display_file.copy()
-        
+
         for obj in display_file_copy:
             if obj.name.startswith("Test"):
                 self.remove_object(self.display_file.index(obj))

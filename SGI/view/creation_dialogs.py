@@ -3,6 +3,7 @@ Módulo com as classes relativas às caixas de diálogo para criação de objeto
 """
 
 import re
+
 from PyQt6 import QtWidgets, uic
 
 
@@ -23,16 +24,16 @@ class ObjectDialog(QtWidgets.QDialog):
         self.colorButton.clicked.connect(self.choose_color)
         self.bulkPointsButton.clicked.connect(self.handle_add_bulk_points)
         self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
-        
+
         # Criando o grupo de botões de tipo de objeto
         self.objectType = QtWidgets.QButtonGroup()
         self.objectType.addButton(self.pointRadio)
         self.objectType.addButton(self.lineRadio)
         self.objectType.addButton(self.wireframeRadio)
         self.objectType.addButton(self.curveRadio)
-        
+
         self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
-        
+
     def create_object(self):
         """Cria um objeto"""
 
@@ -44,11 +45,11 @@ class ObjectDialog(QtWidgets.QDialog):
             return None, None, None, None, None
 
         self.name = self.nameInput.text() if self.nameInput.text().strip() else None
-        
+
         is_filled = (
             self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
         )
-        
+
         object_type = self.objectType.checkedButton().text()
 
         return self.points, self.name, self.color, is_filled, object_type
@@ -75,38 +76,42 @@ class ObjectDialog(QtWidgets.QDialog):
             self._update_interface()
         else:
             self.show_error_message("You must select a point to remove.")
-            
+
     def handle_add_bulk_points(self):
         """Adiciona um conjunto de pontos à lista por meio de um input de texto"""
 
         try:
             # tratamento do texto inserido
             text = self.bulkPointsInput.text()
-            text = re.sub(r'[^0-9.,() ]', '', text)
+            text = re.sub(r"[^0-9.,() ]", "", text)
             points = text.replace(",", " ").split()
-            
+
             new_points = []
             coordinates = []
             for point in points:
-                if point[0] == "(": # começo de uma coordenada
+                if point[0] == "(":  # começo de uma coordenada
                     coordinates.append(float(point[1:]))
-                elif point[-1] == ")": # fim de uma coordenada
+                elif point[-1] == ")":  # fim de uma coordenada
                     coordinates.append(float(point[:-1]))
                     new_points.append(coordinates)
                     coordinates = []
-                elif coordinates: # adiciona um numero a coordenada apenas se houver uma coordenada iniciada
+                elif (
+                    coordinates
+                ):  # adiciona um numero a coordenada apenas se houver uma coordenada iniciada
                     coordinates.append(float(point))
 
         except ValueError:
             self.show_error_message("Invalid input. Please enter valid coordinates.")
             return
-                
+
         # Conferindo se há mais de 2 coordenadas
         for point in new_points:
             if len(point) > 2:
-                self.show_error_message("Points with more than 2 coordinates are not supported yet.")
+                self.show_error_message(
+                    "Points with more than 2 coordinates are not supported yet."
+                )
                 return
-            
+
         for point in new_points:
             self.points.append(tuple(point))
             self.pointsList.addItem(f"Point: {point}")
@@ -141,7 +146,7 @@ class ObjectDialog(QtWidgets.QDialog):
             self.show_error_message(
                 "There must be at least 1 point to create an object."
             )
-        elif self.curveRadio.isChecked() and (len(self.points)-1) % 3 != 0:
+        elif self.curveRadio.isChecked() and (len(self.points) - 1) % 3 != 0:
             self.show_error_message(
                 """The number of points must be 4 plus a multiple of 3 for a curve.
                 Example: 4, 7, 10, 13, etc.
@@ -163,7 +168,7 @@ class ObjectDialog(QtWidgets.QDialog):
         else:
             self.fillCheckBox.setChecked(False)
             self.fillCheckBox.setEnabled(False)
-            
+
     def _handle_fill_checkbox(self):
         """Gerencia o estado do checkbox 'Filled'"""
 
@@ -172,51 +177,58 @@ class ObjectDialog(QtWidgets.QDialog):
                 self.fill_state = True
             else:
                 self.fill_state = False
-    
+
     def _update_object_type(self):
         """Atualiza o tipo de objeto baseado no número de pontos"""
 
         num_points = len(self.points)
-        radio_buttons = [self.pointRadio, self.lineRadio, self.wireframeRadio, self.curveRadio]
-        
-        if num_points == 0: # desabilita todos os botões
+        radio_buttons = [
+            self.pointRadio,
+            self.lineRadio,
+            self.wireframeRadio,
+            self.curveRadio,
+        ]
+
+        if num_points == 0:  # desabilita todos os botões
             for button in radio_buttons:
                 button.setChecked(False)
                 button.setEnabled(False)
 
-        if num_points == 1: # habilita apenas ponto
+        if num_points == 1:  # habilita apenas ponto
             for button in radio_buttons:
                 button.setEnabled(False)
-                                
+
             self.pointRadio.setEnabled(True)
             self.pointRadio.setChecked(True)
-        
-        if num_points == 2: # habilita linha
+
+        if num_points == 2:  # habilita linha
             for button in radio_buttons:
                 button.setEnabled(False)
-                
+
             self.lineRadio.setEnabled(True)
             self.lineRadio.setChecked(True)
 
-        if num_points == 3: # habilita wireframe
+        if num_points == 3:  # habilita wireframe
             for button in radio_buttons:
                 button.setEnabled(False)
-                
+
             self.wireframeRadio.setEnabled(True)
             self.wireframeRadio.setChecked(True)
 
-        if num_points > 3: # habilita curva e wireframe
+        if num_points > 3:  # habilita curva e wireframe
             for button in radio_buttons:
                 button.setEnabled(False)
-                
+
             self.curveRadio.setEnabled(True)
             self.wireframeRadio.setEnabled(True)
-            
+
     def _update_points_number(self):
         """Atualiza o número de pontos"""
 
         num_points = len(self.points)
-        self.numPoints.setText(f'<html><head/><body><p><span style=" font-weight:700;">Number of points:</span> {num_points}</p></body></html>')
+        self.numPoints.setText(
+            f'<html><head/><body><p><span style=" font-weight:700;">Number of points:</span> {num_points}</p></body></html>'
+        )
 
     def _update_interface(self):
         """Atualiza a interface baseado no tipo de objeto selecionado"""
