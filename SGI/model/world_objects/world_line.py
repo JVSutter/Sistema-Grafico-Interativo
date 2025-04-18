@@ -17,16 +17,16 @@ class WorldLine(WorldObject):
         super().__init__(points, name, color, viewport_bounds)
         self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
 
-    def get_clipped_representation(self) -> GraphicalLine | None:
+    def get_clipped_representation(self) -> list:
         clipping_args = self.get_clipping_args()
         clipped_points = self.clipping_mode(*clipping_args)
 
         if clipped_points is None:
-            return None
+            return []
 
         viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
         graphical_representation = GraphicalLine(viewport_points, self.color)
-        return graphical_representation
+        return [graphical_representation]
 
     def change_clipping_mode(self, mode: str) -> None:
         """

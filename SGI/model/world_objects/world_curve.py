@@ -1,5 +1,6 @@
 import numpy as np
 
+from model.clipping_algorithms import ClippingAlgorithms
 from model.world_objects.world_object import WorldObject
 from view.graphical_objects.graphical_curve import GraphicalCurve
 
@@ -15,11 +16,10 @@ class WorldCurve(WorldObject):
         """
 
         self.normalized_points = norm_points
-
-        generated_norm_points = self._generate_curve_points_normalized()
+        self.curve_points = self._generate_curve_points_normalized()
 
         self.viewport_points = self.transform_normalized_points_to_viewport(
-            generated_norm_points
+            self.curve_points
         )
 
     def _generate_curve_points_normalized(self) -> list[tuple[float, float]]:
@@ -59,60 +59,25 @@ class WorldCurve(WorldObject):
 
         return curve_points
 
-    def get_clipped_representation(self) -> GraphicalCurve | None:
+    def get_clipped_representation(self) -> list:
         """
         Retorna a representação gráfica da curva após dividir em retas e aplicar clipping.
         """
 
-        if not self.viewport_points:
-            return None
+        clipped_parts = ClippingAlgorithms.curve_clipping(self.curve_points)
+        if not clipped_parts:
+            return []
 
-        # Divide a curva em segmentos de reta
-        clipped_points = []
+        representations = []
 
-        for i in range(len(self.viewport_points) - 1):
-            # Para cada par de pontos consecutivos, cria uma "linha virtual"
-            start_point = self.viewport_points[i]
-            end_point = self.viewport_points[i + 1]
+        for part in clipped_parts:
+            viewport_points = self.transform_normalized_points_to_viewport(part)
 
-            # Converte os pontos do viewport de volta para coordenadas normalizadas
-            vp_width = self.viewport_bounds.x_max - self.viewport_bounds.x_min
-            vp_height = self.viewport_bounds.y_max - self.viewport_bounds.y_min
-
-            nx1 = 2 * (start_point[0] - self.viewport_bounds.x_min) / vp_width - 1
-            ny1 = 1 - 2 * (start_point[1] - self.viewport_bounds.y_min) / vp_height
-
-            nx2 = 2 * (end_point[0] - self.viewport_bounds.x_min) / vp_width - 1
-            ny2 = 1 - 2 * (end_point[1] - self.viewport_bounds.y_min) / vp_height
-
-            # Aplica o algoritmo de clipping de Cohen-Sutherland
-            from model.world_objects.world_line import WorldLine
-
-            # Cria uma linha temporária para usar seu algoritmo de clipping
-            temp_line = WorldLine(
-                [(nx1, ny1), (nx2, ny2)], "temp", self.color, self.viewport_bounds
-            )
-            temp_line.normalized_points = [(nx1, ny1), (nx2, ny2)]
-
-            # Aplica o clipping
-            clipped_segment = temp_line.cohen_sutherland_clipping()
-
-            # Se o segmento for visível, adiciona aos pontos recortados
-            if clipped_segment is not None:
-                # Converte de volta para coordenadas do viewport
-                viewport_segment = self.transform_normalized_points_to_viewport(
-                    clipped_segment
+            representations.append(
+                GraphicalCurve(
+                    viewport_points,
+                    self.color,
                 )
+            )
 
-                # Adiciona apenas o primeiro ponto (exceto para o último segmento)
-                if i < len(self.viewport_points) - 2:
-                    clipped_points.append(viewport_segment[0])
-                else:
-                    # Para o último segmento, adiciona ambos os pontos
-                    clipped_points.extend(viewport_segment)
-
-        if not clipped_points:
-            return None
-
-        graphical_representation = GraphicalCurve(clipped_points, self.color)
-        return graphical_representation
+        return representations

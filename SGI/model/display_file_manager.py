@@ -25,11 +25,7 @@ class DisplayFileManager:
 
         representations = []
         for obj in self.display_file:
-            representation = obj.get_clipped_representation()
-            if representation is None:
-                continue
-
-            representations.append(representation)
+            representations.extend(obj.get_clipped_representation())
         return representations
 
     def get_obj_name(self, index: int) -> str:

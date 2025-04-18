@@ -234,3 +234,74 @@ class ClippingAlgorithms:
         if clipped_polygon:
             return clipped_polygon
         return None
+
+    @classmethod
+    def curve_clipping(cls, points: list) -> list | None:
+        """
+        Algoritmo de recorte de curvas.
+        @param points: Lista de pontos da curva (representação discretizada).
+        @return: Lista de listas com os pontos recortados ou None se a curva estiver fora do Viewport.
+        """
+
+        clipped_parts = []  # Cada pedaço recortado da curva
+        current_part = []  # Pedaço atual
+
+        for i in range(len(points) - 1):
+            # Converte para tupla para evitar problemas de comparação com numpy
+            current_point = tuple(points[i])
+            next_point = tuple(points[i + 1])
+
+            clipped_segment = cls.liang_barsky_clipping(current_point, next_point)
+
+            if clipped_segment is not None:
+                clip_start, clip_end = clipped_segment
+
+                if (
+                    np.isclose(current_point[0], clip_start[0])
+                    and np.isclose(current_point[1], clip_start[1])
+                    and np.isclose(next_point[0], clip_end[0])
+                    and np.isclose(next_point[1], clip_end[1])
+                ):
+                    # Segmento completamente dentro do viewport, continua current_part
+
+                    # Apenda apenas o ponto atual para evitar duplicação quando o
+                    # current_point se tornar next_point
+                    current_part.append(current_point)
+
+                    if i == len(points) - 2:
+                        # Último segmento, adiciona o próximo ponto (caso contrário, ele não seria incluído)
+                        current_part.append(next_point)
+
+                else:
+                    if np.isclose(current_point[0], clip_start[0]) and np.isclose(
+                        current_point[1], clip_start[1]
+                    ):
+                        # Segmento começa dentro e termina fora
+                        # current_point...ponto de interseção...next_point (fora)
+                        current_part.append(current_point)
+                        current_part.append(clip_end)
+                        clipped_parts.append(current_part)
+                        current_part = []
+
+                    elif np.isclose(next_point[0], clip_end[0]) and np.isclose(
+                        next_point[1], clip_end[1]
+                    ):
+                        # Segmento começa fora e termina dentro
+                        # (fora)...ponto de interseção...next_point
+                        current_part = [clip_start, next_point]
+                    else:
+                        # Segmento começa fora e termina fora
+                        clipped_parts.append([clip_start, clip_end])
+            else:
+                if current_part:
+                    clipped_parts.append(current_part)
+                    current_part = []
+
+        # Adiciona o último pedaço se houver
+        if current_part and len(current_part) >= 2:
+            clipped_parts.append(current_part)
+
+        if clipped_parts:
+            return clipped_parts
+
+        return None
