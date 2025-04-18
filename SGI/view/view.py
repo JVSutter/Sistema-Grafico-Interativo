@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6 import QtWidgets, uic
+from PyQt6 import QtWidgets, uic, QtCore
 
 from view.creation_dialogs import ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
@@ -264,3 +264,19 @@ class View(QtWidgets.QMainWindow):
         """Remove objetos de teste do mundo."""
 
         self.controller.handle_remove_test_objects()
+
+    def keyPressEvent(self, event) -> None:
+        """Trata os eventos de pressionamento de tecla."""
+
+        key = event.key()
+
+        if key == QtCore.Qt.Key.Key_Up:
+            self.on_pan(direction="up")
+        elif key == QtCore.Qt.Key.Key_Down:
+            self.on_pan(direction="down")
+        elif key == QtCore.Qt.Key.Key_Left:
+            self.on_pan(direction="left")
+        elif key == QtCore.Qt.Key.Key_Right:
+            self.on_pan(direction="right")
+        else:
+            super().keyPressEvent(event) 

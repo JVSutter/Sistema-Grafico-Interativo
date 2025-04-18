@@ -56,14 +56,16 @@ class Viewport(QtWidgets.QWidget):
             obj.draw(painter)
 
         frame_pen = QtGui.QPen(QtGui.QColor(0, 0, 0))
-        frame_pen.setWidth(3)
+        frame_pen.setWidth(1)
         painter.setPen(frame_pen)
+        
+        offset = 1
 
         painter.drawRect(
-            self.viewport_bounds.x_min,
-            self.viewport_bounds.y_min,
-            self.viewport_bounds.x_max - self.viewport_bounds.x_min,
-            self.viewport_bounds.y_max - self.viewport_bounds.y_min,
+            self.viewport_bounds.x_min - offset,
+            self.viewport_bounds.y_min - offset,
+            self.viewport_bounds.x_max - self.viewport_bounds.x_min + 2*offset,
+            self.viewport_bounds.y_max - self.viewport_bounds.y_min + 2*offset,
         )
 
     def update_viewport(self, objects: list[GraphicalObject]) -> None:
