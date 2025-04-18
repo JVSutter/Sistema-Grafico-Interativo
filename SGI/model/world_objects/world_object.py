@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from view.graphical_objects.graphical_object import GraphicalObject
 from utils.bounds import Bounds
+from view.graphical_objects.graphical_object import GraphicalObject
 
 
 class WorldObject(ABC):

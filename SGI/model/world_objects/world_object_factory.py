@@ -56,7 +56,7 @@ class WorldObjectFactory:
             obj_type_name = obj_type.__name__.replace("World", "")
 
             highest_index = 0
-            pattern = re.compile(fr"^{obj_type_name} (\d+)$")
+            pattern = re.compile(rf"^{obj_type_name} (\d+)$")
 
             for obj in display_file:
                 if obj.__class__.__name__.replace("World", "") == obj_type_name:

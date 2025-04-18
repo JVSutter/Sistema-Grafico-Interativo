@@ -67,7 +67,6 @@ class Model:
         Remove um objeto do display file e atualiza a View.
         @param index: Índice do objeto a ser removido. Coincide com o índice na lista de objetos da interface.
         """
-
         self.display_file_manager.remove_object(index)
 
     @update_interface
@@ -77,6 +76,7 @@ class Model:
         @new_zoom_value: Novo valor de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
         """
         self.window.apply_zoom(new_zoom_value)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
@@ -86,6 +86,7 @@ class Model:
         @param dy: Deslocamento em y.
         """
         self.window.apply_pan(dx, dy)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def handle_transformations(
@@ -179,8 +180,8 @@ class Model:
         Rotaciona a janela de visualização para o ângulo especificado em graus.
         @param angle: Ângulo de rotação em graus.
         """
-
         self.window.apply_rotation(angle)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def change_clipping_mode(self, mode: str) -> None:
@@ -188,7 +189,6 @@ class Model:
         Muda o modo de clipping.
         @param mode: Modo de clipping.
         """
-
         self.display_file_manager.change_clipping_mode(mode)
 
     @update_interface
@@ -200,5 +200,4 @@ class Model:
     @update_interface
     def remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
-
         self.display_file_manager.remove_test_objects()

@@ -15,6 +15,9 @@ class DisplayFileManager:
 
     def __init__(self, viewport_bounds: Bounds):
         self.display_file: list[WorldObject] = []
+        self.dirty_objects: list[WorldObject] = (
+            []
+        )  # Objetos cujas coordenadas normalizadas precisam ser atualizadas
         WorldObjectFactory.viewport_bounds = viewport_bounds
 
     def get_clipped_representations(self) -> list[GraphicalObject]:
@@ -62,7 +65,9 @@ class DisplayFileManager:
 
         if world_object is None:
             return None
+
         self.display_file.append(world_object)
+        self.dirty_objects.append(world_object)
         return world_object.name
 
     def remove_object(self, index: int) -> None:
@@ -112,6 +117,14 @@ class DisplayFileManager:
         if transformation_mtx is None:
             return
         obj.update_coordinates(transformation_mtx)
+        self.dirty_objects.append(obj)
+
+    def set_all_objects_as_dirty(self) -> None:
+        """
+        Marca todos os objetos no display file como sujos, indicando que precisam ser atualizados.
+        """
+        for obj in self.display_file:
+            self.dirty_objects.append(obj)
 
     def update_ncs_coordinates(
         self,
@@ -138,7 +151,7 @@ class DisplayFileManager:
             window_width=window_width,
         )
 
-        for obj in self.display_file:
+        for obj in self.dirty_objects:
             normalized_coords = []
 
             for point_wc in obj.world_points:
@@ -152,6 +165,8 @@ class DisplayFileManager:
                 normalized_coords.append((nx, ny))
 
             obj.update_normalized_points(normalized_coords)
+
+        self.dirty_objects.clear()
 
     def import_file_to_display_file(self, filepath: str) -> None:
         """
