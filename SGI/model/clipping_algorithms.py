@@ -39,19 +39,11 @@ class ClippingAlgorithms:
         cls,
         p1: tuple[float, float],
         p2: tuple[float, float],
-        x_min: float,
-        y_min: float,
-        x_max: float,
-        y_max: float,
     ) -> tuple[tuple[float, float], tuple[float, float]] | None:
         """
         Algoritmo de Cohen-Sutherland para recorte de linhas.
         @param p1: Primeiro ponto da linha.
         @param p2: Segundo ponto da linha.
-        @param x_min: Limite mínimo em x do viewport.
-        @param y_min: Limite mínimo em y do viewport.
-        @param x_max: Limite máximo em x do viewport.
-        @param y_max: Limite máximo em y do viewport.
         @return: Tupla com os pontos recortados da linha ou None se a linha estiver fora do viewport.
         """
 

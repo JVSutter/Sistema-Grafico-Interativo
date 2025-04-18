@@ -18,8 +18,9 @@ class WorldLine(WorldObject):
         self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
 
     def get_clipped_representation(self) -> list:
-        clipping_args = self.get_clipping_args()
-        clipped_points = self.clipping_mode(*clipping_args)
+        p1 = self.normalized_points[0]
+        p2 = self.normalized_points[1]
+        clipped_points = self.clipping_mode(p1, p2)
 
         if clipped_points is None:
             return []
@@ -43,20 +44,3 @@ class WorldLine(WorldObject):
             self.clipping_mode = ClippingAlgorithms.liang_barsky_clipping
         else:
             raise ValueError(f"Modo de clipping inválido: {mode}")
-
-    def get_clipping_args(self) -> tuple:
-        """
-        Retorna os argumentos de clipping com base no modo de clipping atual.
-        @return: Argumentos de clipping.
-        """
-
-        p1 = self.normalized_points[0]
-        p2 = self.normalized_points[1]
-
-        if self.clipping_mode == ClippingAlgorithms.cohen_sutherland_clipping:
-            x_min, x_max = self.viewport_bounds.x_min, self.viewport_bounds.x_max
-            y_min, y_max = self.viewport_bounds.y_min, self.viewport_bounds.y_max
-            return (p1, p2, x_min, y_min, x_max, y_max)
-
-        elif self.clipping_mode == ClippingAlgorithms.liang_barsky_clipping:
-            return (p1, p2)
