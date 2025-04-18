@@ -782,7 +782,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../../../Computação Gráfica/computacao-grafica/SGI/view/assets/zoomIn.png</normaloff>../../../../../Computação Gráfica/computacao-grafica/SGI/view/assets/zoomIn.png</iconset>
+          <normaloff>../assets/zoomIn.png</normaloff>../assets/zoomIn.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -817,7 +817,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../../../../Computação Gráfica/computacao-grafica/SGI/view/assets/zoomOut.png</normaloff>../../../../../Computação Gráfica/computacao-grafica/SGI/view/assets/zoomOut.png</iconset>
+          <normaloff>../assets/zoomOut.png</normaloff>../assets/zoomOut.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -856,7 +856,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>../../../../../Computação Gráfica/computacao-grafica/SGI/view/assets/dpad.png</pixmap>
+     <pixmap>../assets/dpad.png</pixmap>
     </property>
    </widget>
    <widget class="QPushButton" name="navUpButton">

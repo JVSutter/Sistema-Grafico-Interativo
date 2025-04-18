@@ -51,8 +51,12 @@ class Viewport(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
+        # Desenha cada objeto
+        for obj in self.graphical_objects:
+            obj.draw(painter)
+
         frame_pen = QtGui.QPen(QtGui.QColor(0, 0, 0))
-        frame_pen.setWidth(1)
+        frame_pen.setWidth(3)
         painter.setPen(frame_pen)
 
         painter.drawRect(
@@ -62,9 +66,6 @@ class Viewport(QtWidgets.QWidget):
             self.viewport_bounds.y_max - self.viewport_bounds.y_min,
         )
 
-        # Desenha cada objeto
-        for obj in self.graphical_objects:
-            obj.draw(painter)
 
     def update_viewport(self, objects: list[GraphicalObject]) -> None:
         """Atualiza o viewport."""
