@@ -1,7 +1,6 @@
 from model.world_objects.world_object import WorldObject
 from view.graphical_objects.graphical_curve import GraphicalCurve
 import numpy as np
-import time
 
 
 class WorldCurve(WorldObject):
@@ -20,12 +19,13 @@ class WorldCurve(WorldObject):
         
         self.viewport_points = self.transform_normalized_points_to_viewport(generated_norm_points)
 
-    def _generate_curve_points_normalized(self, num_steps: int = 1000) -> list[tuple[float, float]]:
+    def _generate_curve_points_normalized(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva de Bézier usando a forma matricial em coordenadas normalizadas.
-        @param num_steps: Número de segmentos para aproximar a curva.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.
         """
+        
+        num_steps = 100
         
         # Faz o tratamento de pontos de controle para C(1)
         pts = list(self.normalized_points)

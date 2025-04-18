@@ -102,3 +102,13 @@ class Controller:
         """
 
         self.model.change_clipping_mode(mode)
+        
+    def handle_add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+
+        self.model.add_test_objects()
+        
+    def handle_remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+
+        self.model.remove_test_objects()

@@ -34,7 +34,7 @@ class View(QtWidgets.QMainWindow):
         self.transformObject.clicked.connect(self.on_transform_object)
 
         # Botões de zoom
-        max_zoom = 200
+        max_zoom = 300
         self.zoomSlider.setMaximum(max_zoom)
         self.zoomInButton.clicked.connect(
             lambda: self.on_zoom(mode="in")
@@ -66,6 +66,10 @@ class View(QtWidgets.QMainWindow):
         self.liangBarskyRadioButton.clicked.connect(
             lambda: self.on_clipping(mode="liang_barsky")
         )
+        
+        # Botões de teste
+        self.addTestButton.clicked.connect(self.add_test_objects)
+        self.removeTestButton.clicked.connect(self.remove_test_objects)
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -108,16 +112,20 @@ class View(QtWidgets.QMainWindow):
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
 
-        selected = self.objectsList.currentRow()
+        selected = [item.row() for item in self.objectsList.selectedIndexes()]
+        selected.sort()
 
-        if selected == -1:
+        if selected == []:
             self.add_log("You must select an object to remove")
             return
-
-        text = self.objectsList.currentItem().text()
-
-        self.controller.handle_remove_object(index=selected)
-        self.add_log(f"{text} has been removed")
+        
+        count = 0
+        for index in selected:
+            index -= count
+            text = self.objectsList.item(index).text()
+            self.controller.handle_remove_object(index=index)
+            self.add_log(f"{text} has been removed")
+            count += 1
 
     def on_transform_object(self) -> None:
         """Trata requisições de transformação de objetos no mundo."""
@@ -244,3 +252,13 @@ class View(QtWidgets.QMainWindow):
         """Muda o modo de clipping."""
 
         self.controller.handle_clipping_change(mode)
+        
+    def add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+        
+        self.controller.handle_add_test_objects()
+        
+    def remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+
+        self.controller.handle_remove_test_objects()

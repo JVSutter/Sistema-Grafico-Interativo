@@ -123,7 +123,7 @@ class Model:
         window_cx, window_cy = self.window.get_center()
         window_width, window_height = self.window.get_width_height()
         window_vup = self.window.vup
-
+        
         self.display_file_manager.update_ncs_coordinates(
             window_cx=window_cx,
             window_cy=window_cy,
@@ -186,3 +186,15 @@ class Model:
         """
 
         self.display_file_manager.change_clipping_mode(mode)
+        
+    @update_interface
+    def add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+
+        self.display_file_manager.add_test_objects()
+        
+    @update_interface
+    def remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+
+        self.display_file_manager.remove_test_objects()
