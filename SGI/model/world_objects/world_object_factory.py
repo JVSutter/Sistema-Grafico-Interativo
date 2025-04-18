@@ -1,3 +1,5 @@
+import re
+
 from model.world_objects.world_curve import WorldCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
@@ -52,12 +54,18 @@ class WorldObjectFactory:
 
         if not name:
             obj_type_name = obj_type.__name__.replace("World", "")
-            objects_with_same_type = [
-                obj
-                for obj in display_file
-                if obj.__class__.__name__.replace("World", "") == obj_type_name
-            ]
-            name = f"{obj_type_name} {len(objects_with_same_type) + 1}"
+
+            highest_index = 0
+            pattern = re.compile(fr"^{obj_type_name} (\d+)$")
+
+            for obj in display_file:
+                if obj.__class__.__name__.replace("World", "") == obj_type_name:
+                    match = pattern.match(obj.name)
+                    if match:
+                        index = int(match.group(1))
+                        highest_index = max(highest_index, index)
+
+            name = f"{obj_type_name} {highest_index + 1}"
 
         kwargs["name"] = name
 
