@@ -228,7 +228,7 @@ class ClippingAlgorithms:
         return None
 
     @classmethod
-    def curve_clipping(cls, points: list) -> list | None:
+    def curve_clipping(cls, points: list, line_clipper: callable) -> list | None:
         """
         Algoritmo de recorte de curvas.
         @param points: Lista de pontos da curva (representação discretizada).
@@ -243,7 +243,7 @@ class ClippingAlgorithms:
             current_point = tuple(points[i])
             next_point = tuple(points[i + 1])
 
-            clipped_segment = cls.liang_barsky_clipping(current_point, next_point)
+            clipped_segment = line_clipper(current_point, next_point)
 
             if clipped_segment is not None:
                 clip_start, clip_end = clipped_segment

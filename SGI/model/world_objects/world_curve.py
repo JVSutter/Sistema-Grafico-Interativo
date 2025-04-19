@@ -1,12 +1,20 @@
 import numpy as np
-
 from model.clipping_algorithms import ClippingAlgorithms
-from model.world_objects.world_object import WorldObject
+from model.world_objects.sc_world_object import SCWorldObject
 from view.graphical_objects.graphical_curve import GraphicalCurve
 
 
-class WorldCurve(WorldObject):
+class WorldCurve(SCWorldObject):
     """Classe pertinente a curvas de Bézier cúbicas no mundo."""
+
+    def __init__(self, points, name, color, viewport_bounds):
+        super().__init__(points, name, color, viewport_bounds)
+
+        self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
+        self.clipping_modes = {
+            "cohen_sutherland": ClippingAlgorithms.cohen_sutherland_clipping,
+            "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
+        }
 
     def update_normalized_points(self, norm_points: list[tuple[float, float]]):
         """
@@ -17,7 +25,6 @@ class WorldCurve(WorldObject):
 
         self.normalized_points = norm_points
         self.curve_points = self._generate_curve_points_normalized()
-
         self.viewport_points = self.transform_normalized_points_to_viewport(
             self.curve_points
         )
@@ -64,7 +71,9 @@ class WorldCurve(WorldObject):
         Retorna a representação gráfica da curva após dividir em retas e aplicar clipping.
         """
 
-        clipped_parts = ClippingAlgorithms.curve_clipping(self.curve_points)
+        clipped_parts = ClippingAlgorithms.curve_clipping(
+            self.curve_points, self.clipping_mode
+        )
         if not clipped_parts:
             return []
 

@@ -1,10 +1,10 @@
 from model.clipping_algorithms import ClippingAlgorithms
-from model.world_objects.world_object import WorldObject
+from model.world_objects.sc_world_object import SCWorldObject
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_line import GraphicalLine
 
 
-class WorldLine(WorldObject):
+class WorldLine(SCWorldObject):
     """Classe pertinente a linhas no mundo."""
 
     def __init__(
@@ -15,6 +15,10 @@ class WorldLine(WorldObject):
         viewport_bounds: Bounds,
     ):
         super().__init__(points, name, color, viewport_bounds)
+        self.clipping_modes = {
+            "cohen_sutherland": ClippingAlgorithms.cohen_sutherland_clipping,
+            "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
+        }
         self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
 
     def get_clipped_representation(self) -> list:
@@ -28,16 +32,3 @@ class WorldLine(WorldObject):
         viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
         graphical_representation = GraphicalLine(viewport_points, self.color)
         return [graphical_representation]
-
-    def change_clipping_mode(self, mode: str) -> None:
-        """
-        Muda o modo de clipping.
-        @param mode: Modo de clipping.
-        """
-
-        if mode == "cohen_sutherland":
-            self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
-        elif mode == "liang_barsky":
-            self.clipping_mode = ClippingAlgorithms.liang_barsky_clipping
-        else:
-            raise ValueError(f"Modo de clipping inválido: {mode}")

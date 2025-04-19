@@ -1,7 +1,6 @@
 import sys
 
-from PyQt6 import QtWidgets, uic, QtCore
-
+from PyQt6 import QtCore, QtWidgets, uic
 from view.creation_dialogs import ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
@@ -195,7 +194,7 @@ class View(QtWidgets.QMainWindow):
         elif mode == "right" and window_rotation + rotation_step <= max_rotation:
             self.window_rotation = window_rotation + rotation_step
             self.windowRotationSlider.setValue(self.window_rotation)
-        elif mode == "left" and window_rotation - rotation_step >= min_rotation:    
+        elif mode == "left" and window_rotation - rotation_step >= min_rotation:
             self.window_rotation = window_rotation - rotation_step
             self.windowRotationSlider.setValue(self.window_rotation)
         else:
@@ -293,17 +292,17 @@ class View(QtWidgets.QMainWindow):
             self.on_pan(direction="left")
         elif key == QtCore.Qt.Key.Key_Right:
             self.on_pan(direction="right")
-            
+
         # Zoom (command+ ou command-) ou (ctrl+ ou ctrl-)
         elif key == QtCore.Qt.Key.Key_Equal or key == QtCore.Qt.Key.Key_Plus:
             self.on_zoom(mode="in")
         elif key == QtCore.Qt.Key.Key_Minus:
             self.on_zoom(mode="out")
-            
+
         # Rotação da janela ([ ou ])
         elif key == QtCore.Qt.Key.Key_BracketLeft:
             self.on_window_rotation(mode="left")
         elif key == QtCore.Qt.Key.Key_BracketRight:
             self.on_window_rotation(mode="right")
         else:
-            super().keyPressEvent(event) 
+            super().keyPressEvent(event)
