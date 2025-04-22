@@ -1,6 +1,6 @@
 import re
 
-from model.world_objects.world_curve import WorldCurve
+from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
@@ -48,7 +48,7 @@ class WorldObjectFactory:
             obj_type = WorldWireframe
             kwargs["is_filled"] = is_filled
         elif object_type == "Curve":
-            obj_type = WorldCurve
+            obj_type = WorldBezierCurve
         else:
             raise ValueError(f"Tipo de objeto inválido: {object_type}")
 
