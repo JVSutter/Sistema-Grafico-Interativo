@@ -120,7 +120,7 @@ class Model:
                 )
 
         obj_name = self.display_file_manager.get_obj_name(index)
-        self.view.add_log(f"{obj_name}: Transformations applied.")
+        self.view.add_log(f"{obj_name}: transformations applied.")
 
     def _calculate_and_update_ncs(self) -> None:
         """Calcula as coordenadas normalizadas para todos os objetos."""

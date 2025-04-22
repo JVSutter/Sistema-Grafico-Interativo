@@ -1,4 +1,5 @@
 import numpy as np
+
 from model.transformation_manager import TransformationManager
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_object import WorldObject
