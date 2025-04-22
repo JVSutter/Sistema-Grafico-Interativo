@@ -12,12 +12,12 @@ $(VENV_DIR)/bin/activate:
 	@touch $(VENV_DIR)/bin/activate
 
 install: $(VENV_DIR)/bin/activate
-	@echo "Instalando dependências de SGI/requirements.txt..."
-	@$(VENV_PIP) install -q -r SGI/requirements.txt
+	@echo "Instalando dependências de requirements.txt..."
+	@$(VENV_PIP) install -q -r requirements.txt
 
 run_main: $(VENV_DIR)/bin/activate
-	@echo "Executando SGI/main.py..."
-	@cd SGI && ../$(VENV_PYTHON) main.py
+	@echo "Executando main.py..."
+	@$(VENV_PYTHON) main.py
 
 clean:
 	@echo "Limpando arquivos gerados e ambiente virtual..."
