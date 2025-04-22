@@ -1,7 +1,6 @@
 import sys
 
-from PyQt6 import QtWidgets, uic
-
+from PyQt6 import QtCore, QtWidgets, uic
 from view.creation_dialogs import ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog
@@ -34,6 +33,8 @@ class View(QtWidgets.QMainWindow):
         self.transformObject.clicked.connect(self.on_transform_object)
 
         # Botões de zoom
+        max_zoom = 300
+        self.zoomSlider.setMaximum(max_zoom)
         self.zoomInButton.clicked.connect(
             lambda: self.on_zoom(mode="in")
         )  # Quando aperta o botao de zoom in
@@ -44,7 +45,7 @@ class View(QtWidgets.QMainWindow):
 
         # Botão de rotação da janela
         self.windowRotationSlider.valueChanged.connect(
-            lambda: self.on_window_rotation()
+            lambda: self.on_window_rotation(mode="slider")
         )
 
         # Botões de navegação
@@ -64,6 +65,10 @@ class View(QtWidgets.QMainWindow):
         self.liangBarskyRadioButton.clicked.connect(
             lambda: self.on_clipping(mode="liang_barsky")
         )
+
+        # Botões de teste
+        self.addTestButton.clicked.connect(self.add_test_objects)
+        self.removeTestButton.clicked.connect(self.remove_test_objects)
 
     def setup_viewport(self) -> None:
         """Configura o viewport para exibir os objetos gráficos."""
@@ -99,23 +104,29 @@ class View(QtWidgets.QMainWindow):
     def on_create_object(self, dialog: ObjectDialog) -> None:
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
-        points, name, color, is_filled = dialog.create_object()
+        points, name, color, is_filled, object_type = dialog.create_object()
         if points is not None:
-            self.controller.handle_create_object(points, name, color, is_filled)
+            self.controller.handle_create_object(
+                points, name, color, is_filled, object_type
+            )
 
     def on_remove_object(self) -> None:
         """Trata requisições de remoção de objetos no mundo."""
 
-        selected = self.objectsList.currentRow()
+        selected = [item.row() for item in self.objectsList.selectedIndexes()]
+        selected.sort()
 
-        if selected == -1:
+        if selected == []:
             self.add_log("You must select an object to remove")
             return
 
-        text = self.objectsList.currentItem().text()
-
-        self.controller.handle_remove_object(index=selected)
-        self.add_log(f"{text} has been removed")
+        count = 0
+        for index in selected:
+            index -= count
+            text = self.objectsList.item(index).text()
+            self.controller.handle_remove_object(index=index)
+            self.add_log(f"{text} has been removed")
+            count += 1
 
     def on_transform_object(self) -> None:
         """Trata requisições de transformação de objetos no mundo."""
@@ -165,26 +176,37 @@ class View(QtWidgets.QMainWindow):
 
         # Aplica zoom apenas se houver mudança significativa
         if abs(new_zoom_value - old_zoom_value) > 0.01:
-            relative_change = new_zoom_value / old_zoom_value
-            self.controller.handle_zoom(
-                1 / relative_change  # Pois o zoom aumenta com a diminuição da Window
-            )
+            self.controller.handle_zoom(new_zoom_value)
 
             self.zoomLabel.setText(f"{new_zoom_value}%")
             self.zoom_value = new_zoom_value
 
-    def on_window_rotation(self) -> None:
+    def on_window_rotation(self, mode: str) -> None:
         """Trata as requisições de rotação da janela."""
 
-        self.window_rotation = self.windowRotationSlider.value()
-        self.windowRotationLabel.setText(f"{self.window_rotation}º")
+        rotation_step = 10
+        window_rotation = self.windowRotationSlider.value()
+        min_rotation = 0
+        max_rotation = 360
 
+        if mode == "slider":
+            self.window_rotation = window_rotation
+        elif mode == "right" and window_rotation + rotation_step <= max_rotation:
+            self.window_rotation = window_rotation + rotation_step
+            self.windowRotationSlider.setValue(self.window_rotation)
+        elif mode == "left" and window_rotation - rotation_step >= min_rotation:
+            self.window_rotation = window_rotation - rotation_step
+            self.windowRotationSlider.setValue(self.window_rotation)
+        else:
+            return
+
+        self.windowRotationLabel.setText(f"{self.window_rotation}º")
         self.controller.handle_window_rotation(self.window_rotation)
 
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
 
-        movement = 10
+        movement = 100 / self.zoomSlider.value()
         dx, dy = {
             "up": (0, movement),
             "down": (0, -movement),
@@ -245,3 +267,42 @@ class View(QtWidgets.QMainWindow):
         """Muda o modo de clipping."""
 
         self.controller.handle_clipping_change(mode)
+
+    def add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+
+        self.controller.handle_add_test_objects()
+
+    def remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+
+        self.controller.handle_remove_test_objects()
+
+    def keyPressEvent(self, event) -> None:
+        """Trata os eventos de pressionamento de tecla."""
+
+        key = event.key()
+
+        # Movimentação da janela
+        if key == QtCore.Qt.Key.Key_Up:
+            self.on_pan(direction="up")
+        elif key == QtCore.Qt.Key.Key_Down:
+            self.on_pan(direction="down")
+        elif key == QtCore.Qt.Key.Key_Left:
+            self.on_pan(direction="left")
+        elif key == QtCore.Qt.Key.Key_Right:
+            self.on_pan(direction="right")
+
+        # Zoom (command+ ou command-) ou (ctrl+ ou ctrl-)
+        elif key == QtCore.Qt.Key.Key_Equal or key == QtCore.Qt.Key.Key_Plus:
+            self.on_zoom(mode="in")
+        elif key == QtCore.Qt.Key.Key_Minus:
+            self.on_zoom(mode="out")
+
+        # Rotação da janela ([ ou ])
+        elif key == QtCore.Qt.Key.Key_BracketLeft:
+            self.on_window_rotation(mode="left")
+        elif key == QtCore.Qt.Key.Key_BracketRight:
+            self.on_window_rotation(mode="right")
+        else:
+            super().keyPressEvent(event)

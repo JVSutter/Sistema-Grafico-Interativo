@@ -37,7 +37,7 @@ class Model:
 
     @update_interface
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool
+        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
     ) -> None:
         """
         Adiciona um objeto gráfico ao mundo.
@@ -45,16 +45,21 @@ class Model:
         @param name: Nome do objeto.
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
+        @param object_type: Tipo de objeto.
         """
 
         obj_name = self.display_file_manager.add_object(
-            points=points, name=name, color=color, is_filled=is_filled
+            points=points,
+            name=name,
+            color=color,
+            is_filled=is_filled,
+            object_type=object_type,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")
             return
 
-        self.view.add_log(f"Object {obj_name} added: {points}")
+        self.view.add_log(f"{object_type} {obj_name} added: {points}")
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -62,16 +67,16 @@ class Model:
         Remove um objeto do display file e atualiza a View.
         @param index: Índice do objeto a ser removido. Coincide com o índice na lista de objetos da interface.
         """
-
         self.display_file_manager.remove_object(index)
 
     @update_interface
-    def zoom(self, factor: float) -> None:
+    def zoom(self, new_zoom_value: float) -> None:
         """
         Aplica um zoom na janela de visualização e atualiza a View.
-        @factor: Fator de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
+        @new_zoom_value: Novo valor de zoom. Valores maiores que 1 aumentam o zoom, valores menores que 1 diminuem.
         """
-        self.window.apply_zoom(factor)
+        self.window.apply_zoom(new_zoom_value)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def pan(self, dx: float, dy: float) -> None:
@@ -81,6 +86,7 @@ class Model:
         @param dy: Deslocamento em y.
         """
         self.window.apply_pan(dx, dy)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def handle_transformations(
@@ -174,8 +180,8 @@ class Model:
         Rotaciona a janela de visualização para o ângulo especificado em graus.
         @param angle: Ângulo de rotação em graus.
         """
-
         self.window.apply_rotation(angle)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def change_clipping_mode(self, mode: str) -> None:
@@ -183,5 +189,15 @@ class Model:
         Muda o modo de clipping.
         @param mode: Modo de clipping.
         """
-
         self.display_file_manager.change_clipping_mode(mode)
+
+    @update_interface
+    def add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+
+        self.display_file_manager.add_test_objects()
+
+    @update_interface
+    def remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+        self.display_file_manager.remove_test_objects()

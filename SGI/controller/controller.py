@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.model import Model
 from view.view import View
 
@@ -20,7 +19,12 @@ class Controller:
         self.view.run()
 
     def handle_create_object(
-        self, points_input: list, name_input: str, color_input: tuple, is_filled: bool
+        self,
+        points_input: list,
+        name_input: str,
+        color_input: tuple,
+        is_filled: bool,
+        object_type: str,
     ) -> None:
         """
         Constrói um novo objeto no mundo.
@@ -28,10 +32,15 @@ class Controller:
         @param name_input: Nome do objeto
         @param color_input: Cor do objeto
         @param is_filled: Se o objeto é preenchido ou não
+        @param object_type: Tipo de objeto
         """
 
         self.model.add_object(
-            points=points_input, name=name_input, color=color_input, is_filled=is_filled
+            points=points_input,
+            name=name_input,
+            color=color_input,
+            is_filled=is_filled,
+            object_type=object_type,
         )
 
     def handle_remove_object(self, index: int) -> None:
@@ -42,13 +51,13 @@ class Controller:
 
         self.model.remove_object(index=index)
 
-    def handle_zoom(self, factor: float) -> None:
+    def handle_zoom(self, new_zoom_value: float) -> None:
         """
         Processa um zoom out/in da janela de visualização.
-        @param factor: Fator de zoom.
+        @param new_zoom_value: Novo valor de zoom.
         """
 
-        self.model.zoom(factor)
+        self.model.zoom(new_zoom_value)
 
     def handle_pan(self, dx: float, dy: float) -> None:
         """
@@ -101,3 +110,13 @@ class Controller:
         """
 
         self.model.change_clipping_mode(mode)
+
+    def handle_add_test_objects(self) -> None:
+        """Adiciona objetos de teste ao mundo."""
+
+        self.model.add_test_objects()
+
+    def handle_remove_test_objects(self) -> None:
+        """Remove objetos de teste do mundo."""
+
+        self.model.remove_test_objects()

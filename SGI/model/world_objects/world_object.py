@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-
 from utils.bounds import Bounds
+from view.graphical_objects.graphical_object import GraphicalObject
 
 
 class WorldObject(ABC):
@@ -67,9 +67,11 @@ class WorldObject(ABC):
         self.world_points = [point @ composite_matrix for point in self.world_points]
 
     @abstractmethod
-    def get_clipped_representation(self) -> None:
+    def get_clipped_representation(self) -> list[GraphicalObject]:
         """
         Executa o clipping do objeto e retorna a representação gráfica.
+        @return: lista de objetos gráficos representando o objeto no Viewport. Pode ser vazia, se o
+        objeto estiver fora, ou conter um ou mais objetos gráficos (dependendo da clipagem)
         """
 
     def get_center(self) -> tuple[float, float]:

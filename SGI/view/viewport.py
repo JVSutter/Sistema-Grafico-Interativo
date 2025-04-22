@@ -1,5 +1,4 @@
 from PyQt6 import QtGui, QtWidgets
-
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
@@ -51,20 +50,34 @@ class Viewport(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
-        frame_pen = QtGui.QPen(QtGui.QColor(0, 0, 0))
-        frame_pen.setWidth(1)
-        painter.setPen(frame_pen)
-
-        painter.drawRect(
-            self.viewport_bounds.x_min,
-            self.viewport_bounds.y_min,
-            self.viewport_bounds.x_max - self.viewport_bounds.x_min,
-            self.viewport_bounds.y_max - self.viewport_bounds.y_min,
-        )
-
         # Desenha cada objeto
         for obj in self.graphical_objects:
             obj.draw(painter)
+
+        def _draw_viewport_frame(
+            painter: QtGui.QPainter, color: QtGui.QColor, width: int, offset: int
+        ) -> None:
+            """Desenha a borda do viewport com as configurações especificadas."""
+            frame_pen = QtGui.QPen(color)
+            frame_pen.setWidth(width)
+            painter.setPen(frame_pen)
+
+            painter.drawRect(
+                self.viewport_bounds.x_min - offset,
+                self.viewport_bounds.y_min - offset,
+                self.viewport_bounds.x_max - self.viewport_bounds.x_min + 2 * offset,
+                self.viewport_bounds.y_max - self.viewport_bounds.y_min + 2 * offset,
+            )
+
+        # Desenha a borda externa (branca)
+        _draw_viewport_frame(
+            painter=painter, color=QtGui.QColor(230, 230, 230), width=3, offset=1
+        )
+
+        # Desenha a borda interna (preta)
+        _draw_viewport_frame(
+            painter=painter, color=QtGui.QColor(0, 0, 0), width=1, offset=-1
+        )
 
     def update_viewport(self, objects: list[GraphicalObject]) -> None:
         """Atualiza o viewport."""

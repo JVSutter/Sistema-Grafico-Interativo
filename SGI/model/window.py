@@ -1,5 +1,4 @@
 import numpy as np
-
 from utils.bounds import Bounds
 
 
@@ -17,16 +16,17 @@ class Window:
         viewport_height = viewport_bounds.y_max - viewport_bounds.y_min
         aspect_ratio = viewport_width / viewport_height
 
-        default_height = 200
-        default_width = default_height * aspect_ratio
+        self.default_height = 20
+        self.default_width = self.default_height * aspect_ratio
 
         self.window_bounds = Bounds(
-            x_min=-default_width / 2,
-            x_max=default_width / 2,
-            y_min=-default_height / 2,
-            y_max=default_height / 2,
+            x_min=-self.default_width,
+            x_max=self.default_width,
+            y_min=-self.default_height,
+            y_max=self.default_height,
         )
 
+        self.zoom_level = 1.0
         self.angle = 0.0
         self.vup = np.array([0.0, 1.0])
 
@@ -45,13 +45,20 @@ class Window:
             self.window_bounds.y_max - self.window_bounds.y_min,
         )
 
-    def apply_zoom(self, factor: float) -> None:
-        """Aplica um zoom na janela de visualização"""
+    def apply_zoom(self, zoom_level: float) -> None:
+        """Aplica um zoom na janela de visualização baseado no nível de zoom."""
 
-        self.window_bounds.x_min *= factor
-        self.window_bounds.x_max *= factor
-        self.window_bounds.y_min *= factor
-        self.window_bounds.y_max *= factor
+        zoom_level /= 100
+
+        relative_change = zoom_level / self.zoom_level
+        self.zoom_level = zoom_level
+
+        scaling_factor = 1 / relative_change
+
+        self.window_bounds.x_min *= scaling_factor
+        self.window_bounds.x_max *= scaling_factor
+        self.window_bounds.y_min *= scaling_factor
+        self.window_bounds.y_max *= scaling_factor
 
     def apply_pan(self, dx: float, dy: float) -> None:
         """Aplica um pan na janela de visualização."""
