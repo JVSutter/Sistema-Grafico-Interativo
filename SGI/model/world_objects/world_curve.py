@@ -25,13 +25,13 @@ class WorldCurve(SCWorldObject, ABC):
         """
 
         self.normalized_points = norm_points
-        self.curve_points = self._generate_curve_points_normalized()
+        self.curve_points = self._generate_normalized_curve_points()
         self.viewport_points = self.transform_normalized_points_to_viewport(
             self.curve_points
         )
 
     @abstractmethod
-    def _generate_curve_points_normalized(self) -> list[tuple[float, float]]:
+    def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva usando a forma matricial em coordenadas normalizadas.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.

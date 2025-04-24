@@ -6,7 +6,7 @@ from model.world_objects.world_curve import WorldCurve
 class WorldBezierCurve(WorldCurve):
     """Classe pertinente a curvas de Bézier cúbicas no mundo."""
 
-    def _generate_curve_points_normalized(self) -> list[tuple[float, float]]:
+    def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva de Bézier usando a forma matricial em coordenadas normalizadas.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.
