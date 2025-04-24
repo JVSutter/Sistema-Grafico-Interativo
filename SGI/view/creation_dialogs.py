@@ -83,12 +83,14 @@ class ObjectDialog(QtWidgets.QDialog):
         try:
             # tratamento do texto inserido
             text = self.bulkPointsInput.text()
-            text = re.sub(r"[^0-9.,() ]", "", text)
+            text = re.sub(r"[^0-9.,() \-]", "", text)
             points = text.replace(",", " ").split()
 
             new_points = []
             coordinates = []
+
             for point in points:
+
                 if point[0] == "(":  # começo de uma coordenada
                     coordinates.append(float(point[1:]))
                 elif point[-1] == ")":  # fim de uma coordenada
