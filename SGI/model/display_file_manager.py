@@ -180,6 +180,7 @@ class DisplayFileManager:
 
         for world_object in world_objects:
             self.display_file.append(world_object)
+            self.dirty_objects.append(world_object)
 
         return skipped_objects
 
