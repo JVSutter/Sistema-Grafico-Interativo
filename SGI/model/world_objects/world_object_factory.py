@@ -48,7 +48,7 @@ class WorldObjectFactory:
         elif object_type == "Wireframe":
             obj_type = WorldWireframe
             kwargs["is_filled"] = is_filled
-        elif object_type == "Curve":
+        elif object_type == "Bézier":
             obj_type = WorldBezierCurve
         elif object_type == "B-Spline":
             obj_type = WorldBSplineCurve

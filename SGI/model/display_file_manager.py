@@ -226,7 +226,7 @@ class DisplayFileManager:
             object_type="Line",
         )
 
-        # Curva artística 1 (13 pontos para 3n+1)
+        # Curva artística 1 - Bézier (13 pontos para 3n+1)
         curve1 = [
             (-18, -10),
             (-14, -4),
@@ -247,34 +247,29 @@ class DisplayFileManager:
             name="Test Curve I",
             color=(255, 20, 147),  # deep pink
             is_filled=False,
-            object_type="Curve",
+            object_type="Bézier",
         )
 
-        # Curva artística 2 (16 pontos para 3n+1)
+        # Curva artística 2 - B-Spline
         curve2 = [
-            (-20, 0),
-            (-16, 4),
-            (-12, 8),
-            (-8, 12),
-            (-4, 16),
-            (0, 12),
-            (4, 8),
-            (8, 4),
-            (12, 0),
-            (8, -4),
-            (4, -8),
-            (0, -12),
-            (-4, -16),
-            (-8, -12),
-            (-12, -8),
-            (10, -4),
+            (-15, 20),
+            (-20, 15),
+            (-15, 45),
+            (-5, 0),
+            (10, 30),
+            (14, -5),
+            (0, -8),
+            (5, -9),
+            (0, -10),
+            (5, 20),
         ]
+
         self.add_object(
             points=curve2,
             name="Test Curve II",
             color=(0, 206, 209),  # dark turquoise
             is_filled=False,
-            object_type="Curve",
+            object_type="B-Spline",
         )
 
         # Pontos decorativos centrais
