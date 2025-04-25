@@ -28,6 +28,7 @@ class WorldObject(ABC):
 
         self.name = name
         self.color = color
+        self.dirty = True  # Booleano para indicar se o objeto precisa ser atualizado
 
     def update_normalized_points(self, norm_points: list[tuple[float, float]]):
         """
