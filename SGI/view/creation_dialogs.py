@@ -31,6 +31,7 @@ class ObjectDialog(QtWidgets.QDialog):
         self.objectType.addButton(self.lineRadio)
         self.objectType.addButton(self.wireframeRadio)
         self.objectType.addButton(self.curveRadio)
+        self.objectType.addButton(self.bSplineRadio)
 
         self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
 
@@ -189,6 +190,7 @@ class ObjectDialog(QtWidgets.QDialog):
             self.lineRadio,
             self.wireframeRadio,
             self.curveRadio,
+            self.bSplineRadio,
         ]
 
         if num_points == 0:  # desabilita todos os botões
@@ -222,6 +224,7 @@ class ObjectDialog(QtWidgets.QDialog):
                 button.setEnabled(False)
 
             self.curveRadio.setEnabled(True)
+            self.bSplineRadio.setEnabled(True)
             self.wireframeRadio.setEnabled(True)
 
     def _update_points_number(self):
