@@ -11,6 +11,11 @@ class WorldWireframe(WorldObject):
     ):
         super().__init__(points, name, color, viewport_bounds)
         self.is_filled = is_filled
+        
+        if is_filled:
+            self.obj_type = "f"
+        else:
+            self.obj_type = "l"
 
     def get_clipped_representation(self) -> list:
         clipped_points = ClippingAlgorithms.sutherland_hodgman_clipping(

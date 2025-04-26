@@ -23,7 +23,7 @@ class WorldObjectFactory:
         color: tuple,
         display_file: list,
         is_filled: bool,
-        object_type: str,
+        object_type: type,
     ):
         """
         Cria um novo objeto do mundo a partir de uma lista de pontos.
@@ -41,22 +41,11 @@ class WorldObjectFactory:
             "viewport_bounds": cls.viewport_bounds,
         }
 
-        if object_type == "Point":
-            obj_type = WorldPoint
-        elif object_type == "Line":
-            obj_type = WorldLine
-        elif object_type == "Wireframe":
-            obj_type = WorldWireframe
+        if object_type == WorldWireframe:
             kwargs["is_filled"] = is_filled
-        elif object_type == "Bézier":
-            obj_type = WorldBezierCurve
-        elif object_type == "B-Spline":
-            obj_type = WorldBSplineCurve
-        else:
-            raise ValueError(f"Tipo de objeto inválido: {object_type}")
 
         if not name:
-            obj_type_name = obj_type.__name__.replace("World", "")
+            obj_type_name = object_type.__name__.replace("World", "")
 
             highest_index = 0
             pattern = re.compile(rf"^{obj_type_name} (\d+)$")
@@ -72,7 +61,7 @@ class WorldObjectFactory:
 
         kwargs["name"] = name
 
-        return obj_type(**kwargs)
+        return object_type(**kwargs)
 
     @classmethod
     def read_obj_file(cls, filepath: str) -> list:
@@ -89,15 +78,22 @@ class WorldObjectFactory:
 
                 tam = len(current_object_points)
 
-                if tam == 2:
-                    obj_type = "Line"
-                elif tam > 2:
-                    obj_type = "Wireframe"
-                else:
-                    obj_type = "Point"
+                if current_command == "p":
+                    obj_type = WorldPoint
+                elif current_command == "l":
+                    if tam == 2:
+                        obj_type = WorldLine
+                    else:
+                        obj_type = WorldWireframe
+                elif current_command == "f":
+                    obj_type = WorldWireframe
+                elif current_command == "bezier":
+                    obj_type = WorldBezierCurve
+                elif current_command == "bspline":
+                    obj_type = WorldBSplineCurve
 
                 if (
-                    obj_type == "Wireframe"
+                    obj_type == WorldWireframe
                     and not current_fill_state
                     and current_object_points[0] == current_object_points[-1]
                 ):  # Se o objeto não for preenchido, remove o último ponto
@@ -117,6 +113,7 @@ class WorldObjectFactory:
         current_object_name = "Object 0"  # Nome padrão se nenhum 'o' for encontrado
         current_object_points = []  # Pontos (x,y) do objeto atual
         current_fill_state = False  # Estado de preenchimento
+        current_command = None
 
         try:
             with open(filepath, "r") as f:
@@ -151,6 +148,8 @@ class WorldObjectFactory:
                         "f",
                         "l",
                         "p",
+                        "bezier",
+                        "bspline",
                     ):  # Define uma face ou linha ou ponto
 
                         if command == "f":
@@ -176,6 +175,7 @@ class WorldObjectFactory:
                                 )
 
                             current_object_points.append(vertices[vertex_index])
+                        current_command = command
 
             # Adiciona o último objeto lido se ele tiver pontos
             add_object()

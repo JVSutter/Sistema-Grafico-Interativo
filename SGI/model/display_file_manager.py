@@ -1,5 +1,9 @@
 import numpy as np
 
+from model.world_objects.world_bezier_curve import WorldBezierCurve
+from model.world_objects.world_bspline_curve import WorldBSplineCurve
+from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_wireframe import WorldWireframe
 from model.transformation_manager import TransformationManager
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_object import WorldObject
@@ -213,7 +217,7 @@ class DisplayFileManager:
                 name=f"Test Triangle {i+1}",
                 color=colors[i],
                 is_filled=True if i % 2 == 0 else False,
-                object_type="Wireframe",
+                object_type=WorldWireframe,
             )
 
         # Linha diagonal decorativa
@@ -222,7 +226,7 @@ class DisplayFileManager:
             name="Test Line",
             color=(70, 100, 255),
             is_filled=False,
-            object_type="Line",
+            object_type=WorldLine,
         )
 
         # Curva artística 1 - Bézier (13 pontos para 3n+1)
@@ -246,7 +250,7 @@ class DisplayFileManager:
             name="Test Curve I",
             color=(255, 20, 147),  # deep pink
             is_filled=False,
-            object_type="Bézier",
+            object_type=WorldBezierCurve,
         )
 
         # Curva artística 2 - B-Spline
@@ -268,7 +272,7 @@ class DisplayFileManager:
             name="Test Curve II",
             color=(0, 206, 209),  # dark turquoise
             is_filled=False,
-            object_type="B-Spline",
+            object_type=WorldBSplineCurve,
         )
 
         # Pontos decorativos centrais
@@ -283,7 +287,7 @@ class DisplayFileManager:
                 name=f"Test Point {coord}",
                 color=col,
                 is_filled=False,
-                object_type="Point",
+                object_type=WorldPoint,
             )
 
     def remove_test_objects(self) -> None:

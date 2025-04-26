@@ -7,6 +7,10 @@ class WorldBSplineCurve(WorldCurve):
     """
     Classe pertinente a curvas B-spline no mundo.
     """
+    
+    def __init__(self, points, name, color, viewport_bounds):
+        super().__init__(points, name, color, viewport_bounds)
+        self.obj_type = "bspline"
 
     def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
         """
