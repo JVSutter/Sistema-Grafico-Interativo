@@ -2,6 +2,11 @@ from model.display_file_manager import DisplayFileManager
 from model.window import Window
 from view.view import View
 
+from model.world_objects.world_wireframe import WorldWireframe
+from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_line import WorldLine
+from model.world_objects.world_bezier_curve import WorldBezierCurve
+from model.world_objects.world_bspline_curve import WorldBSplineCurve
 
 class Model:
     """Classe que representa o modelo da nossa arquitetura MVC."""
@@ -48,12 +53,22 @@ class Model:
         @param object_type: Tipo de objeto.
         """
 
+        obj_types = {
+            "Wireframe": WorldWireframe,
+            "Point": WorldPoint,
+            "Line": WorldLine,
+            "Bézier": WorldBezierCurve,
+            "B-Spline": WorldBSplineCurve,
+        }
+
+        obj_type = obj_types[object_type]
+
         obj_name = self.display_file_manager.add_object(
             points=points,
             name=name,
             color=color,
             is_filled=is_filled,
-            object_type=object_type,
+            object_type=obj_type,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")
