@@ -31,6 +31,7 @@ class ObjectDialog(QtWidgets.QDialog):
         self.objectType.addButton(self.lineRadio)
         self.objectType.addButton(self.wireframeRadio)
         self.objectType.addButton(self.curveRadio)
+        self.objectType.addButton(self.bSplineRadio)
 
         self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
 
@@ -83,12 +84,14 @@ class ObjectDialog(QtWidgets.QDialog):
         try:
             # tratamento do texto inserido
             text = self.bulkPointsInput.text()
-            text = re.sub(r"[^0-9.,() ]", "", text)
+            text = re.sub(r"[^0-9.,() \-]", "", text)
             points = text.replace(",", " ").split()
 
             new_points = []
             coordinates = []
+
             for point in points:
+
                 if point[0] == "(":  # começo de uma coordenada
                     coordinates.append(float(point[1:]))
                 elif point[-1] == ")":  # fim de uma coordenada
@@ -187,6 +190,7 @@ class ObjectDialog(QtWidgets.QDialog):
             self.lineRadio,
             self.wireframeRadio,
             self.curveRadio,
+            self.bSplineRadio,
         ]
 
         if num_points == 0:  # desabilita todos os botões
@@ -220,6 +224,7 @@ class ObjectDialog(QtWidgets.QDialog):
                 button.setEnabled(False)
 
             self.curveRadio.setEnabled(True)
+            self.bSplineRadio.setEnabled(True)
             self.wireframeRadio.setEnabled(True)
 
     def _update_points_number(self):

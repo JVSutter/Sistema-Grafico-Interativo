@@ -13,7 +13,7 @@ $(VENV_DIR)/bin/activate:
 
 install: $(VENV_DIR)/bin/activate
 	@echo "Instalando dependências de requirements.txt..."
-	@$(VENV_PIP) install -q -r requirements.txt
+	@$(VENV_PIP) install -q --disable-pip-version-check -r requirements.txt
 
 run_main: $(VENV_DIR)/bin/activate
 	@echo "Executando main.py..."

@@ -27,6 +27,7 @@ class WorldObject(ABC):
 
         self.name = name
         self.color = color
+        self.dirty = True  # Booleano para indicar se o objeto precisa ser atualizado
 
     def update_normalized_points(self, norm_points: list[tuple[float, float]]):
         """
@@ -107,20 +108,10 @@ class WorldObject(ABC):
             str(i) for i in range(last_index, last_index + len(self.world_points))
         )
 
-        if len(self.world_points) == 1:  # Ponto
-            obj_type = "p"
+        if self.__class__.__name__ == "WorldWireframe" and not self.is_filled:
+            obj_points += " " + str(last_index)
 
-        elif len(self.world_points) == 2:  # Segmento de reta
-            obj_type = "l"
-
-        else:  # Polígono
-            if hasattr(self, "is_filled") and self.is_filled:
-                obj_type = "f"
-            else:
-                obj_type = "l"
-                obj_points += " " + str(last_index)
-
-        obj_description += f"{obj_type} {obj_points}\n\n"
+        obj_description += f"{self.obj_type} {obj_points}\n\n"
 
         return obj_description, last_index + len(self.world_points)
 

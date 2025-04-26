@@ -20,6 +20,7 @@ class WorldLine(SCWorldObject):
             "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
         }
         self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
+        self.obj_type = "l"
 
     def get_clipped_representation(self) -> list:
         p1 = self.normalized_points[0]

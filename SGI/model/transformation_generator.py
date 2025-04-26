@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class TransformationManager:
+class TransformationGenerator:
     """
     Classe responsável por gerar matrizes de transformação.
     """

@@ -1,8 +1,12 @@
 import numpy as np
-from model.transformation_manager import TransformationManager
+from model.transformation_generator import TransformationGenerator
+from model.world_objects.world_bezier_curve import WorldBezierCurve
+from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
+from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_wireframe import WorldWireframe
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
@@ -14,9 +18,6 @@ class DisplayFileManager:
 
     def __init__(self, viewport_bounds: Bounds):
         self.display_file: list[WorldObject] = []
-        self.dirty_objects: list[WorldObject] = (
-            []
-        )  # Objetos cujas coordenadas normalizadas precisam ser atualizadas
         WorldObjectFactory.viewport_bounds = viewport_bounds
 
     def get_clipped_representations(self) -> list[GraphicalObject]:
@@ -39,7 +40,7 @@ class DisplayFileManager:
         return self.display_file[index].name
 
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
+        self, points: list, name: str, color: tuple, is_filled: bool, object_type: type
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.
@@ -66,7 +67,6 @@ class DisplayFileManager:
             return None
 
         self.display_file.append(world_object)
-        self.dirty_objects.append(world_object)
         return world_object.name
 
     def remove_object(self, index: int) -> None:
@@ -109,21 +109,21 @@ class DisplayFileManager:
 
         obj = self.display_file[index]
         obj_center = obj.get_center()
-        transformation_mtx = TransformationManager.get_transformation_matrix(
+        transformation_mtx = TransformationGenerator.get_transformation_matrix(
             transformations_list=transformations_list, obj_center=obj_center
         )
 
         if transformation_mtx is None:
             return
         obj.update_coordinates(transformation_mtx)
-        self.dirty_objects.append(obj)
+        obj.dirty = True
 
     def set_all_objects_as_dirty(self) -> None:
         """
         Marca todos os objetos no display file como sujos, indicando que precisam ser atualizados.
         """
         for obj in self.display_file:
-            self.dirty_objects.append(obj)
+            obj.dirty = True
 
     def update_ncs_coordinates(
         self,
@@ -142,7 +142,7 @@ class DisplayFileManager:
         @param window_vup: Vetor de direção para cima da janela.
         """
 
-        ncs_conversion_mtx = TransformationManager.get_ncs_transformation_matrix(
+        ncs_conversion_mtx = TransformationGenerator.get_ncs_transformation_matrix(
             window_cx=window_cx,
             window_cy=window_cy,
             window_vup=window_vup,
@@ -150,7 +150,11 @@ class DisplayFileManager:
             window_width=window_width,
         )
 
-        for obj in self.dirty_objects:
+        for obj in self.display_file:
+            if not obj.dirty:  # Evita atualizações desnecessárias
+                continue
+            obj.dirty = False
+
             normalized_coords = []
 
             for point_wc in obj.world_points:
@@ -165,8 +169,6 @@ class DisplayFileManager:
 
             obj.update_normalized_points(normalized_coords)
 
-        self.dirty_objects.clear()
-
     def import_file_to_display_file(self, filepath: str) -> None:
         """
         Importa um arquivo .obj e adiciona os objetos ao display file.
@@ -179,6 +181,7 @@ class DisplayFileManager:
 
         for world_object in world_objects:
             self.display_file.append(world_object)
+            world_object.dirty = True
 
         return skipped_objects
 
@@ -213,7 +216,7 @@ class DisplayFileManager:
                 name=f"Test Triangle {i+1}",
                 color=colors[i],
                 is_filled=True if i % 2 == 0 else False,
-                object_type="Wireframe",
+                object_type=WorldWireframe,
             )
 
         # Linha diagonal decorativa
@@ -222,10 +225,10 @@ class DisplayFileManager:
             name="Test Line",
             color=(70, 100, 255),
             is_filled=False,
-            object_type="Line",
+            object_type=WorldLine,
         )
 
-        # Curva artística 1 (13 pontos para 3n+1)
+        # Curva artística 1 - Bézier (13 pontos para 3n+1)
         curve1 = [
             (-18, -10),
             (-14, -4),
@@ -246,34 +249,29 @@ class DisplayFileManager:
             name="Test Curve I",
             color=(255, 20, 147),  # deep pink
             is_filled=False,
-            object_type="Curve",
+            object_type=WorldBezierCurve,
         )
 
-        # Curva artística 2 (16 pontos para 3n+1)
+        # Curva artística 2 - B-Spline
         curve2 = [
-            (-20, 0),
-            (-16, 4),
-            (-12, 8),
-            (-8, 12),
-            (-4, 16),
-            (0, 12),
-            (4, 8),
-            (8, 4),
-            (12, 0),
-            (8, -4),
-            (4, -8),
-            (0, -12),
-            (-4, -16),
-            (-8, -12),
-            (-12, -8),
-            (10, -4),
+            (-15, 20),
+            (-20, 15),
+            (-15, 45),
+            (-5, 0),
+            (10, 30),
+            (14, -5),
+            (0, -8),
+            (5, -9),
+            (0, -10),
+            (5, 20),
         ]
+
         self.add_object(
             points=curve2,
             name="Test Curve II",
             color=(0, 206, 209),  # dark turquoise
             is_filled=False,
-            object_type="Curve",
+            object_type=WorldBSplineCurve,
         )
 
         # Pontos decorativos centrais
@@ -288,7 +286,7 @@ class DisplayFileManager:
                 name=f"Test Point {coord}",
                 color=col,
                 is_filled=False,
-                object_type="Point",
+                object_type=WorldPoint,
             )
 
     def remove_test_objects(self) -> None:
