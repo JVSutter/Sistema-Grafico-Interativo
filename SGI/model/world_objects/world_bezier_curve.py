@@ -1,11 +1,10 @@
 import numpy as np
-
 from model.world_objects.world_curve import WorldCurve
 
 
 class WorldBezierCurve(WorldCurve):
     """Classe pertinente a curvas de Bézier cúbicas no mundo."""
-    
+
     def __init__(self, points, name, color, viewport_bounds):
         super().__init__(points, name, color, viewport_bounds)
         self.obj_type = "bezier"

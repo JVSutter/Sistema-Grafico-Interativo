@@ -1,7 +1,6 @@
 import sys
 
 from PyQt6 import QtCore, QtWidgets, uic
-
 from view.creation_dialogs import ObjectDialog
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.transform_dialogs import TransformationDialog

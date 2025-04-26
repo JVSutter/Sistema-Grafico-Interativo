@@ -4,7 +4,7 @@ from view.graphical_objects.graphical_point import GraphicalPoint
 
 class WorldPoint(WorldObject):
     """Classe pertinente a pontos no mundo."""
-    
+
     def __init__(self, points, name, color, viewport_bounds):
         super().__init__(points, name, color, viewport_bounds)
         self.obj_type = "p"

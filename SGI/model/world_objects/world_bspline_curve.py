@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.world_objects.world_curve import WorldCurve
 
 
@@ -7,7 +6,7 @@ class WorldBSplineCurve(WorldCurve):
     """
     Classe pertinente a curvas B-spline no mundo.
     """
-    
+
     def __init__(self, points, name, color, viewport_bounds):
         super().__init__(points, name, color, viewport_bounds)
         self.obj_type = "bspline"
@@ -70,7 +69,7 @@ class WorldBSplineCurve(WorldCurve):
         self, delta: float, coefficients_mtx: np.array
     ) -> np.array:
         """
-        Obtemos os valores da primeira iteração no algoritmo de forward differences
+        Obtém os valores da primeira iteração no algoritmo de forward differences
         @param delta: o valor do delta no algoritmo
         @param coefficients_mtx: matriz de coeficientes com os coeficientes a, b, c e d
         @return: matriz contendo [f(0), Δf(0), Δ²f(0), Δ³f(0)]

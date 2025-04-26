@@ -1,13 +1,12 @@
 import numpy as np
-
+from model.transformation_generator import TransformationGenerator
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
-from model.world_objects.world_point import WorldPoint
-from model.world_objects.world_wireframe import WorldWireframe
-from model.transformation_manager import TransformationManager
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
+from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_wireframe import WorldWireframe
 from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
 
@@ -110,7 +109,7 @@ class DisplayFileManager:
 
         obj = self.display_file[index]
         obj_center = obj.get_center()
-        transformation_mtx = TransformationManager.get_transformation_matrix(
+        transformation_mtx = TransformationGenerator.get_transformation_matrix(
             transformations_list=transformations_list, obj_center=obj_center
         )
 
@@ -143,7 +142,7 @@ class DisplayFileManager:
         @param window_vup: Vetor de direção para cima da janela.
         """
 
-        ncs_conversion_mtx = TransformationManager.get_ncs_transformation_matrix(
+        ncs_conversion_mtx = TransformationGenerator.get_ncs_transformation_matrix(
             window_cx=window_cx,
             window_cy=window_cy,
             window_vup=window_vup,

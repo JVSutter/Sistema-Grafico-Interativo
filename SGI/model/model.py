@@ -1,12 +1,12 @@
 from model.display_file_manager import DisplayFileManager
 from model.window import Window
-from view.view import View
-
-from model.world_objects.world_wireframe import WorldWireframe
-from model.world_objects.world_point import WorldPoint
-from model.world_objects.world_line import WorldLine
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
+from model.world_objects.world_line import WorldLine
+from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_wireframe import WorldWireframe
+from view.view import View
+
 
 class Model:
     """Classe que representa o modelo da nossa arquitetura MVC."""
