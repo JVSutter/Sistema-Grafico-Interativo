@@ -17,14 +17,27 @@ class Window:
         viewport_height = viewport_bounds.y_max - viewport_bounds.y_min
         aspect_ratio = viewport_width / viewport_height
 
-        self.default_height = 20
-        self.default_width = self.default_height * aspect_ratio
+        self.height = 20  # Valor default
+        self.width = self.height * aspect_ratio
+
+        # Utilizados para projetar os pontos na janela de visualização. O centro da Window foi escolhido como
+        # o VRP (View Reference Point) por conveniência
+        self.window_center = np.array(
+            [
+                self.width / 2,
+                self.height / 2,
+                0.0,
+            ]
+        )
+        self.view_plane_normal = np.array(
+            [0.0, 0.0, 1.0]
+        )  # Window começa sobre o plano xy
 
         self.window_bounds = Bounds(
-            x_min=-self.default_width,
-            x_max=self.default_width,
-            y_min=-self.default_height,
-            y_max=self.default_height,
+            x_min=-self.width,
+            x_max=self.width,
+            y_min=-self.height,
+            y_max=self.height,
         )
 
         self.zoom_level = 1.0

@@ -36,15 +36,17 @@ class Controller:
         @param object_type: Tipo de objeto
         """
 
-        # self.model.add_object(
-        #     points=points_input,
-        #     name=name_input,
-        #     color=color_input,
-        #     is_filled=is_filled,
-        #     object_type=object_type,
-        # )
+        if object_type == "Point":
+            self.model.add_object(
+                points=points_input,
+                name=name_input,
+                color=color_input,
+                is_filled=is_filled,
+                object_type=object_type,
+            )
+            return
 
-        print("TODO: handle_create_object")
+        print("Só ponto por enquanto")
 
     def handle_remove_object(self, index: int) -> None:
         """

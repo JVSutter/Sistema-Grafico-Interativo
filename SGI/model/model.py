@@ -61,14 +61,14 @@ class Model:
             "B-Spline": WorldBSplineCurve,
         }
 
-        obj_type = obj_types[object_type]
+        object_type = obj_types[object_type]
 
         obj_name = self.display_file_manager.add_object(
             points=points,
             name=name,
             color=color,
             is_filled=is_filled,
-            object_type=obj_type,
+            object_type=object_type,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")

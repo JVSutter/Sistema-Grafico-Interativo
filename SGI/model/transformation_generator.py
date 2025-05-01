@@ -155,3 +155,61 @@ class TransformationGenerator:
         transformations = transformations @ scale_to_ncs
 
         return transformations
+
+    @classmethod
+    def get_parallel_projection_matrix(
+        cls,
+        window_center: np.ndarray,
+        view_plane_normal: np.ndarray,
+        window_vup: np.ndarray,
+        window_width: float,
+        window_height: float,
+    ):
+        """
+        Retorna a matriz de projeção paralela.
+        @param window_center: Ponto de referência da visão (centro da janela).
+        @param view_plane_normal: Vetor normal ao plano de visão.
+        @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
+        @param window_width: Largura da janela.
+        @param window_height: Altura da janela.
+        @return: Matriz de projeção paralela.
+        """
+
+        window_cx, window_cy, window_cz = -window_center
+        vpn_x, vpn_y, vpn_z = view_plane_normal
+
+        # Passo 1: Translação do centro da janela para a origem
+        translate_to_origin = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [-window_cx, -window_cy, -window_cz, 1],
+            ])
+
+        # Passo 2: Rotacionar o mundo em torno de X e de Y de forma a alinha VPN com o eixo Z
+        angle_vup_y = np.arctan2(vpn_x, vpn_z)
+        rotate_y = np.array([
+            [np.cos(angle_vup_y), 0, np.sin(angle_vup_y), 0],
+            [0, 1, 0, 0],
+            [-np.sin(angle_vup_y), 0, np.cos(angle_vup_y), 0],
+            [0, 0, 0, 1],
+        ])
+
+        angle_vup_x = np.arctan2(vpn_y, vpn_z)
+        rotate_x = np.array([
+            [1, 0, 0, 0],
+            [0, np.cos(angle_vup_x), -np.sin(angle_vup_x), 0],
+            [0, np.sin(angle_vup_x), np.cos(angle_vup_x), 0],
+            [0, 0, 0, 1],
+        ])
+
+        # Passo 4: Ignorar a coordenada z
+        ignore_z = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 1],
+        ])
+
+        

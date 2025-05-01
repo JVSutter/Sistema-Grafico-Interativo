@@ -19,9 +19,10 @@ class WorldObject(ABC):
 
         self.world_points: list[np.array] = []
         for point in points:  # Converte os pontos para coordenadas homogêneas
-            x, y = point
-            self.world_points.append(np.array([x, y, 1]))
+            x, y, z = point
+            self.world_points.append(np.array([x, y, z, 1]))
 
+        self.projected_points: list[np.array] = []
         self.normalized_points: list[tuple[float, float]] = []
         self.viewport_points: list[tuple[float, float]] = []
         self.viewport_bounds: Bounds = viewport_bounds

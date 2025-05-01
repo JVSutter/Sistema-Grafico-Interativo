@@ -30,7 +30,7 @@ class WorldObjectFactory:
         """
 
         if any(
-            points == [(x, y) for x, y, *_ in objs.world_points]
+            points == [(x, y, z) for x, y, z, *_ in objs.world_points]
             for objs in display_file
         ):
             return None
