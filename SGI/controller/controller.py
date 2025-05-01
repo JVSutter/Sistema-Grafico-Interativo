@@ -1,4 +1,5 @@
 import numpy as np
+
 from model.model import Model
 from view.view import View
 
@@ -35,13 +36,15 @@ class Controller:
         @param object_type: Tipo de objeto
         """
 
-        self.model.add_object(
-            points=points_input,
-            name=name_input,
-            color=color_input,
-            is_filled=is_filled,
-            object_type=object_type,
-        )
+        # self.model.add_object(
+        #     points=points_input,
+        #     name=name_input,
+        #     color=color_input,
+        #     is_filled=is_filled,
+        #     object_type=object_type,
+        # )
+
+        print("TODO: handle_create_object")
 
     def handle_remove_object(self, index: int) -> None:
         """
@@ -49,7 +52,8 @@ class Controller:
         @param index: Índice do objeto a ser removido.
         """
 
-        self.model.remove_object(index=index)
+        # self.model.remove_object(index=index)
+        print("TODO: handle_remove_object")
 
     def handle_zoom(self, new_zoom_value: float) -> None:
         """
@@ -57,7 +61,8 @@ class Controller:
         @param new_zoom_value: Novo valor de zoom.
         """
 
-        self.model.zoom(new_zoom_value)
+        # self.model.zoom(new_zoom_value)
+        print("TODO: handle_zoom")
 
     def handle_pan(self, dx: float, dy: float) -> None:
         """
@@ -66,7 +71,8 @@ class Controller:
         @param dy: Deslocamento em y.
         """
 
-        self.model.pan(dx, dy)
+        # self.model.pan(dx, dy)
+        print("TODO: handle_pan")
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]
@@ -77,7 +83,8 @@ class Controller:
         @param transformations_list: Lista de transformações a serem aplicadas.
         """
 
-        self.model.handle_transformations(index, transformations_list)
+        # self.model.handle_transformations(index, transformations_list)
+        print("TODO: handle_transformations")
 
     def handle_window_rotation(self, angle: float) -> None:
         """
@@ -85,7 +92,8 @@ class Controller:
         @param angle: Ângulo de rotação.
         """
 
-        self.model.rotate_window(angle)
+        # self.model.rotate_window(angle)
+        print("TODO: handle_window_rotation")
 
     def handle_import_obj_file(self, filepath: str) -> None:
         """
@@ -93,7 +101,8 @@ class Controller:
         @param filepath: Caminho do arquivo .obj.
         """
 
-        self.model.import_obj_file(filepath)
+        # self.model.import_obj_file(filepath)
+        print("TODO: handle_import_obj_file")
 
     def handle_export_obj_file(self, filepath: str) -> None:
         """
@@ -101,7 +110,8 @@ class Controller:
         @param filepath: Caminho do arquivo .obj.
         """
 
-        self.model.export_obj_file(filepath)
+        # self.model.export_obj_file(filepath)
+        print("TODO: handle_export_obj_file")
 
     def handle_clipping_change(self, mode: str) -> None:
         """
@@ -109,14 +119,17 @@ class Controller:
         @param mode: Modo de clipping.
         """
 
-        self.model.change_clipping_mode(mode)
+        # self.model.change_clipping_mode(mode)
+        print("TODO: handle_clipping_change")
 
     def handle_add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
 
-        self.model.add_test_objects()
+        # self.model.add_test_objects()
+        print("TODO: handle_add_test_objects")
 
     def handle_remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
 
-        self.model.remove_test_objects()
+        # self.model.remove_test_objects()
+        print("TODO: handle_remove_test_objects")
