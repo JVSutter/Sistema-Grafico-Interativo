@@ -60,7 +60,8 @@ class ObjectDialog(QtWidgets.QDialog):
 
         x = float(self.xInput.value())
         y = float(self.yInput.value())
-        point = (x, y)
+        z = float(self.zInput.value())
+        point = (x, y, z)
 
         self.points.append(point)
         self.pointsList.addItem(f"Point: {point}")
