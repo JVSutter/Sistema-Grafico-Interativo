@@ -106,14 +106,6 @@ class View(QtWidgets.QMainWindow):
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
         points, name, color, is_filled, object_type = dialog.create_object()
-        print(
-            "Criando objeto com as características:",
-            points,
-            name,
-            color,
-            is_filled,
-            object_type,
-        )
         if points is not None:
             self.controller.handle_create_object(
                 points, name, color, is_filled, object_type

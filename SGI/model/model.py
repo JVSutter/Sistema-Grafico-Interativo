@@ -100,7 +100,7 @@ class Model:
         @param dx: Deslocamento em x.
         @param dy: Deslocamento em y.
         """
-        self.window.apply_pan(dx, dy)
+        self.window.apply_pan(d_vertical=dy, d_horizontal=dx, d_depth=0.0)
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface

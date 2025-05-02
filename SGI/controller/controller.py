@@ -74,8 +74,7 @@ class Controller:
         @param dy: Deslocamento em y.
         """
 
-        # self.model.pan(dx, dy)
-        print("TODO: handle_pan")
+        self.model.pan(dx, dy)
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]

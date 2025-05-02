@@ -1,5 +1,6 @@
 import numpy as np
 
+from model.transformation_generator import TransformationGenerator
 from utils.bounds import Bounds
 
 
@@ -20,13 +21,15 @@ class Window:
         self.height = 20  # Valor default
         self.width = self.height * aspect_ratio
 
-        # Utilizados para projetar os pontos na janela de visualização. O centro da Window foi escolhido como
-        # o VRP (View Reference Point) por conveniência
-        self.window_center = np.array([0.0, 0.0, 0.0])
+        # O centro da Window foi escolhido como o VRP (View Reference Point) por conveniência
+        self.window_center = np.array([0.0, 0.0, 0.0, 1.0])
+
+        # Vetores da window: um apontando pra cima, um apontando pra direita e um apontando pra frente
+        self.vup = np.array([0.0, 1.0, 0.0, 1.0])
+        self.vright = np.array([1.0, 0.0, 0.0, 1.0])
         self.view_plane_normal = np.array(
-            [0.0, 0.0, 1.0]
-        )  # Window começa sobre o plano xy
-        self.vup = np.array([0.0, 1.0, 0.0])  # Vetor Vup da janela
+            [0.0, 0.0, 1.0, 1.0]
+        )  # Window começa sobre o plano xy, olhando em direção a z positivo
 
         self.window_bounds = Bounds(
             x_min=-self.width,
@@ -37,13 +40,6 @@ class Window:
 
         self.zoom_level = 1.0
         self.angle = 0.0
-
-    def get_center(self) -> tuple[float, float]:
-        """Retorna o centro da janela de visualização. (WCx, WCy)"""
-
-        return (self.window_bounds.x_min + self.window_bounds.x_max) / 2, (
-            self.window_bounds.y_min + self.window_bounds.y_max
-        ) / 2
 
     def get_width_height(self) -> tuple[float, float]:
         """Retorna a largura e a altura da janela de visualização. (Wx, Wy)"""
@@ -68,17 +64,38 @@ class Window:
         self.window_bounds.y_min *= scaling_factor
         self.window_bounds.y_max *= scaling_factor
 
-    def apply_pan(self, dx: float, dy: float) -> None:
-        """Aplica um pan na janela de visualização."""
+    def apply_pan(self, d_vertical, d_horizontal: float, d_depth: float) -> None:
+        """
+        Aplica um pan na janela de visualização.
+        @param d_vertical: Deslocamento vertical
+        @param d_horizontal: Deslocamento horizontal
+        @param d_depth: Deslocamento em profundidade
+        """
 
-        # Rotaciona dx e dy pelo ângulo atual da window
-        dx_world = dx * np.cos(self.angle) - dy * np.sin(self.angle)
-        dy_world = dx * np.sin(self.angle) + dy * np.cos(self.angle)
+        pan_mtx = TransformationGenerator.get_pan_matrix(
+            d_vertical,
+            d_horizontal,
+            d_depth,
+            self.vup,
+            self.vright,
+            self.view_plane_normal,
+        )
 
-        self.window_bounds.x_min += dx_world
-        self.window_bounds.x_max += dx_world
-        self.window_bounds.y_min += dy_world
-        self.window_bounds.y_max += dy_world
+        self.window_center = self.window_center @ pan_mtx
+
+        min_point = np.array(
+            [self.window_bounds.x_min, self.window_bounds.y_min, 0.0, 1.0]
+        )
+        min_point = min_point @ pan_mtx
+        self.window_bounds.x_min = min_point[0]
+        self.window_bounds.y_min = min_point[1]
+
+        max_point = np.array(
+            [self.window_bounds.x_max, self.window_bounds.y_max, 0.0, 1.0]
+        )
+        max_point = max_point @ pan_mtx
+        self.window_bounds.x_max = max_point[0]
+        self.window_bounds.y_max = max_point[1]
 
     def apply_rotation(self, angle_degrees: float) -> None:
         """Aplica uma rotação na janela de visualização."""

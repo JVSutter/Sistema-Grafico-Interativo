@@ -63,8 +63,6 @@ class DisplayFileManager:
             is_filled=is_filled,
             object_type=object_type,
         )
-        print(f"Novo objeto: {world_object.name}")
-        print(f"Pontos: {world_object.world_points}")
 
         if world_object is None:
             return None
@@ -152,7 +150,6 @@ class DisplayFileManager:
             window_width=window_width,
             window_height=window_height,
         )
-        print(f"Projection matrix: {projection_mtx}")
 
         for obj in self.display_file:
             if not obj.dirty:  # Evita atualizações desnecessárias
@@ -165,10 +162,6 @@ class DisplayFileManager:
                 projection_points = [
                     (normalized_x, normalized_y)
                 ]  # Descarta z e w e converte para lista de tuplas
-
-                print(
-                    f"Point WC: {point_wc} -> Projection points (NCS): {projection_points}"
-                )
 
             obj.update_projection_points(projection_points)
 

@@ -176,6 +176,61 @@ class TransformationGenerator:
         )
 
     @staticmethod
+    def get_pan_matrix(
+        d_vertical: float,
+        d_horizontal: float,
+        d_depth: float,
+        window_vup: np.ndarray,
+        window_vright: np.ndarray,
+        view_plane_normal: np.ndarray,
+    ) -> np.ndarray:
+        """
+        Obtém a matriz de pan.
+        @param d_vertical: Deslocamento vertical.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_depth: Deslocamento em profundidade.
+        @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
+        @param window_vright: Vetor Vright da janela (indicando a direção "para a direita").
+        @param view_plane_normal: Vetor normal ao plano de visão.
+        @return: Matriz de pan.
+        """
+
+        window_vup_x, window_vup_y, window_vup_z, _ = window_vup
+        window_vright_x, window_vright_y, window_vright_z, _ = window_vright
+        view_plane_normal_x, view_plane_normal_y, view_plane_normal_z, _ = (
+            view_plane_normal
+        )
+
+        # Para mover numa dada direção, multiplicamos o vetor unitário da janela pelo deslocamento.
+        # Isto produz um vetor de deslocamento na direção desejada e com o comprimento desejado.
+        translation_x = (
+            d_horizontal * window_vright_x
+            + d_vertical * window_vup_x
+            + d_depth * view_plane_normal_x
+        )
+        translation_y = (
+            d_horizontal * window_vright_y
+            + d_vertical * window_vup_y
+            + d_depth * view_plane_normal_y
+        )
+        translation_z = (
+            d_horizontal * window_vright_z
+            + d_vertical * window_vup_z
+            + d_depth * view_plane_normal_z
+        )
+
+        pan_matrix = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [translation_x, translation_y, translation_z, 1],
+            ]
+        )
+
+        return pan_matrix
+
+    @staticmethod
     def get_parallel_projection_matrix(
         window_center: np.ndarray,
         view_plane_normal: np.ndarray,
@@ -193,10 +248,9 @@ class TransformationGenerator:
         @return: Matriz de projeção paralela.
         """
 
-        window_cx, window_cy, window_cz = window_center
-        print(f"Window center: {window_center}")
-        vpn_x, vpn_y, vpn_z = view_plane_normal
-        window_vup_x, window_vup_y, _ = window_vup
+        window_cx, window_cy, window_cz, _ = window_center
+        vpn_x, vpn_y, vpn_z, _ = view_plane_normal
+        window_vup_x, window_vup_y, _, _ = window_vup
 
         # Passo 1: Translação do centro da janela para a origem
         translate_vrp_to_origin = np.array(
@@ -231,7 +285,9 @@ class TransformationGenerator:
 
         # Passo 4: Rotacionar o mundo para alinhar Vup com o eixo y
         angle_vup_y = np.degrees(np.arctan2(window_vup_y, window_vup_x) - np.pi / 2)
-        align_vup_with_y = TransformationGenerator.get_z_axis_rotation_matrix(angle_vup_y)
+        align_vup_with_y = TransformationGenerator.get_z_axis_rotation_matrix(
+            angle_vup_y
+        )
 
         # Passo 5: Normalizar as coordenadas, realizando um escalonamento
         scale_x = 2.0 / window_width
