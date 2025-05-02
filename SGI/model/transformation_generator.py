@@ -118,6 +118,64 @@ class TransformationGenerator:
         return composite_matrix
 
     @staticmethod
+    def get_x_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo x.
+        @return: Matriz de rotação em torno do eixo x.
+        """
+
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, cos_r, -sin_r, 0],
+                [0, sin_r, cos_r, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_y_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo y.
+        @param angle_degrees: Ângulo de rotação em graus.
+        @return: Matriz de rotação em torno do eixo y.
+        """
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+        return np.array(
+            [
+                [cos_r, 0, sin_r, 0],
+                [0, 1, 0, 0],
+                [-sin_r, 0, cos_r, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_z_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo z.
+        @param angle_degrees: Ângulo de rotação em graus.
+        @return: Matriz de rotação em torno do eixo z.
+        """
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+        return np.array(
+            [
+                [cos_r, -sin_r, 0, 0],
+                [sin_r, cos_r, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
     def get_parallel_projection_matrix(
         window_center: np.ndarray,
         view_plane_normal: np.ndarray,
@@ -151,25 +209,15 @@ class TransformationGenerator:
         )
 
         # Passo 2: Rotacionar o mundo em torno de x e de u de forma a alinhar VPN com o eixo z
-        angle_vup_y = np.arctan2(vpn_x, vpn_z)
-        rotate_y = np.array(
-            [
-                [np.cos(angle_vup_y), 0, np.sin(angle_vup_y), 0],
-                [0, 1, 0, 0],
-                [-np.sin(angle_vup_y), 0, np.cos(angle_vup_y), 0],
-                [0, 0, 0, 1],
-            ]
-        )
+        angle_vpn_xz = np.degrees(
+            np.arctan2(vpn_z, vpn_x) - np.pi / 2
+        )  # Ângulo que falta para colocar VPN no plano zy
+        rotate_y = TransformationGenerator.get_y_axis_rotation_matrix(angle_vpn_xz)
 
-        angle_vup_x = np.arctan2(vpn_y, vpn_z)
-        rotate_x = np.array(
-            [
-                [1, 0, 0, 0],
-                [0, np.cos(angle_vup_x), -np.sin(angle_vup_x), 0],
-                [0, np.sin(angle_vup_x), np.cos(angle_vup_x), 0],
-                [0, 0, 0, 1],
-            ]
-        )
+        angle_vpn_yz = np.degrees(
+            np.arctan2(vpn_z, vpn_y) - np.pi / 2
+        )  # Ângulo que falta para alinhar VPN com o eixo z
+        rotate_x = TransformationGenerator.get_x_axis_rotation_matrix(angle_vpn_yz)
 
         # Passo 3: Ignorar a coordenada z
         ignore_z = np.array(
@@ -181,22 +229,11 @@ class TransformationGenerator:
             ]
         )
 
-        # Passo 4: Determinar ângulo entre o vetor Vup e o eixo y
-        angle_vup_y = np.arctan2(window_vup_y, window_vup_x) - np.pi / 2
+        # Passo 4: Rotacionar o mundo para alinhar Vup com o eixo y
+        angle_vup_y = np.degrees(np.arctan2(window_vup_y, window_vup_x) - np.pi / 2)
+        align_vup_with_y = TransformationGenerator.get_z_axis_rotation_matrix(angle_vup_y)
 
-        # Passo 5: Rotacionar o mundo para alinhar Vup com o eixo y
-        cos_r = np.cos(angle_vup_y)
-        sin_r = np.sin(angle_vup_y)
-        rotate_align_y = np.array(
-            [
-                [cos_r, sin_r, 0, 0],
-                [-sin_r, cos_r, 0, 0],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1],
-            ]
-        )
-
-        # Passo 6: Normalizar as coordenadas, realizando um escalonamento
+        # Passo 5: Normalizar as coordenadas, realizando um escalonamento
         scale_x = 2.0 / window_width
         scale_y = 2.0 / window_height
         scale_to_ncs = np.array(
@@ -213,7 +250,7 @@ class TransformationGenerator:
             @ rotate_y
             @ rotate_x
             @ ignore_z
-            @ rotate_align_y
+            @ align_vup_with_y
             @ scale_to_ncs
         )
         return transformation
