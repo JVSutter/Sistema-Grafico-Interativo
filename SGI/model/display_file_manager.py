@@ -137,7 +137,12 @@ class DisplayFileManager:
         window_height: float,
     ) -> None:
         """
-        Atualiza as as projeções dos objetos no display file.
+        Atualiza as projeções dos objetos no display file.
+        @param window_center: Centro da janela de visualização.
+        @param view_plane_normal: Vetor normal ao plano de visualização.
+        @param window_vup: Vetor de orientação para cima da janela de visualização.
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
         """
 
         projection_mtx = TransformationGenerator.get_parallel_projection_matrix(
@@ -154,17 +159,18 @@ class DisplayFileManager:
                 continue
             obj.dirty = False
 
-            normalized_coords = []
-
             for point_wc in obj.world_points:
-                point_ncs = point_wc @ projection_mtx  # Transforma o ponto WC para ncs
+                projection_points = point_wc @ projection_mtx
+                normalized_x, normalized_y, _, _ = projection_points
+                projection_points = [
+                    (normalized_x, normalized_y)
+                ]  # Descarta z e w e converte para lista de tuplas
 
-                nx = point_ncs[0]
-                ny = point_ncs[1]
-                print(f"Point WC: {point_wc} -> Point NCS: {point_ncs}")
-                normalized_coords.append((nx, ny))
+                print(
+                    f"Point WC: {point_wc} -> Projection points (NCS): {projection_points}"
+                )
 
-            obj.update_normalized_points(normalized_coords)
+            obj.update_projection_points(projection_points)
 
     def import_file_to_display_file(self, filepath: str) -> None:
         """

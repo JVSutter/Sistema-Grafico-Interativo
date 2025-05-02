@@ -14,7 +14,7 @@ class WorldPoint(WorldObject):
         Apenda o ponto apenas se estiver dentro dos limites do Viewport
         """
 
-        x, y = self.normalized_points[0]
+        x, y = self.projection_points[0]
         if x < -1 or x > 1 or y < -1 or y > 1:
             return []
 

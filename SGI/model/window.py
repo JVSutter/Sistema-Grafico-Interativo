@@ -22,9 +22,7 @@ class Window:
 
         # Utilizados para projetar os pontos na janela de visualização. O centro da Window foi escolhido como
         # o VRP (View Reference Point) por conveniência
-        self.window_center = np.array(
-            [0.0, 0.0, 0.0]
-        )
+        self.window_center = np.array([0.0, 0.0, 0.0])
         self.view_plane_normal = np.array(
             [0.0, 0.0, 1.0]
         )  # Window começa sobre o plano xy

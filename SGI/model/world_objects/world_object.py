@@ -22,8 +22,9 @@ class WorldObject(ABC):
             x, y, z = point
             self.world_points.append(np.array([x, y, z, 1]))
 
-        self.projected_points: list[np.array] = []
-        self.normalized_points: list[tuple[float, float]] = []
+        self.projection_points: list[tuple[float, float]] = (
+            []
+        )  # Lista de pontos projetados no plano da window em coordenadas normalizadas
         self.viewport_points: list[tuple[float, float]] = []
         self.viewport_bounds: Bounds = viewport_bounds
 
@@ -31,33 +32,35 @@ class WorldObject(ABC):
         self.color = color
         self.dirty = True  # Booleano para indicar se o objeto precisa ser atualizado
 
-    def update_normalized_points(self, norm_points: list[tuple[float, float]]):
+    def update_projection_points(self, projection_points: list[tuple[float, float]]):
         """
         Atualiza as coordenadas normalizadas (NCS) do objeto e converte para as coordenadas do viewport.
         @param norm_points: Lista de pontos normalizados.
         """
 
-        self.normalized_points = norm_points
-        self.viewport_points = self.transform_normalized_points_to_viewport(norm_points)
+        self.projection_points = projection_points
+        self.viewport_points = self.transform_projection_points_to_viewport(
+            projection_points
+        )
 
-    def transform_normalized_points_to_viewport(
+    def transform_projection_points_to_viewport(
         self, points: tuple[float, float]
     ) -> list[tuple[float, float]]:
         """
-        Converte as coordenadas normalizadas (NCS) para as coordenadas do viewport.
+        Converte as coordenadas da projeção para as coordenadas do viewport.
         @param points: Lista de pontos normalizados.
         @return: Lista de pontos transformados.
         """
 
         transformed_points = []
         for point in points:
-            nx, ny = point
+            normalized_x, normalized_y = point
 
             vp_width = self.viewport_bounds.x_max - self.viewport_bounds.x_min
             vp_height = self.viewport_bounds.y_max - self.viewport_bounds.y_min
 
-            vx = (nx + 1) / 2 * vp_width + self.viewport_bounds.x_min
-            vy = (1 - ny) / 2 * vp_height + self.viewport_bounds.y_min
+            vx = (normalized_x + 1) / 2 * vp_width + self.viewport_bounds.x_min
+            vy = (1 - normalized_y) / 2 * vp_height + self.viewport_bounds.y_min
             transformed_points.append((vx, vy))
 
         return transformed_points
