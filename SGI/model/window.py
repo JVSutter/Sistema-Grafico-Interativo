@@ -23,15 +23,12 @@ class Window:
         # Utilizados para projetar os pontos na janela de visualização. O centro da Window foi escolhido como
         # o VRP (View Reference Point) por conveniência
         self.window_center = np.array(
-            [
-                self.width / 2,
-                self.height / 2,
-                0.0,
-            ]
+            [0.0, 0.0, 0.0]
         )
         self.view_plane_normal = np.array(
             [0.0, 0.0, 1.0]
         )  # Window começa sobre o plano xy
+        self.vup = np.array([0.0, 1.0, 0.0])  # Vetor Vup da janela
 
         self.window_bounds = Bounds(
             x_min=-self.width,
@@ -42,7 +39,6 @@ class Window:
 
         self.zoom_level = 1.0
         self.angle = 0.0
-        self.vup = np.array([0.0, 1.0])
 
     def get_center(self) -> tuple[float, float]:
         """Retorna o centro da janela de visualização. (WCx, WCy)"""

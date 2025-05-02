@@ -116,7 +116,7 @@ class TransformationGenerator:
         return composite_matrix
 
     @classmethod
-    def get_ncs_transformation_matrix(
+    def _get_ncs_transformation_matrix(
         cls,
         window_cx: float,
         window_cy: float,
@@ -175,41 +175,85 @@ class TransformationGenerator:
         @return: Matriz de projeção paralela.
         """
 
-        window_cx, window_cy, window_cz = -window_center
+        window_cx, window_cy, window_cz = window_center
+        print(f"Window center: {window_center}")
         vpn_x, vpn_y, vpn_z = view_plane_normal
+        window_vup_x, window_vup_y, _ = window_vup
 
         # Passo 1: Translação do centro da janela para a origem
-        translate_to_origin = np.array(
+        translate_vrp_to_origin = np.array(
             [
                 [1, 0, 0, 0],
                 [0, 1, 0, 0],
                 [0, 0, 1, 0],
                 [-window_cx, -window_cy, -window_cz, 1],
-            ])
+            ]
+        )
 
         # Passo 2: Rotacionar o mundo em torno de X e de Y de forma a alinha VPN com o eixo Z
         angle_vup_y = np.arctan2(vpn_x, vpn_z)
-        rotate_y = np.array([
-            [np.cos(angle_vup_y), 0, np.sin(angle_vup_y), 0],
-            [0, 1, 0, 0],
-            [-np.sin(angle_vup_y), 0, np.cos(angle_vup_y), 0],
-            [0, 0, 0, 1],
-        ])
+        rotate_y = np.array(
+            [
+                [np.cos(angle_vup_y), 0, np.sin(angle_vup_y), 0],
+                [0, 1, 0, 0],
+                [-np.sin(angle_vup_y), 0, np.cos(angle_vup_y), 0],
+                [0, 0, 0, 1],
+            ]
+        )
 
         angle_vup_x = np.arctan2(vpn_y, vpn_z)
-        rotate_x = np.array([
-            [1, 0, 0, 0],
-            [0, np.cos(angle_vup_x), -np.sin(angle_vup_x), 0],
-            [0, np.sin(angle_vup_x), np.cos(angle_vup_x), 0],
-            [0, 0, 0, 1],
-        ])
+        rotate_x = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, np.cos(angle_vup_x), -np.sin(angle_vup_x), 0],
+                [0, np.sin(angle_vup_x), np.cos(angle_vup_x), 0],
+                [0, 0, 0, 1],
+            ]
+        )
 
-        # Passo 4: Ignorar a coordenada z
-        ignore_z = np.array([
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 1],
-        ])
+        # Passo 3: Ignorar a coordenada z
+        ignore_z = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+            ]
+        )
 
-        
+        # Passo 4: Determinar ângulo entre o vetor Vup e o eixo Y
+        angle_vup_y = np.arctan2(window_vup_y, window_vup_x) - np.pi / 2
+
+        # Passo 5: Rotacionar o mundo para alinhar Vup com o eixo Y
+        cos_r = np.cos(angle_vup_y)
+        sin_r = np.sin(angle_vup_y)
+        rotate_align_y = np.array(
+            [
+                [cos_r, sin_r, 0, 0],
+                [-sin_r, cos_r, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        # Passo 6: Normalizar as coordenadas, realizando um escalonamento
+        scale_x = 2.0 / window_width
+        scale_y = 2.0 / window_height
+        scale_to_ncs = np.array(
+            [
+                [scale_x, 0, 0, 0],
+                [0, scale_y, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        transformation = (
+            translate_vrp_to_origin
+            @ rotate_y
+            @ rotate_x
+            @ ignore_z
+            @ rotate_align_y
+            @ scale_to_ncs
+        )
+        return transformation

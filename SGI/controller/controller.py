@@ -37,6 +37,7 @@ class Controller:
         """
 
         if object_type == "Point":
+            print("Criando ponto")
             self.model.add_object(
                 points=points_input,
                 name=name_input,

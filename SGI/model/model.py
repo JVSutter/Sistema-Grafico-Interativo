@@ -26,8 +26,8 @@ class Model:
             self = args[0]
             result = func(*args, **kwargs)
 
-            # Recalcula as coordenadas normalizadas para todos os objetos
-            self._calculate_and_update_ncs()
+            # Atualiza as projeções
+            self.update_projections()
 
             # Atualiza a View
             graphical_representations = (
@@ -61,14 +61,14 @@ class Model:
             "B-Spline": WorldBSplineCurve,
         }
 
-        object_type = obj_types[object_type]
+        object_type_cls = obj_types[object_type]
 
         obj_name = self.display_file_manager.add_object(
             points=points,
             name=name,
             color=color,
             is_filled=is_filled,
-            object_type=object_type,
+            object_type=object_type_cls,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")
@@ -137,19 +137,15 @@ class Model:
         obj_name = self.display_file_manager.get_obj_name(index)
         self.view.add_log(f"{obj_name}: transformations applied.")
 
-    def _calculate_and_update_ncs(self) -> None:
-        """Calcula as coordenadas normalizadas para todos os objetos."""
+    def update_projections(self) -> None:
+        """Método para recalcular as projeções de todos os objetos no display file."""
 
-        window_cx, window_cy = self.window.get_center()
-        window_width, window_height = self.window.get_width_height()
-        window_vup = self.window.vup
-
-        self.display_file_manager.update_ncs_coordinates(
-            window_cx=window_cx,
-            window_cy=window_cy,
-            window_width=window_width,
-            window_height=window_height,
-            window_vup=window_vup,
+        self.display_file_manager.update_projections(
+            window_center=self.window.window_center,
+            view_plane_normal=self.window.view_plane_normal,
+            window_vup=self.window.vup,
+            window_width=self.window.width,
+            window_height=self.window.height,
         )
 
     @update_interface

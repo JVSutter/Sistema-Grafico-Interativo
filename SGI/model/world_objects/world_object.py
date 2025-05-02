@@ -120,9 +120,9 @@ class WorldObject(ABC):
     def __str__(self):
         """
         Retorna uma string no seguinte formato:
-        <Tipo_do_objeto> <nome_do_objeto>: (x1, y1), (x2, y2), ...
+        <Tipo_do_objeto> <nome_do_objeto>: (x1, y1, z1), (x2, y2, z2), ...
         """
         formatted_points = ", ".join(
-            f"({x:.1f}, {y:.1f})" for x, y, _ in self.world_points
+            f"({x:.1f}, {y:.1f}, {z:.1f})" for x, y, z, _ in self.world_points
         )
         return f"{self.__class__.__name__.replace("World", "")} {self.name}: {formatted_points}"

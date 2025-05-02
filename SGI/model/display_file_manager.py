@@ -63,6 +63,8 @@ class DisplayFileManager:
             is_filled=is_filled,
             object_type=object_type,
         )
+        print(f"Novo objeto: {world_object.name}")
+        print(f"Pontos: {world_object.world_points}")
 
         if world_object is None:
             return None
@@ -126,30 +128,26 @@ class DisplayFileManager:
         for obj in self.display_file:
             obj.dirty = True
 
-    def update_ncs_coordinates(
+    def update_projections(
         self,
-        window_cx: float,
-        window_cy: float,
+        window_center: np.ndarray,
+        view_plane_normal: np.ndarray,
+        window_vup: np.ndarray,
         window_width: float,
         window_height: float,
-        window_vup: np.ndarray,
     ) -> None:
         """
-        Atualiza as coordenadas do display file para o sistema de coordenadas da janela.
-        @param window_cx: Coordenada x do centro da janela.
-        @param window_cy: Coordenada y do centro da janela.
-        @param window_width: Largura da janela.
-        @param window_height: Altura da janela.
-        @param window_vup: Vetor de direção para cima da janela.
+        Atualiza as as projeções dos objetos no display file.
         """
 
-        ncs_conversion_mtx = TransformationGenerator.get_ncs_transformation_matrix(
-            window_cx=window_cx,
-            window_cy=window_cy,
+        projection_mtx = TransformationGenerator.get_parallel_projection_matrix(
+            window_center=window_center,
+            view_plane_normal=view_plane_normal,
             window_vup=window_vup,
-            window_height=window_height,
             window_width=window_width,
+            window_height=window_height,
         )
+        print(f"Projection matrix: {projection_mtx}")
 
         for obj in self.display_file:
             if not obj.dirty:  # Evita atualizações desnecessárias
@@ -159,13 +157,11 @@ class DisplayFileManager:
             normalized_coords = []
 
             for point_wc in obj.world_points:
-                point_ncs = (
-                    point_wc @ ncs_conversion_mtx
-                )  # Transforma o ponto WC para ncs
+                point_ncs = point_wc @ projection_mtx  # Transforma o ponto WC para ncs
 
                 nx = point_ncs[0]
                 ny = point_ncs[1]
-
+                print(f"Point WC: {point_wc} -> Point NCS: {point_ncs}")
                 normalized_coords.append((nx, ny))
 
             obj.update_normalized_points(normalized_coords)
