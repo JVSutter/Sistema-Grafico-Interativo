@@ -8,8 +8,8 @@ from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class DisplayFileManager:
@@ -17,7 +17,7 @@ class DisplayFileManager:
     Classe responsável por gerenciar o display file
     """
 
-    def __init__(self, viewport_bounds: Bounds):
+    def __init__(self, viewport_bounds: ViewportBounds):
         self.display_file: list[WorldObject] = []
         WorldObjectFactory.viewport_bounds = viewport_bounds
 

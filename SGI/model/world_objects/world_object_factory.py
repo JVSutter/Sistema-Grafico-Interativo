@@ -5,7 +5,7 @@ from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from utils.bounds import Bounds
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class WorldObjectFactory:
@@ -13,7 +13,7 @@ class WorldObjectFactory:
     Uma classe de fábrica para instanciar objetos no mundo
     """
 
-    viewport_bounds: Bounds = None
+    viewport_bounds: ViewportBounds = None
 
     @classmethod
     def new_world_object(

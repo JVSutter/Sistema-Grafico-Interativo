@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class WorldObject(ABC):
@@ -14,7 +14,7 @@ class WorldObject(ABC):
         points: list,
         name: str,
         color: tuple[int, int, int],
-        viewport_bounds: Bounds,
+        viewport_bounds: ViewportBounds,
     ):
 
         self.world_points: list[np.array] = []
@@ -26,7 +26,7 @@ class WorldObject(ABC):
             []
         )  # Lista de pontos projetados no plano da window em coordenadas normalizadas
         self.viewport_points: list[tuple[float, float]] = []
-        self.viewport_bounds: Bounds = viewport_bounds
+        self.viewport_bounds: ViewportBounds = viewport_bounds
 
         self.name = name
         self.color = color
@@ -56,11 +56,15 @@ class WorldObject(ABC):
         for point in points:
             normalized_x, normalized_y = point
 
-            vp_width = self.viewport_bounds.x_max - self.viewport_bounds.x_min
-            vp_height = self.viewport_bounds.y_max - self.viewport_bounds.y_min
+            vp_width = (
+                self.viewport_bounds.x_lower_right - self.viewport_bounds.x_upper_left
+            )
+            vp_height = (
+                self.viewport_bounds.y_lower_right - self.viewport_bounds.y_upper_left
+            )
 
-            vx = (normalized_x + 1) / 2 * vp_width + self.viewport_bounds.x_min
-            vy = (1 - normalized_y) / 2 * vp_height + self.viewport_bounds.y_min
+            vx = (normalized_x + 1) / 2 * vp_width + self.viewport_bounds.x_upper_left
+            vy = (1 - normalized_y) / 2 * vp_height + self.viewport_bounds.y_upper_left
             transformed_points.append((vx, vy))
 
         return transformed_points

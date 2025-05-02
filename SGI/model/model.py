@@ -1,5 +1,5 @@
 from model.display_file_manager import DisplayFileManager
-from model.window import Window
+from model.window.window import Window
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
