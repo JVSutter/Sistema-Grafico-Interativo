@@ -9,3 +9,6 @@ class Bounds:
     x_max: float
     y_min: float
     y_max: float
+    # Opcionalmente, podemos adicionar limites para o eixo Z
+    z_min: float = 0.0
+    z_max: float = 0.0

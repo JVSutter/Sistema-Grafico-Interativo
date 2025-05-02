@@ -36,6 +36,8 @@ class Window:
             x_max=self.width,
             y_min=-self.height,
             y_max=self.height,
+            z_min=0.0,
+            z_max=0.0,
         )
 
         self.zoom_level = 1.0
@@ -84,14 +86,24 @@ class Window:
         self.window_center = self.window_center @ pan_mtx
 
         min_point = np.array(
-            [self.window_bounds.x_min, self.window_bounds.y_min, 0.0, 1.0]
+            [
+                self.window_bounds.x_min,
+                self.window_bounds.y_min,
+                self.window_bounds.z_min,
+                1.0,
+            ]
         )
         min_point = min_point @ pan_mtx
         self.window_bounds.x_min = min_point[0]
         self.window_bounds.y_min = min_point[1]
 
         max_point = np.array(
-            [self.window_bounds.x_max, self.window_bounds.y_max, 0.0, 1.0]
+            [
+                self.window_bounds.x_max,
+                self.window_bounds.y_max,
+                self.window_bounds.z_max,
+                1.0,
+            ]
         )
         max_point = max_point @ pan_mtx
         self.window_bounds.x_max = max_point[0]
