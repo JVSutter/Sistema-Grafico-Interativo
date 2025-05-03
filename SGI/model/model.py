@@ -102,13 +102,18 @@ class Model:
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
-    def pan(self, dx: float, dy: float) -> None:
+    def pan(self, d_horizontal: float, d_vertical: float, d_depth: float) -> None:
         """
         Aplica um pan na janela de visualização.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_vertical: Deslocamento vertical.
+        @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
-        self.window.apply_pan(d_vertical=dy, d_horizontal=dx, d_depth=0.0)
+        self.window.apply_pan(
+            d_horizontal=d_horizontal,
+            d_vertical=d_vertical,
+            d_depth=d_depth,
+        )
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface

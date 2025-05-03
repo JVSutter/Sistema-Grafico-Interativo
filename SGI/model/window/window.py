@@ -72,7 +72,7 @@ class Window:
             self.window_bounds.lower_left_point @ scaling_matrix
         )
 
-    def apply_pan(self, d_vertical, d_horizontal: float, d_depth: float) -> None:
+    def apply_pan(self, d_horizontal: float, d_vertical: float, d_depth: float) -> None:
         """
         Aplica um pan na janela de visualização.
         @param d_vertical: Deslocamento vertical

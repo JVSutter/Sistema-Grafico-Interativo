@@ -69,14 +69,17 @@ class Controller:
 
         self.model.zoom(new_zoom_value)
 
-    def handle_pan(self, dx: float, dy: float) -> None:
+    def handle_pan(
+        self, d_horizontal: float, d_vertical: float, d_depth: float
+    ) -> None:
         """
         Processa um deslocamento na janela de visualização.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_vertical: Deslocamento vertical.
+        @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
 
-        self.model.pan(dx, dy)
+        self.model.pan(d_horizontal, d_vertical, d_depth)
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]
