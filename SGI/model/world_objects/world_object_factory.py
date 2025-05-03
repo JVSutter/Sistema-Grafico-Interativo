@@ -42,7 +42,7 @@ class WorldObjectFactory:
             "viewport_bounds": cls.viewport_bounds,
         }
 
-        if object_type == WorldWireframe:
+        if object_type == WorldWireframe:  # Único que tem arestas e preenchimento
             kwargs["is_filled"] = is_filled
             kwargs["edges"] = edges
 

@@ -1,6 +1,6 @@
 from model.clipping_algorithms import ClippingAlgorithms
 from model.world_objects.world_object import WorldObject
-from view.graphical_objects.graphical_wireframe import GraphicalWireframe
+from view.graphical_objects.graphical_line import GraphicalLine
 
 
 class WorldWireframe(WorldObject):
@@ -26,14 +26,18 @@ class WorldWireframe(WorldObject):
         self.edges = edges
 
     def get_clipped_representation(self) -> list:
-        clipped_points = ClippingAlgorithms.sutherland_hodgman_clipping(
-            self.normalized_points
-        )
-        if clipped_points is None:
-            return []
+        clipped_representations = []
 
-        viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
-        graphical_representation = GraphicalWireframe(
-            viewport_points, self.color, self.is_filled
-        )
-        return [graphical_representation]
+        for index_1, index_2 in self.edges:
+            p1 = self.projection_points[index_1]
+            p2 = self.projection_points[index_2]
+            clipped_points = ClippingAlgorithms.cohen_sutherland_clipping(p1, p2)
+
+            if clipped_points is not None:
+                viewport_points = self.transform_projection_points_to_viewport(
+                    clipped_points
+                )
+                graphical_representation = GraphicalLine(viewport_points, self.color)
+                clipped_representations.append(graphical_representation)
+
+        return clipped_representations

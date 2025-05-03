@@ -29,7 +29,7 @@ class DisplayFileManager:
 
         representations = []
         for obj in self.display_file:
-            representations.extend(obj.get_clipped_representation())
+            representations += obj.get_clipped_representation()
         return representations
 
     def get_obj_name(self, index: int) -> str:
