@@ -54,12 +54,16 @@ class View(QtWidgets.QMainWindow):
         self.navDownButton.clicked.connect(lambda: self.on_pan(direction="down"))
         self.navLeftButton.clicked.connect(lambda: self.on_pan(direction="left"))
         self.navRightButton.clicked.connect(lambda: self.on_pan(direction="right"))
-        
-        # Botoes de navegacao 3D
-        self.backwardButton.clicked.connect(lambda: self.on_pan_3d(direction="backward"))
-        self.forwardButton.clicked.connect(lambda: self.on_pan_3d(direction="forward"))
-        self.verticalRotationSlider.valueChanged.connect(lambda: self.on_vertical_rotation())
-        self.horizontalRotationSlider.valueChanged.connect(lambda: self.on_horizontal_rotation())
+        self.forwardButton.clicked.connect(lambda: self.on_pan(direction="forward"))
+        self.backwardButton.clicked.connect(lambda: self.on_pan(direction="backward"))
+
+        # Botões de rotação
+        self.verticalRotationSlider.valueChanged.connect(
+            lambda: self.on_vertical_rotation()
+        )
+        self.horizontalRotationSlider.valueChanged.connect(
+            lambda: self.on_horizontal_rotation()
+        )
 
         # Botões de importação e exportação de arquivos
         self.importButton.clicked.connect(self.import_obj_file)
@@ -214,21 +218,17 @@ class View(QtWidgets.QMainWindow):
         """Trata as requisições de pan."""
 
         movement = 100 / self.zoomSlider.value()
-        dx, dy = {
-            "up": (0, movement),
-            "down": (0, -movement),
-            "left": (-movement, 0),
-            "right": (movement, 0),
+        d_horizontal, d_vertical, d_depth = {
+            "up": (0, movement, 0),
+            "down": (0, -movement, 0),
+            "left": (-movement, 0, 0),
+            "right": (movement, 0, 0),
+            "forward": (0, 0, movement),
+            "backward": (0, 0, -movement),
         }[direction]
 
-        self.controller.handle_pan(dx, dy)
-        
-    def on_pan_3d(self, direction: str) -> None:
-        """Trata as requisições de pan 3D."""
+        self.controller.handle_pan(d_horizontal, d_vertical, d_depth)
 
-        print(f"TODO: Pan 3D - {direction}")
-        pass
-        
     def on_vertical_rotation(self) -> None:
         """Trata as requisições de rotação vertical."""
 

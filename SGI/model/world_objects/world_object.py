@@ -25,23 +25,21 @@ class WorldObject(ABC):
         self.projection_points: list[tuple[float, float]] = (
             []
         )  # Lista de pontos projetados no plano da window em coordenadas normalizadas
-        self.viewport_points: list[tuple[float, float]] = []
         self.viewport_bounds: ViewportBounds = viewport_bounds
 
         self.name = name
         self.color = color
         self.dirty = True  # Booleano para indicar se o objeto precisa ser atualizado
 
-    def update_projection_points(self, projection_points: list[tuple[float, float]]) -> None:
+    def update_projection_points(
+        self, projection_points: list[tuple[float, float]]
+    ) -> None:
         """
-        Atualiza as coordenadas projetadas do objeto e converte-as para as coordenadas do viewport.
+        Atualiza as coordenadas projetadas do objeto.
         @param norm_points: Lista de pontos projetados em coordenadas normalizadas.
         """
 
         self.projection_points = projection_points
-        self.viewport_points = self.transform_projection_points_to_viewport(
-            projection_points
-        )
 
     def transform_projection_points_to_viewport(
         self, points: tuple[float, float]
@@ -92,10 +90,12 @@ class WorldObject(ABC):
 
         x_sum = sum(point[0] for point in self.world_points)
         y_sum = sum(point[1] for point in self.world_points)
+        z_sum = sum(point[2] for point in self.world_points)
         x_center = x_sum / len(self.world_points)
         y_center = y_sum / len(self.world_points)
+        z_center = z_sum / len(self.world_points)
 
-        return x_center, y_center
+        return x_center, y_center, z_center
 
     def get_obj_description(self, last_index: int) -> tuple[str, int]:
         """

@@ -29,7 +29,7 @@ class DisplayFileManager:
 
         representations = []
         for obj in self.display_file:
-            representations.extend(obj.get_clipped_representation())
+            representations += obj.get_clipped_representation()
         return representations
 
     def get_obj_name(self, index: int) -> str:
@@ -41,7 +41,13 @@ class DisplayFileManager:
         return self.display_file[index].name
 
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: type, edges: list
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        is_filled: bool,
+        object_type: type,
+        edges: list,
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.

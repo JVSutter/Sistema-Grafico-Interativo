@@ -6,28 +6,28 @@ class TransformationGenerator:
     Classe responsável por gerar matrizes de transformação.
     """
 
-    @staticmethod
-    def get_rotation_matrix(angle_degrees: float, cx: float, cy: float) -> np.ndarray:
-        """
-        Obtém a matriz de rotação.
-        @param angle_degrees: Ângulo de rotação em graus.
-        @param cx: Coordenada x do centro de rotação.
-        @param cy: Coordenada y do centro de rotação.
-        @return: Matriz de rotação.
-        """
+    # @staticmethod
+    # def get_rotation_matrix(angle_degrees: float, cx: float, cy: float) -> np.ndarray:
+    #     """
+    #     Obtém a matriz de rotação.
+    #     @param angle_degrees: Ângulo de rotação em graus.
+    #     @param cx: Coordenada x do centro de rotação.
+    #     @param cy: Coordenada y do centro de rotação.
+    #     @return: Matriz de rotação.
+    #     """
 
-        angle_radians = np.radians(angle_degrees)
-        cos_r = np.cos(angle_radians)
-        sin_r = np.sin(angle_radians)
+    #     angle_radians = np.radians(angle_degrees)
+    #     cos_r = np.cos(angle_radians)
+    #     sin_r = np.sin(angle_radians)
 
-        translate_to_origin = TransformationGenerator.get_translation_matrix(-cx, -cy)
-        rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        translate_back = TransformationGenerator.get_translation_matrix(cx, cy)
-        return translate_to_origin @ rotate @ translate_back
+    #     translate_to_origin = TransformationGenerator.get_translation_matrix(-cx, -cy)
+    #     rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
+    #     translate_back = TransformationGenerator.get_translation_matrix(cx, cy)
+    #     return translate_to_origin @ rotate @ translate_back
 
     @staticmethod
     def get_transformation_matrix(
-        transformations_list: list[dict], obj_center: tuple[float, float]
+        transformations_list: list[dict], obj_center: tuple[float, float, float]
     ) -> np.ndarray | None:
         """
         Método para obtenção de uma matriz de transformação composta.
@@ -41,50 +41,58 @@ class TransformationGenerator:
             return None
 
         # Inicializa a matriz composta como a matriz identidade
-        composite_matrix = np.identity(3)
+        composite_matrix = np.identity(4)
 
         for transformation in transformations_list:
             transformation_type = transformation["type"]
-            matrix = np.identity(3)
+            matrix = np.identity(4)
 
             if transformation_type == "translation":
                 dx = transformation["dx"]
                 dy = transformation["dy"]
-                matrix = TransformationGenerator.get_translation_matrix(dx, dy)
+                dz = transformation["dz"]
+                matrix = TransformationGenerator.get_translation_matrix(dx, dy, dz)
 
             elif transformation_type == "scaling":
                 sx = transformation["sx"]
                 sy = transformation["sy"]
-                center_x, center_y = obj_center
+                sz = transformation["sz"]
+
+                center_x, center_y, center_z = obj_center
                 center_transformed = (
-                    np.array([center_x, center_y, 1]) @ composite_matrix
+                    np.array([center_x, center_y, center_z, 1]) @ composite_matrix
                 )
-                cx_current, cy_current = center_transformed[0], center_transformed[1]
+                cx_current, cy_current, cz_current = (
+                    center_transformed[0],
+                    center_transformed[1],
+                    center_transformed[2],
+                )
+
                 matrix = TransformationGenerator.get_scaling_matrix(
-                    sx, sy, cx_current, cy_current
+                    cx_current, cy_current, cz_current, sx, sy, sz
                 )
 
-            elif transformation_type == "rotation":
-                angle = transformation["angle"]
-                cx = transformation["cx"]
-                cy = transformation["cy"]
+            # elif transformation_type == "rotation":
+            #     angle = transformation["angle"]
+            #     cx = transformation["cx"]
+            #     cy = transformation["cy"]
 
-                if cx == "obj_center":
-                    center_x, center_y = obj_center
-                    center_transformed = (
-                        np.array([center_x, center_y, 1]) @ composite_matrix
-                    )
-                    cx_current, cy_current = (
-                        center_transformed[0],
-                        center_transformed[1],
-                    )
-                    matrix = TransformationGenerator.get_rotation_matrix(
-                        angle, cx_current, cy_current
-                    )
-                else:  # origem ou ponto arbitrario
-                    matrix = TransformationGenerator.get_rotation_matrix(
-                        angle, float(cx), float(cy)
-                    )
+            #     if cx == "obj_center":
+            #         center_x, center_y = obj_center
+            #         center_transformed = (
+            #             np.array([center_x, center_y, 1]) @ composite_matrix
+            #         )
+            #         cx_current, cy_current = (
+            #             center_transformed[0],
+            #             center_transformed[1],
+            #         )
+            #         matrix = TransformationGenerator.get_rotation_matrix(
+            #             angle, cx_current, cy_current
+            #         )
+            #     else:  # origem ou ponto arbitrario
+            #         matrix = TransformationGenerator.get_rotation_matrix(
+            #             angle, float(cx), float(cy)
+            #         )
 
             composite_matrix = composite_matrix @ matrix
 
@@ -203,6 +211,7 @@ class TransformationGenerator:
 
         return pan_matrix
 
+    @staticmethod
     def get_translation_matrix(dx: float, dy: float, dz: float) -> np.ndarray:
         """
         Obtém a matriz de translação.

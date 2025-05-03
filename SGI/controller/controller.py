@@ -38,8 +38,8 @@ class Controller:
         @param edges_input: Lista de arestas que compõem o objeto
         """
 
-        if object_type == "Point":
-            print("Criando ponto")
+        if object_type in ("Point", "Wireframe", "Line"):
+            print(f"Adicionando objeto de nome {name_input} e do tipo {object_type}")
             self.model.add_object(
                 points=points_input,
                 name=name_input,
@@ -58,8 +58,7 @@ class Controller:
         @param index: Índice do objeto a ser removido.
         """
 
-        # self.model.remove_object(index=index)
-        print("TODO: handle_remove_object")
+        self.model.remove_object(index=index)
 
     def handle_zoom(self, new_zoom_value: float) -> None:
         """
@@ -69,14 +68,17 @@ class Controller:
 
         self.model.zoom(new_zoom_value)
 
-    def handle_pan(self, dx: float, dy: float) -> None:
+    def handle_pan(
+        self, d_horizontal: float, d_vertical: float, d_depth: float
+    ) -> None:
         """
         Processa um deslocamento na janela de visualização.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_vertical: Deslocamento vertical.
+        @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
 
-        self.model.pan(dx, dy)
+        self.model.pan(d_horizontal, d_vertical, d_depth)
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]
@@ -87,8 +89,7 @@ class Controller:
         @param transformations_list: Lista de transformações a serem aplicadas.
         """
 
-        # self.model.handle_transformations(index, transformations_list)
-        print("TODO: handle_transformations")
+        self.model.handle_transformations(index, transformations_list)
 
     def handle_window_rotation(self, angle: float) -> None:
         """
