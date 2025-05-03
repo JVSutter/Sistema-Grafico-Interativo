@@ -6,39 +6,8 @@ class TransformationGenerator:
     Classe responsável por gerar matrizes de transformação.
     """
 
-    @classmethod
-    def _get_translation_matrix(cls, dx: float, dy: float) -> np.ndarray:
-        """
-        Obtém a matriz de translação.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
-        @return: Matriz de translação.
-        """
-
-        return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
-
-    @classmethod
-    def _get_scaling_matrix(
-        cls, sx: float, sy: float, cx: float, cy: float
-    ) -> np.ndarray:
-        """
-        Obtém a matriz de escalonamento.
-        @param sx: Fator de escalonamento em x.
-        @param sy: Fator de escalonamento em y.
-        @param cx: Coordenada x do centro de escalonamento.
-        @param cy: Coordenada y do centro de escalonamento.
-        @return: Matriz de escalonamento.
-        """
-
-        translate_to_origin = cls._get_translation_matrix(-cx, -cy)
-        scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        translate_back = cls._get_translation_matrix(cx, cy)
-        return translate_to_origin @ scale @ translate_back
-
-    @classmethod
-    def _get_rotation_matrix(
-        cls, angle_degrees: float, cx: float, cy: float
-    ) -> np.ndarray:
+    @staticmethod
+    def get_rotation_matrix(angle_degrees: float, cx: float, cy: float) -> np.ndarray:
         """
         Obtém a matriz de rotação.
         @param angle_degrees: Ângulo de rotação em graus.
@@ -51,14 +20,14 @@ class TransformationGenerator:
         cos_r = np.cos(angle_radians)
         sin_r = np.sin(angle_radians)
 
-        translate_to_origin = cls._get_translation_matrix(-cx, -cy)
+        translate_to_origin = TransformationGenerator.get_translation_matrix(-cx, -cy)
         rotate = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        translate_back = cls._get_translation_matrix(cx, cy)
+        translate_back = TransformationGenerator.get_translation_matrix(cx, cy)
         return translate_to_origin @ rotate @ translate_back
 
-    @classmethod
+    @staticmethod
     def get_transformation_matrix(
-        cls, transformations_list: list[dict], obj_center: tuple[float, float]
+        transformations_list: list[dict], obj_center: tuple[float, float]
     ) -> np.ndarray | None:
         """
         Método para obtenção de uma matriz de transformação composta.
@@ -81,7 +50,7 @@ class TransformationGenerator:
             if transformation_type == "translation":
                 dx = transformation["dx"]
                 dy = transformation["dy"]
-                matrix = cls._get_translation_matrix(dx, dy)
+                matrix = TransformationGenerator.get_translation_matrix(dx, dy)
 
             elif transformation_type == "scaling":
                 sx = transformation["sx"]
@@ -91,7 +60,9 @@ class TransformationGenerator:
                     np.array([center_x, center_y, 1]) @ composite_matrix
                 )
                 cx_current, cy_current = center_transformed[0], center_transformed[1]
-                matrix = cls._get_scaling_matrix(sx, sy, cx_current, cy_current)
+                matrix = TransformationGenerator.get_scaling_matrix(
+                    sx, sy, cx_current, cy_current
+                )
 
             elif transformation_type == "rotation":
                 angle = transformation["angle"]
@@ -107,51 +78,253 @@ class TransformationGenerator:
                         center_transformed[0],
                         center_transformed[1],
                     )
-                    matrix = cls._get_rotation_matrix(angle, cx_current, cy_current)
+                    matrix = TransformationGenerator.get_rotation_matrix(
+                        angle, cx_current, cy_current
+                    )
                 else:  # origem ou ponto arbitrario
-                    matrix = cls._get_rotation_matrix(angle, float(cx), float(cy))
+                    matrix = TransformationGenerator.get_rotation_matrix(
+                        angle, float(cx), float(cy)
+                    )
 
             composite_matrix = composite_matrix @ matrix
 
         return composite_matrix
 
-    @classmethod
-    def get_ncs_transformation_matrix(
-        cls,
-        window_cx: float,
-        window_cy: float,
-        window_height: float,
-        window_width: float,
+    @staticmethod
+    def get_x_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo x.
+        @return: Matriz de rotação em torno do eixo x.
+        """
+
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, cos_r, -sin_r, 0],
+                [0, sin_r, cos_r, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_y_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo y.
+        @param angle_degrees: Ângulo de rotação em graus.
+        @return: Matriz de rotação em torno do eixo y.
+        """
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+        return np.array(
+            [
+                [cos_r, 0, sin_r, 0],
+                [0, 1, 0, 0],
+                [-sin_r, 0, cos_r, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_z_axis_rotation_matrix(angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno do eixo z.
+        @param angle_degrees: Ângulo de rotação em graus.
+        @return: Matriz de rotação em torno do eixo z.
+        """
+        angle_radians = np.radians(angle_degrees)
+        cos_r = np.cos(angle_radians)
+        sin_r = np.sin(angle_radians)
+        return np.array(
+            [
+                [cos_r, -sin_r, 0, 0],
+                [sin_r, cos_r, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_pan_matrix(
+        d_vertical: float,
+        d_horizontal: float,
+        d_depth: float,
         window_vup: np.ndarray,
+        window_vright: np.ndarray,
+        view_plane_normal: np.ndarray,
     ) -> np.ndarray:
         """
-        Retorna a matriz de transformação para coordenadas normalizadas.
-        @param window_cx: Coordenada x do centro da janela.
-        @param window_cy: Coordenada y do centro da janela.
+        Obtém a matriz de pan.
+        @param d_vertical: Deslocamento vertical.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_depth: Deslocamento em profundidade.
         @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
-        @return: Matriz de transformação para coordenadas normalizadas.
+        @param window_vright: Vetor Vright da janela (indicando a direção "para a direita").
+        @param view_plane_normal: Vetor normal ao plano de visão.
+        @return: Matriz de pan.
         """
 
-        # 1. Translada Wc para origem
-        translate_to_origin = np.array(
-            [[1, 0, 0], [0, 1, 0], [-window_cx, -window_cy, 1]]
+        window_vup_x, window_vup_y, window_vup_z, _ = window_vup
+        window_vright_x, window_vright_y, window_vright_z, _ = window_vright
+        view_plane_normal_x, view_plane_normal_y, view_plane_normal_z, _ = (
+            view_plane_normal
         )
-        transformations = translate_to_origin
 
-        # 2. Determina vup e o angulo entre ele e o eixo y
-        angle_vup_y = np.arctan2(window_vup[1], window_vup[0]) - np.pi / 2
-        rotation_angle_rad = -angle_vup_y
+        # Para mover numa dada direção, multiplicamos o vetor unitário da janela pelo deslocamento.
+        # Isto produz um vetor de deslocamento na direção desejada e com o comprimento desejado.
+        translation_x = (
+            d_horizontal * window_vright_x
+            + d_vertical * window_vup_x
+            + d_depth * view_plane_normal_x
+        )
+        translation_y = (
+            d_horizontal * window_vright_y
+            + d_vertical * window_vup_y
+            + d_depth * view_plane_normal_y
+        )
+        translation_z = (
+            d_horizontal * window_vright_z
+            + d_vertical * window_vup_z
+            + d_depth * view_plane_normal_z
+        )
 
-        # 3. Rotaciona o mundo para alinhar vup com o eixo y
-        cos_r = np.cos(rotation_angle_rad)
-        sin_r = np.sin(rotation_angle_rad)
-        rotate_align_y = np.array([[cos_r, sin_r, 0], [-sin_r, cos_r, 0], [0, 0, 1]])
-        transformations = transformations @ rotate_align_y
+        pan_matrix = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [translation_x, translation_y, translation_z, 1],
+            ]
+        )
 
-        # 4. Normaliza as coordenadas, realizando um escalonamento
-        scale_x = 2.0 / window_width if window_width != 0 else 1.0
-        scale_y = 2.0 / window_height if window_height != 0 else 1.0
-        scale_to_ncs = np.array([[scale_x, 0, 0], [0, scale_y, 0], [0, 0, 1]])
-        transformations = transformations @ scale_to_ncs
+        return pan_matrix
 
-        return transformations
+    def get_translation_matrix(dx: float, dy: float, dz: float) -> np.ndarray:
+        """
+        Obtém a matriz de translação.
+        @param dx: Deslocamento em x.
+        @param dy: Deslocamento em y.
+        @param dz: Deslocamento em z.
+        @return: Matriz de translação.
+        """
+
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [dx, dy, dz, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_scaling_matrix(
+        cx: float, cy: float, cz: float, scale_x: float, scale_y: float, scale_z: float
+    ) -> np.ndarray:
+        """
+        Obtém a matriz de escalonamento natural, isto é, em torno do centro do objeto.
+        @param cx: Coordenada x do centro do objeto a ser escalonado.
+        @param cy: Coordenada y do centro do objeto a ser escalonado.
+        @param cz: Coordenada z do centro do objeto a ser escalonado.
+        @param scale_x: Fator de escalonamento em x.
+        @param scale_y: Fator de escalonamento em y.
+        @param scale_z: Fator de escalonamento em z.
+        @return: Matriz de escalonamento.
+        """
+
+        # Passo 1: Translação do centro do objeto para a origem
+        translate_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-cx, dy=-cy, dz=-cz
+        )
+
+        # Passo 2: Escalonamento
+        scale_mtx = np.array(
+            [
+                [scale_x, 0, 0, 0],
+                [0, scale_y, 0, 0],
+                [0, 0, scale_z, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        # Passo 3: Translação de volta para a posição original
+        translate_back = TransformationGenerator.get_translation_matrix(
+            dx=cx, dy=cy, dz=cz
+        )
+
+        return translate_to_origin @ scale_mtx @ translate_back
+
+    @staticmethod
+    def get_parallel_projection_matrix(
+        window_center: np.ndarray,
+        view_plane_normal: np.ndarray,
+        window_vup: np.ndarray,
+        window_width: float,
+        window_height: float,
+    ):
+        """
+        Retorna a matriz de projeção paralela.
+        @param window_center: Centro da janela, que será usado como view reference point (VRP).
+        @param view_plane_normal: Vetor normal ao plano de visão.
+        @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
+        @param window_width: Largura da janela.
+        @param window_height: Altura da janela.
+        @return: Matriz de projeção paralela.
+        """
+
+        window_cx, window_cy, window_cz, _ = window_center
+        vpn_x, vpn_y, vpn_z, _ = view_plane_normal
+        window_vup_x, window_vup_y, _, _ = window_vup
+
+        # Passo 1: Translação do centro da janela para a origem
+        translate_vrp_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-window_cx, dy=-window_cy, dz=-window_cz
+        )
+
+        # Passo 2: Rotacionar o mundo em torno de x e de u de forma a alinhar VPN com o eixo z
+        angle_vpn_xz = np.degrees(
+            np.arctan2(vpn_z, vpn_x) - np.pi / 2
+        )  # Ângulo que falta para colocar VPN no plano zy
+        rotate_y = TransformationGenerator.get_y_axis_rotation_matrix(angle_vpn_xz)
+
+        angle_vpn_yz = np.degrees(
+            np.arctan2(vpn_z, vpn_y) - np.pi / 2
+        )  # Ângulo que falta para alinhar VPN com o eixo z
+        rotate_x = TransformationGenerator.get_x_axis_rotation_matrix(angle_vpn_yz)
+
+        # Passo 3: Ignorar a coordenada z
+        ignore_z = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        # Passo 4: Rotacionar o mundo para alinhar Vup com o eixo y
+        angle_vup_y = np.degrees(np.arctan2(window_vup_y, window_vup_x) - np.pi / 2)
+        align_vup_with_y = TransformationGenerator.get_z_axis_rotation_matrix(
+            angle_vup_y
+        )
+
+        # Passo 5: Normalizar as coordenadas, realizando um escalonamento
+        scale_x = 2.0 / window_width
+        scale_y = 2.0 / window_height
+        scale_to_ncs = TransformationGenerator.get_scaling_matrix(
+            cx=0, cy=0, cz=0, scale_x=scale_x, scale_y=scale_y, scale_z=1
+        )
+
+        transformation = (
+            translate_vrp_to_origin
+            @ rotate_y
+            @ rotate_x
+            @ ignore_z
+            @ align_vup_with_y
+            @ scale_to_ncs
+        )
+        return transformation

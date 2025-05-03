@@ -8,8 +8,8 @@ from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class DisplayFileManager:
@@ -17,7 +17,7 @@ class DisplayFileManager:
     Classe responsável por gerenciar o display file
     """
 
-    def __init__(self, viewport_bounds: Bounds):
+    def __init__(self, viewport_bounds: ViewportBounds):
         self.display_file: list[WorldObject] = []
         WorldObjectFactory.viewport_bounds = viewport_bounds
 
@@ -126,29 +126,29 @@ class DisplayFileManager:
         for obj in self.display_file:
             obj.dirty = True
 
-    def update_ncs_coordinates(
+    def update_projections(
         self,
-        window_cx: float,
-        window_cy: float,
+        window_center: np.ndarray,
+        view_plane_normal: np.ndarray,
+        window_vup: np.ndarray,
         window_width: float,
         window_height: float,
-        window_vup: np.ndarray,
     ) -> None:
         """
-        Atualiza as coordenadas do display file para o sistema de coordenadas da janela.
-        @param window_cx: Coordenada x do centro da janela.
-        @param window_cy: Coordenada y do centro da janela.
-        @param window_width: Largura da janela.
-        @param window_height: Altura da janela.
-        @param window_vup: Vetor de direção para cima da janela.
+        Atualiza as projeções dos objetos no display file.
+        @param window_center: Centro da janela de visualização.
+        @param view_plane_normal: Vetor normal ao plano de visualização.
+        @param window_vup: Vetor de orientação para cima da janela de visualização.
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
         """
 
-        ncs_conversion_mtx = TransformationGenerator.get_ncs_transformation_matrix(
-            window_cx=window_cx,
-            window_cy=window_cy,
+        projection_mtx = TransformationGenerator.get_parallel_projection_matrix(
+            window_center=window_center,
+            view_plane_normal=view_plane_normal,
             window_vup=window_vup,
-            window_height=window_height,
             window_width=window_width,
+            window_height=window_height,
         )
 
         for obj in self.display_file:
@@ -156,19 +156,15 @@ class DisplayFileManager:
                 continue
             obj.dirty = False
 
-            normalized_coords = []
+            projection_points = []
 
             for point_wc in obj.world_points:
-                point_ncs = (
-                    point_wc @ ncs_conversion_mtx
-                )  # Transforma o ponto WC para ncs
-
-                nx = point_ncs[0]
-                ny = point_ncs[1]
-
-                normalized_coords.append((nx, ny))
-
-            obj.update_normalized_points(normalized_coords)
+                projected_point = point_wc @ projection_mtx
+                normalized_x, normalized_y, _, _ = projected_point
+                projection_points.append(
+                    (normalized_x, normalized_y)
+                )  # Descarta z e w e converte em lista de tuplas
+            obj.update_projection_points(projection_points)
 
     def import_file_to_display_file(self, filepath: str) -> None:
         """

@@ -1,7 +1,7 @@
 from PyQt6 import QtGui, QtWidgets
 
-from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class Viewport(QtWidgets.QWidget):
@@ -17,7 +17,7 @@ class Viewport(QtWidgets.QWidget):
         self.setPalette(palette)
 
         self.viewport_offset = 10
-        self.viewport_bounds: Bounds = (
+        self.viewport_bounds: ViewportBounds = (
             None  # Será definido automaticamente no evento resizeEvent
         )
         self.graphical_objects = []
@@ -38,11 +38,11 @@ class Viewport(QtWidgets.QWidget):
 
         super().resizeEvent(event)
 
-        self.viewport_bounds = Bounds(
-            x_min=self.viewport_offset,
-            x_max=self.width() - self.viewport_offset,
-            y_min=self.viewport_offset,
-            y_max=self.height() - self.viewport_offset,
+        self.viewport_bounds = ViewportBounds(
+            x_upper_left=self.viewport_offset,
+            x_lower_right=self.width() - self.viewport_offset,
+            y_upper_left=self.viewport_offset,
+            y_lower_right=self.height() - self.viewport_offset,
         )
 
     def paintEvent(self, event) -> None:
@@ -64,10 +64,14 @@ class Viewport(QtWidgets.QWidget):
             painter.setPen(frame_pen)
 
             painter.drawRect(
-                self.viewport_bounds.x_min - offset,
-                self.viewport_bounds.y_min - offset,
-                self.viewport_bounds.x_max - self.viewport_bounds.x_min + 2 * offset,
-                self.viewport_bounds.y_max - self.viewport_bounds.y_min + 2 * offset,
+                self.viewport_bounds.x_upper_left - offset,
+                self.viewport_bounds.y_upper_left - offset,
+                self.viewport_bounds.x_lower_right
+                - self.viewport_bounds.x_upper_left
+                + 2 * offset,
+                self.viewport_bounds.y_lower_right
+                - self.viewport_bounds.y_upper_left
+                + 2 * offset,
             )
 
         # Desenha a borda externa (branca)

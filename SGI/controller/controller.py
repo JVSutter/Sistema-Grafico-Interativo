@@ -36,15 +36,18 @@ class Controller:
         @param object_type: Tipo de objeto
         """
 
-        # self.model.add_object(
-        #     points=points_input,
-        #     name=name_input,
-        #     color=color_input,
-        #     is_filled=is_filled,
-        #     object_type=object_type,
-        # )
+        if object_type == "Point":
+            print("Criando ponto")
+            self.model.add_object(
+                points=points_input,
+                name=name_input,
+                color=color_input,
+                is_filled=is_filled,
+                object_type=object_type,
+            )
+            return
 
-        print("TODO: handle_create_object")
+        print("Só ponto por enquanto")
 
     def handle_remove_object(self, index: int) -> None:
         """
@@ -61,8 +64,7 @@ class Controller:
         @param new_zoom_value: Novo valor de zoom.
         """
 
-        # self.model.zoom(new_zoom_value)
-        print("TODO: handle_zoom")
+        self.model.zoom(new_zoom_value)
 
     def handle_pan(self, dx: float, dy: float) -> None:
         """
@@ -71,8 +73,7 @@ class Controller:
         @param dy: Deslocamento em y.
         """
 
-        # self.model.pan(dx, dy)
-        print("TODO: handle_pan")
+        self.model.pan(dx, dy)
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]
