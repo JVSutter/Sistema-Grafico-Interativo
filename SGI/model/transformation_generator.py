@@ -7,33 +7,6 @@ class TransformationGenerator:
     """
 
     @staticmethod
-    def get_translation_matrix_2d(dx: float, dy: float) -> np.ndarray:
-        """
-        Obtém a matriz de translação.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
-        @return: Matriz de translação.
-        """
-
-        return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
-
-    @staticmethod
-    def get_scaling_matrix_2D(sx: float, sy: float, cx: float, cy: float) -> np.ndarray:
-        """
-        Obtém a matriz de escalonamento.
-        @param sx: Fator de escalonamento em x.
-        @param sy: Fator de escalonamento em y.
-        @param cx: Coordenada x do centro de escalonamento.
-        @param cy: Coordenada y do centro de escalonamento.
-        @return: Matriz de escalonamento.
-        """
-
-        translate_to_origin = TransformationGenerator.get_translation_matrix(-cx, -cy)
-        scale = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        translate_back = TransformationGenerator.get_translation_matrix(cx, cy)
-        return translate_to_origin @ scale @ translate_back
-
-    @staticmethod
     def get_rotation_matrix(angle_degrees: float, cx: float, cy: float) -> np.ndarray:
         """
         Obtém a matriz de rotação.
@@ -342,13 +315,8 @@ class TransformationGenerator:
         # Passo 5: Normalizar as coordenadas, realizando um escalonamento
         scale_x = 2.0 / window_width
         scale_y = 2.0 / window_height
-        scale_to_ncs = np.array(
-            [
-                [scale_x, 0, 0, 0],
-                [0, scale_y, 0, 0],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1],
-            ]
+        scale_to_ncs = TransformationGenerator.get_scaling_matrix(
+            cx=0, cy=0, cz=0, scale_x=scale_x, scale_y=scale_y, scale_z=1
         )
 
         transformation = (
