@@ -156,13 +156,14 @@ class DisplayFileManager:
                 continue
             obj.dirty = False
 
-            for point_wc in obj.world_points:
-                projection_points = point_wc @ projection_mtx
-                normalized_x, normalized_y, _, _ = projection_points
-                projection_points = [
-                    (normalized_x, normalized_y)
-                ]  # Descarta z e w e converte para lista de tuplas
+            projection_points = []
 
+            for point_wc in obj.world_points:
+                projected_point = point_wc @ projection_mtx
+                normalized_x, normalized_y, _, _ = projected_point
+                projection_points.append(
+                    (normalized_x, normalized_y)
+                )  # Descarta z e w e converte em lista de tuplas
             obj.update_projection_points(projection_points)
 
     def import_file_to_display_file(self, filepath: str) -> None:
