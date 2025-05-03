@@ -144,8 +144,8 @@ class Model:
             window_center=self.window.window_center,
             view_plane_normal=self.window.view_plane_normal,
             window_vup=self.window.vup,
-            window_width=self.window.width,
-            window_height=self.window.height,
+            window_width=self.window.get_width(),
+            window_height=self.window.get_height(),
         )
 
     @update_interface

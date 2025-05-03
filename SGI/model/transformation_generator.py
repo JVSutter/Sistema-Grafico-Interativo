@@ -7,7 +7,7 @@ class TransformationGenerator:
     """
 
     @staticmethod
-    def get_translation_matrix(dx: float, dy: float) -> np.ndarray:
+    def get_translation_matrix_2d(dx: float, dy: float) -> np.ndarray:
         """
         Obtém a matriz de translação.
         @param dx: Deslocamento em x.
@@ -18,7 +18,7 @@ class TransformationGenerator:
         return np.array([[1, 0, 0], [0, 1, 0], [dx, dy, 1]])
 
     @staticmethod
-    def get_scaling_matrix(sx: float, sy: float, cx: float, cy: float) -> np.ndarray:
+    def get_scaling_matrix_2D(sx: float, sy: float, cx: float, cy: float) -> np.ndarray:
         """
         Obtém a matriz de escalonamento.
         @param sx: Fator de escalonamento em x.
@@ -230,6 +230,61 @@ class TransformationGenerator:
 
         return pan_matrix
 
+    def get_translation_matrix(dx: float, dy: float, dz: float) -> np.ndarray:
+        """
+        Obtém a matriz de translação.
+        @param dx: Deslocamento em x.
+        @param dy: Deslocamento em y.
+        @param dz: Deslocamento em z.
+        @return: Matriz de translação.
+        """
+
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [dx, dy, dz, 1],
+            ]
+        )
+
+    @staticmethod
+    def get_scaling_matrix(
+        cx: float, cy: float, cz: float, scale_x: float, scale_y: float, scale_z: float
+    ) -> np.ndarray:
+        """
+        Obtém a matriz de escalonamento natural, isto é, em torno do centro do objeto.
+        @param cx: Coordenada x do centro do objeto a ser escalonado.
+        @param cy: Coordenada y do centro do objeto a ser escalonado.
+        @param cz: Coordenada z do centro do objeto a ser escalonado.
+        @param scale_x: Fator de escalonamento em x.
+        @param scale_y: Fator de escalonamento em y.
+        @param scale_z: Fator de escalonamento em z.
+        @return: Matriz de escalonamento.
+        """
+
+        # Passo 1: Translação do centro do objeto para a origem
+        translate_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-cx, dy=-cy, dz=-cz
+        )
+
+        # Passo 2: Escalonamento
+        scale_mtx = np.array(
+            [
+                [scale_x, 0, 0, 0],
+                [0, scale_y, 0, 0],
+                [0, 0, scale_z, 0],
+                [0, 0, 0, 1],
+            ]
+        )
+
+        # Passo 3: Translação de volta para a posição original
+        translate_back = TransformationGenerator.get_translation_matrix(
+            dx=cx, dy=cy, dz=cz
+        )
+
+        return translate_to_origin @ scale_mtx @ translate_back
+
     @staticmethod
     def get_parallel_projection_matrix(
         window_center: np.ndarray,
@@ -253,13 +308,8 @@ class TransformationGenerator:
         window_vup_x, window_vup_y, _, _ = window_vup
 
         # Passo 1: Translação do centro da janela para a origem
-        translate_vrp_to_origin = np.array(
-            [
-                [1, 0, 0, 0],
-                [0, 1, 0, 0],
-                [0, 0, 1, 0],
-                [-window_cx, -window_cy, -window_cz, 1],
-            ]
+        translate_vrp_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-window_cx, dy=-window_cy, dz=-window_cz
         )
 
         # Passo 2: Rotacionar o mundo em torno de x e de u de forma a alinhar VPN com o eixo z

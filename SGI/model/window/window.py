@@ -19,9 +19,6 @@ class Window:
         viewport_height = viewport_bounds.y_lower_right - viewport_bounds.y_upper_left
         aspect_ratio = viewport_width / viewport_height
 
-        self.height = 20  # Valor default
-        self.width = self.height * aspect_ratio
-
         # O centro da Window foi escolhido como o VRP (View Reference Point) por conveniência
         self.window_center = np.array([0.0, 0.0, 0.0, 1.0])
 
@@ -32,11 +29,14 @@ class Window:
             [0.0, 0.0, 1.0, 1.0]
         )  # Window começa sobre o plano xy, olhando em direção a z positivo
 
+        height = 20  # Valor default
+        width = height * aspect_ratio
+
         self.window_bounds = WindowBounds(
-            x_lower_left=-self.width,
-            x_upper_right=self.width,
-            y_lower_left=-self.height,
-            y_upper_right=self.height,
+            x_lower_left=-width,
+            x_upper_right=width,
+            y_lower_left=-height,
+            y_upper_right=height,
             z_lower_left=0.0,
             z_upper_right=0.0,
         )
@@ -51,13 +51,26 @@ class Window:
 
         relative_change = zoom_level / self.zoom_level
         self.zoom_level = zoom_level
-
         scaling_factor = 1 / relative_change
 
-        self.window_bounds.x_min *= scaling_factor
-        self.window_bounds.x_max *= scaling_factor
-        self.window_bounds.y_min *= scaling_factor
-        self.window_bounds.y_max *= scaling_factor
+        cx, cy, cz, _ = self.window_center
+        scaling_matrix = TransformationGenerator.get_scaling_matrix(
+            scale_x=scaling_factor,
+            scale_y=scaling_factor,
+            scale_z=scaling_factor,
+            cx=cx,
+            cy=cy,
+            cz=cz,
+        )
+
+        self.window_center = self.window_center @ scaling_matrix
+
+        self.window_bounds.upper_right_point = (
+            self.window_bounds.upper_right_point @ scaling_matrix
+        )
+        self.window_bounds.lower_left_point = (
+            self.window_bounds.lower_left_point @ scaling_matrix
+        )
 
     def apply_pan(self, d_vertical, d_horizontal: float, d_depth: float) -> None:
         """
@@ -77,30 +90,12 @@ class Window:
         )
 
         self.window_center = self.window_center @ pan_mtx
-
-        min_point = np.array(
-            [
-                self.window_bounds.x_lower_left,
-                self.window_bounds.y_lower_left,
-                self.window_bounds.z_lower_left,
-                1.0,
-            ]
+        self.window_bounds.upper_right_point = (
+            self.window_bounds.upper_right_point @ pan_mtx
         )
-        min_point = min_point @ pan_mtx
-        self.window_bounds.x_min = min_point[0]
-        self.window_bounds.y_min = min_point[1]
-
-        max_point = np.array(
-            [
-                self.window_bounds.x_upper_right,
-                self.window_bounds.y_upper_right,
-                self.window_bounds.z_upper_right,
-                1.0,
-            ]
+        self.window_bounds.lower_left_point = (
+            self.window_bounds.lower_left_point @ pan_mtx
         )
-        max_point = max_point @ pan_mtx
-        self.window_bounds.x_max = max_point[0]
-        self.window_bounds.y_max = max_point[1]
 
     def apply_rotation(self, angle_degrees: float) -> None:
         """Aplica uma rotação na janela de visualização."""
@@ -116,3 +111,11 @@ class Window:
         )
 
         self.vup = rotation_matrix @ np.array([0.0, 1.0])
+
+    def get_width(self) -> float:
+        """Retorna a largura da janela de visualização."""
+        return self.window_bounds.x_upper_right - self.window_bounds.x_lower_left
+
+    def get_height(self) -> float:
+        """Retorna a altura da janela de visualização."""
+        return self.window_bounds.y_upper_right - self.window_bounds.y_lower_left

@@ -64,8 +64,7 @@ class Controller:
         @param new_zoom_value: Novo valor de zoom.
         """
 
-        # self.model.zoom(new_zoom_value)
-        print("TODO: handle_zoom")
+        self.model.zoom(new_zoom_value)
 
     def handle_pan(self, dx: float, dy: float) -> None:
         """
