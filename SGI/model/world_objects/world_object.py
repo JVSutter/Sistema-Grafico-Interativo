@@ -90,10 +90,12 @@ class WorldObject(ABC):
 
         x_sum = sum(point[0] for point in self.world_points)
         y_sum = sum(point[1] for point in self.world_points)
+        z_sum = sum(point[2] for point in self.world_points)
         x_center = x_sum / len(self.world_points)
         y_center = y_sum / len(self.world_points)
+        z_center = z_sum / len(self.world_points)
 
-        return x_center, y_center
+        return x_center, y_center, z_center
 
     def get_obj_description(self, last_index: int) -> tuple[str, int]:
         """

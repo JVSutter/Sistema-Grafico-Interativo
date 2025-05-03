@@ -90,7 +90,7 @@ class Controller:
         @param transformations_list: Lista de transformações a serem aplicadas.
         """
 
-        # self.model.handle_transformations(index, transformations_list)
+        self.model.handle_transformations(index, transformations_list)
 
     def handle_window_rotation(self, angle: float) -> None:
         """

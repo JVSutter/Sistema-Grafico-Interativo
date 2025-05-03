@@ -136,16 +136,16 @@ class Model:
         for transformation in transformations_list:
             if transformation["type"] == "scaling":
                 self.view.add_log(
-                    f"Scaling object by factors {transformation['sx']}, {transformation['sy']}"
+                    f"Scaling object by factors {transformation['sx']}, {transformation['sy']}, {transformation['sz']}"
                 )
             elif transformation["type"] == "translation":
                 self.view.add_log(
-                    f"Translating object by ({transformation['dx']}, {transformation['dy']})"
+                    f"Translating object by ({transformation['dx']}, {transformation['dy']}, {transformation['dz']})"
                 )
-            elif transformation["type"] == "rotation":
-                self.view.add_log(
-                    f"Rotating object by {transformation['angle']} degrees"
-                )
+            # elif transformation["type"] == "rotation":
+            #     self.view.add_log(
+            #         f"Rotating object by {transformation['angle']} degrees"
+            #     )
 
         obj_name = self.display_file_manager.get_obj_name(index)
         self.view.add_log(f"{obj_name}: transformations applied.")
