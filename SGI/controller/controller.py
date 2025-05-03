@@ -38,10 +38,8 @@ class Controller:
         @param edges_input: Lista de arestas que compõem o objeto
         """
 
-        print(edges_input)
-
         if object_type == "Point" or object_type == "Wireframe":
-            print(f"Adicionando objeto {name_input} do tipo {object_type}")
+            print(f"Adicionando objeto de nome {name_input} e do tipo {object_type}")
             self.model.add_object(
                 points=points_input,
                 name=name_input,
