@@ -42,7 +42,7 @@ class Model:
 
     @update_interface
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
+        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str, edges: list
     ) -> None:
         """
         Adiciona um objeto gráfico ao mundo.
@@ -51,6 +51,7 @@ class Model:
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
         @param object_type: Tipo de objeto.
+        @param edges: Lista de arestas que compõem o objeto.
         """
 
         obj_types = {
@@ -69,6 +70,7 @@ class Model:
             color=color,
             is_filled=is_filled,
             object_type=object_type_cls,
+            edges=edges,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")

@@ -26,6 +26,7 @@ class Controller:
         color_input: tuple,
         is_filled: bool,
         object_type: str,
+        edges_input: list,
     ) -> None:
         """
         Constrói um novo objeto no mundo.
@@ -34,6 +35,7 @@ class Controller:
         @param color_input: Cor do objeto
         @param is_filled: Se o objeto é preenchido ou não
         @param object_type: Tipo de objeto
+        @param edges_input: Lista de arestas que compõem o objeto
         """
 
         if object_type == "Point":
@@ -44,6 +46,7 @@ class Controller:
                 color=color_input,
                 is_filled=is_filled,
                 object_type=object_type,
+                edges=edges_input,
             )
             return
 
