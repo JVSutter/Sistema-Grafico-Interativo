@@ -58,8 +58,7 @@ class Controller:
         @param index: Índice do objeto a ser removido.
         """
 
-        # self.model.remove_object(index=index)
-        print("TODO: handle_remove_object")
+        self.model.remove_object(index=index)
 
     def handle_zoom(self, new_zoom_value: float) -> None:
         """
