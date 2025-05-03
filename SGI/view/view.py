@@ -105,10 +105,10 @@ class View(QtWidgets.QMainWindow):
     def on_create_object(self, dialog: ObjectDialog) -> None:
         """Trata requisições de criação de objetos usando uma caixa de diálogo."""
 
-        points, name, color, is_filled, object_type = dialog.create_object()
+        points, name, color, is_filled, object_type, edges = dialog.create_object()
         if points is not None:
             self.controller.handle_create_object(
-                points, name, color, is_filled, object_type
+                points, name, color, is_filled, object_type, edges
             )
 
     def on_remove_object(self) -> None:

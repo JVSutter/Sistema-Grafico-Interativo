@@ -24,6 +24,7 @@ class WorldObjectFactory:
         display_file: list,
         is_filled: bool,
         object_type: type,
+        edges: list,
     ):
         """
         Cria um novo objeto do mundo a partir de uma lista de pontos.
@@ -43,6 +44,7 @@ class WorldObjectFactory:
 
         if object_type == WorldWireframe:
             kwargs["is_filled"] = is_filled
+            kwargs["edges"] = edges
 
         if not name:
             obj_type_name = object_type.__name__.replace("World", "")

@@ -7,7 +7,13 @@ class WorldWireframe(WorldObject):
     """Classe pertinente a Wireframes no mundo."""
 
     def __init__(
-        self, points: list, name: str, color: tuple, viewport_bounds, is_filled: bool
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        viewport_bounds,
+        is_filled: bool,
+        edges: list,
     ):
         super().__init__(points, name, color, viewport_bounds)
         self.is_filled = is_filled
@@ -16,6 +22,8 @@ class WorldWireframe(WorldObject):
             self.obj_type = "f"
         else:
             self.obj_type = "l"
+
+        self.edges = edges
 
     def get_clipped_representation(self) -> list:
         clipped_points = ClippingAlgorithms.sutherland_hodgman_clipping(
