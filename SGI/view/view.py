@@ -54,6 +54,12 @@ class View(QtWidgets.QMainWindow):
         self.navDownButton.clicked.connect(lambda: self.on_pan(direction="down"))
         self.navLeftButton.clicked.connect(lambda: self.on_pan(direction="left"))
         self.navRightButton.clicked.connect(lambda: self.on_pan(direction="right"))
+        
+        # Botoes de navegacao 3D
+        self.backwardButton.clicked.connect(lambda: self.on_pan_3d(direction="backward"))
+        self.forwardButton.clicked.connect(lambda: self.on_pan_3d(direction="forward"))
+        self.verticalRotationSlider.valueChanged.connect(lambda: self.on_vertical_rotation())
+        self.horizontalRotationSlider.valueChanged.connect(lambda: self.on_horizontal_rotation())
 
         # Botões de importação e exportação de arquivos
         self.importButton.clicked.connect(self.import_obj_file)
@@ -216,6 +222,24 @@ class View(QtWidgets.QMainWindow):
         }[direction]
 
         self.controller.handle_pan(dx, dy)
+        
+    def on_pan_3d(self, direction: str) -> None:
+        """Trata as requisições de pan 3D."""
+
+        print(f"TODO: Pan 3D - {direction}")
+        pass
+        
+    def on_vertical_rotation(self) -> None:
+        """Trata as requisições de rotação vertical."""
+
+        print("TODO: Vertical rotation")
+        pass
+
+    def on_horizontal_rotation(self) -> None:
+        """Trata as requisições de rotação horizontal."""
+
+        print("TODO: Horizontal rotation")
+        pass
 
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""

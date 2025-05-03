@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>912</width>
-    <height>777</height>
+    <height>939</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>912</width>
-    <height>777</height>
+    <height>939</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>912</width>
-    <height>777</height>
+    <height>939</height>
    </size>
   </property>
   <property name="palette">
@@ -692,10 +692,10 @@
   <widget class="QGroupBox" name="Navigation">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>340</y>
+     <x>18</x>
+     <y>344</y>
      <width>371</width>
-     <height>331</height>
+     <height>479</height>
     </rect>
    </property>
    <property name="cursor">
@@ -867,7 +867,7 @@
      <rect>
       <x>190</x>
       <y>40</y>
-      <width>151</width>
+      <width>123</width>
       <height>71</height>
      </rect>
     </property>
@@ -1008,7 +1008,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>240</y>
+      <y>236</y>
       <width>321</width>
       <height>71</height>
      </rect>
@@ -1061,14 +1061,215 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>18</x>
+      <y>316</y>
+      <width>333</width>
+      <height>148</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>3D View Manipulation</string>
+    </property>
+    <widget class="QSlider" name="verticalRotationSlider">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>22</width>
+       <height>112</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>360</number>
+     </property>
+     <property name="value">
+      <number>180</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TickPosition::TicksAbove</enum>
+     </property>
+     <property name="tickInterval">
+      <number>180</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="imageForward">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>38</y>
+       <width>43</width>
+       <height>43</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>../assets/forward.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QLabel" name="imageBackward">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>90</y>
+       <width>42</width>
+       <height>42</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>../assets/back.png</pixmap>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalRotationSlider">
+     <property name="geometry">
+      <rect>
+       <x>81</x>
+       <y>84</y>
+       <width>160</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>360</number>
+     </property>
+     <property name="value">
+      <number>180</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TickPosition::TicksAbove</enum>
+     </property>
+     <property name="tickInterval">
+      <number>180</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>104</x>
+       <y>116</y>
+       <width>119</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Horizontal Rotation</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>48</x>
+       <y>35</y>
+       <width>119</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vertical Rotation</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="forwardButton">
+     <property name="geometry">
+      <rect>
+       <x>271</x>
+       <y>38</y>
+       <width>40</width>
+       <height>43</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+      background: transparent;
+      border: none;
+  }
+  QPushButton:pressed {
+      background: transparent;
+  }
+  QPushButton:hover {
+      background: transparent;
+  }</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="backwardButton">
+     <property name="geometry">
+      <rect>
+       <x>271</x>
+       <y>91</y>
+       <width>40</width>
+       <height>43</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+      background: transparent;
+      border: none;
+  }
+  QPushButton:pressed {
+      background: transparent;
+  }
+  QPushButton:hover {
+      background: transparent;
+  }</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>542</y>
+     <y>657</y>
      <width>481</width>
-     <height>209</height>
+     <height>252</height>
     </rect>
    </property>
    <property name="title">
@@ -1191,7 +1392,7 @@
      <x>410</x>
      <y>10</y>
      <width>481</width>
-     <height>523</height>
+     <height>641</height>
     </rect>
    </property>
    <property name="title">
@@ -1217,7 +1418,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>680</y>
+     <y>838</y>
      <width>371</width>
      <height>69</height>
     </rect>

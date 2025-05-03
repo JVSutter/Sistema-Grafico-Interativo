@@ -618,6 +618,11 @@
       <height>32</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>.AppleSystemUIFont</family>
+     </font>
+    </property>
     <property name="text">
      <string>Add Orded Edges</string>
     </property>
