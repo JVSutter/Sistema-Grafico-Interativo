@@ -947,12 +947,12 @@ background-color: rgb(0, 0, 0);</string>
     </size>
    </property>
    <property name="title">
-    <string>Add in Bulk</string>
+    <string>Add in Batch</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
-   <widget class="QPushButton" name="bulkPointsButton">
+   <widget class="QPushButton" name="batchPointsButton">
     <property name="geometry">
      <rect>
       <x>352</x>
@@ -965,7 +965,7 @@ background-color: rgb(0, 0, 0);</string>
      <string>Add Points</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="bulkPointsInput">
+   <widget class="QLineEdit" name="batchPointsInput">
     <property name="geometry">
      <rect>
       <x>39</x>
@@ -983,7 +983,7 @@ background-color: rgb(0, 0, 0);</string>
      <string/>
     </property>
     <property name="placeholderText">
-     <string>Format: (x1,y1),(x2,y2),...</string>
+     <string>Format: (x1,y1,z1),(x2,y2,z2),...</string>
     </property>
    </widget>
   </widget>

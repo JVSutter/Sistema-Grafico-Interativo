@@ -22,7 +22,7 @@ class ObjectDialog(QtWidgets.QDialog):
         self.newPointButton.clicked.connect(self.add_point)
         self.removeButton.clicked.connect(self.remove_selected_point)
         self.colorButton.clicked.connect(self.choose_color)
-        self.bulkPointsButton.clicked.connect(self.handle_add_bulk_points)
+        self.batchPointsButton.clicked.connect(self.handle_add_points_in_batch)
         self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
 
         # Criando o grupo de botões de tipo de objeto
@@ -91,12 +91,12 @@ class ObjectDialog(QtWidgets.QDialog):
         else:
             self.show_error_message("You must select a point to remove.")
 
-    def handle_add_bulk_points(self):
+    def handle_add_points_in_batch(self):
         """Adiciona um conjunto de pontos à lista por meio de um input de texto"""
 
         try:
             # tratamento do texto inserido
-            text = self.bulkPointsInput.text()
+            text = self.batchPointsInput.text()
             text = re.sub(r"[^0-9.,() \-]", "", text)
             points = text.replace(",", " ").split()
 
@@ -120,12 +120,10 @@ class ObjectDialog(QtWidgets.QDialog):
             self.show_error_message("Invalid input. Please enter valid coordinates.")
             return
 
-        # Conferindo se há mais de 2 coordenadas
+        # Conferindo se o número de coordenadas difere de 3
         for point in new_points:
-            if len(point) > 2:
-                self.show_error_message(
-                    "Points with more than 2 coordinates are not supported yet."
-                )
+            if len(point) != 3:
+                self.show_error_message("Points must have 3 coordinates (x, y, z).")
                 return
 
         for point in new_points:
