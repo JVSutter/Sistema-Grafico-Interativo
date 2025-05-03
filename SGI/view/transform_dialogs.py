@@ -50,13 +50,14 @@ class TransformationDialog(QtWidgets.QDialog):
 
         dx = self.translationXInput.value()
         dy = self.translationYInput.value()
+        dz = self.translationZInput.value()
 
-        if dx == 0 and dy == 0:
+        if dx == dy == dz == 0:
             return
 
-        transformation = {"type": "translation", "dx": dx, "dy": dy}
+        transformation = {"type": "translation", "dx": dx, "dy": dy, "dz": dz}
         self.transformations.append(transformation)
-        self.transformationsList.addItem(f"Translate: ({dx:.2f}, {dy:.2f})")
+        self.transformationsList.addItem(f"Translate: ({dx:.2f}, {dy:.2f}, {dz:.2f})")
 
     def add_scaling(self):
         """Adiciona uma transformação de escalonamento à lista."""
@@ -64,29 +65,32 @@ class TransformationDialog(QtWidgets.QDialog):
         if self.scalingTab.currentIndex() == 0:  # Tab "Coordinates"
             sx = self.scalingXInput.value() / 100.0
             sy = self.scalingYInput.value() / 100.0
+            sz = self.scalingZInput.value() / 100.0
 
-            if sx == 1 and sy == 1:
+            if sx == sy == sz == 1:
                 return
 
-            label = f"Scale: (x: {sx*100:.1f}%, y: {sy*100:.1f}%)"
+            label = f"Scale: (x: {sx*100:.1f}%, y: {sy*100:.1f}, {sz*100:.1f}%)"
 
         else:  # Tab "Proportion"
             proportion = self.scalingProportionInput.value() / 100.0
             sx = proportion
             sy = proportion
+            sz = proportion
 
             if sx == 1:
                 return
 
             label = f"Scale: ({proportion*100:.1f}%)"
 
-        transformation = {"type": "scaling", "sx": sx, "sy": sy}
+        transformation = {"type": "scaling", "sx": sx, "sy": sy, "sz": sz}
         self.transformations.append(transformation)
         self.transformationsList.addItem(label)
 
         # reseta os inputs (evita adicionar a mesma transformação de novo)
         self.scalingXInput.setValue(100.0)
         self.scalingYInput.setValue(100.0)
+        self.scalingZInput.setValue(100.0)
         self.scalingProportionInput.setValue(100.0)
 
     def add_rotation(self):

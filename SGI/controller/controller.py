@@ -91,7 +91,6 @@ class Controller:
         """
 
         # self.model.handle_transformations(index, transformations_list)
-        print("TODO: handle_transformations")
 
     def handle_window_rotation(self, angle: float) -> None:
         """
