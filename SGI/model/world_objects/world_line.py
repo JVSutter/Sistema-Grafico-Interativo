@@ -23,13 +23,13 @@ class WorldLine(SCWorldObject):
         self.obj_type = "l"
 
     def get_clipped_representation(self) -> list:
-        p1 = self.normalized_points[0]
-        p2 = self.normalized_points[1]
+        p1 = self.projection_points[0]
+        p2 = self.projection_points[1]
         clipped_points = self.clipping_mode(p1, p2)
 
         if clipped_points is None:
             return []
 
-        viewport_points = self.transform_normalized_points_to_viewport(clipped_points)
+        viewport_points = self.transform_projection_points_to_viewport(clipped_points)
         graphical_representation = GraphicalLine(viewport_points, self.color)
         return [graphical_representation]
