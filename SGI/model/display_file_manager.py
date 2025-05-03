@@ -41,7 +41,13 @@ class DisplayFileManager:
         return self.display_file[index].name
 
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: type, edges: list
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        is_filled: bool,
+        object_type: type,
+        edges: list,
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.

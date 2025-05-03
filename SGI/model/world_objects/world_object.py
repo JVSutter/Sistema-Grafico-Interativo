@@ -32,7 +32,9 @@ class WorldObject(ABC):
         self.color = color
         self.dirty = True  # Booleano para indicar se o objeto precisa ser atualizado
 
-    def update_projection_points(self, projection_points: list[tuple[float, float]]) -> None:
+    def update_projection_points(
+        self, projection_points: list[tuple[float, float]]
+    ) -> None:
         """
         Atualiza as coordenadas projetadas do objeto e converte-as para as coordenadas do viewport.
         @param norm_points: Lista de pontos projetados em coordenadas normalizadas.

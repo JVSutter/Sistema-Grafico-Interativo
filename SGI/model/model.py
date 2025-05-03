@@ -42,7 +42,13 @@ class Model:
 
     @update_interface
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str, edges: list
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        is_filled: bool,
+        object_type: str,
+        edges: list,
     ) -> None:
         """
         Adiciona um objeto gráfico ao mundo.
