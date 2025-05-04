@@ -26,14 +26,16 @@ class TransformationDialog(QtWidgets.QDialog):
 
         self.removeTransformationBtn.clicked.connect(self.remove_transformation)
 
-        self.arbitraryBtn.toggled.connect(self.toggle_arbitrary_point_input)
+        self.arbitraryAxisBtn.toggled.connect(self.toggle_arbitrary_point_input)
+        self.axisBtn.toggled.connect(lambda: self.axisCombo.setEnabled(self.axisBtn.isChecked()))
 
     def toggle_arbitrary_point_input(self, checked):
         """Habilita/desabilita os inputs de ponto arbitrário para rotação."""
 
         self.rotationXInput.setEnabled(checked)
         self.rotationYInput.setEnabled(checked)
-
+        self.rotationZInput.setEnabled(checked)
+        
     def get_transformations(self) -> list[dict] | None:
         """Exibe o diálogo e retorna a lista de transformações ou None se cancelado."""
 
@@ -101,22 +103,22 @@ class TransformationDialog(QtWidgets.QDialog):
         if angle == 0:
             return
 
-        # origem
-        cx, cy = 0, 0
-        point_label = "origin"
+        x, y, z = 0, 0, 0
+        axis = None
 
-        if self.objCenterBtn.isChecked():  # centro do objeto
-            cx, cy = "obj_center", "obj_center"
-            point_label = "object center"
+        if self.axisBtn.isChecked(): # eixo X, Y ou Z
+            axis = self.axisCombo.currentText()
+        
+        elif self.arbitraryAxisBtn.isChecked():  # eixo arbitrario (a partir da origem)
+            x = self.rotationXInput.value()
+            y = self.rotationYInput.value()
+            z = self.rotationZInput.value()
+            axis = "arbitrary"
 
-        elif self.arbitraryBtn.isChecked():  # ponto arbitrario
-            cx = self.rotationXInput.value()
-            cy = self.rotationYInput.value()
-            point_label = f"({cx:.2f}, {cy:.2f})"
 
-        transformation = {"type": "rotation", "angle": angle, "cx": cx, "cy": cy}
+        transformation = {"type": "rotation", "angle": angle, "x": x, "y": y, "z": z, "axis": axis}
         self.transformations.append(transformation)
-        self.transformationsList.addItem(f"Rotate: {angle:.2f}° about {point_label}")
+        self.transformationsList.addItem(f"Rotate: {angle:.2f}° about {axis} axis")
 
         # reseta o angulo
         self.angleInput.setValue(0.0)

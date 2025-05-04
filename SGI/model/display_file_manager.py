@@ -118,7 +118,7 @@ class DisplayFileManager:
 
         obj = self.display_file[index]
         obj_center = obj.get_center()
-        transformation_mtx = TransformationGenerator.get_transformation_matrix(
+        transformation_mtx = TransformationGenerator.get_composite_transformation_matrix(
             transformations_list=transformations_list, obj_center=obj_center
         )
 

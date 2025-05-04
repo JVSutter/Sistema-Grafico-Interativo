@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
-    <height>507</height>
+    <width>745</width>
+    <height>546</height>
    </rect>
   </property>
   <property name="palette">
@@ -530,8 +530,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>440</y>
+     <x>286</x>
+     <y>471</y>
      <width>161</width>
      <height>32</height>
     </rect>
@@ -549,7 +549,7 @@
      <x>70</x>
      <y>50</y>
      <width>331</width>
-     <height>351</height>
+     <height>383</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -916,127 +916,163 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>50</y>
-       <width>211</width>
-       <height>161</height>
+       <x>31</x>
+       <y>60</y>
+       <width>266</width>
+       <height>152</height>
       </rect>
      </property>
      <property name="title">
       <string/>
      </property>
-     <widget class="QRadioButton" name="originBtn">
+     <widget class="QRadioButton" name="arbitraryAxisBtn">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>20</y>
-        <width>99</width>
-        <height>20</height>
+        <y>60</y>
+        <width>209</width>
+        <height>33</height>
        </rect>
       </property>
       <property name="text">
-       <string>...the origin</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="objCenterBtn">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>50</y>
-        <width>161</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...the object's center</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="arbitraryBtn">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>90</y>
-        <width>151</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...an arbitrary point:</string>
+       <string>...an arbitrary axis passing 
+through the origin:</string>
       </property>
       <property name="checked">
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QWidget" name="layoutWidget_4">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>120</y>
-        <width>117</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Y</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="rotationYInput">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <double>-1000.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>1000.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget_3">
+     <widget class="QRadioButton" name="axisBtn">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>120</y>
-        <width>117</width>
-        <height>33</height>
+        <y>24</y>
+        <width>161</width>
+        <height>20</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <property name="text">
+       <string>....a canonical axis</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="axisCombo">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>20</y>
+        <width>72</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>X</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Y</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Z</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>110</y>
+        <width>238</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>X</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>X</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationXInput">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="rotationXInput">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <double>-1000.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>1000.000000000000000</double>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Y</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationYInput">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Z</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationZInput">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -1060,8 +1096,8 @@
     <widget class="QPushButton" name="addRotationBtn">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>270</y>
+       <x>53</x>
+       <y>290</y>
        <width>211</width>
        <height>32</height>
       </rect>
@@ -1077,7 +1113,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>230</y>
+       <y>240</y>
        <width>56</width>
        <height>21</height>
       </rect>
@@ -1093,7 +1129,7 @@
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>230</y>
+       <y>240</y>
        <width>141</width>
        <height>24</height>
       </rect>
