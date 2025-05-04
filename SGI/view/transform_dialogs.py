@@ -117,6 +117,9 @@ class TransformationDialog(QtWidgets.QDialog):
             z = self.rotationZInput.value()
             axis = "arbitrary"
 
+        else:
+            return
+
         transformation = {
             "type": "rotation",
             "angle": angle,

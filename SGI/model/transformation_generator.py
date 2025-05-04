@@ -60,18 +60,17 @@ class TransformationGenerator:
                 z = transformation["z"]
                 axis = transformation["axis"]
 
-                if axis == "x":
+                if axis == "X":
                     matrix = TransformationGenerator.get_x_axis_rotation_matrix(angle)
-                elif axis == "y":
+                elif axis == "Y":
                     matrix = TransformationGenerator.get_y_axis_rotation_matrix(angle)
-                elif axis == "z":
+                elif axis == "Z":
                     matrix = TransformationGenerator.get_z_axis_rotation_matrix(angle)
                 elif axis == "arbitrary":
                     matrix = TransformationGenerator.get_arbitrary_rotation_matrix(
                         angle, x, y, z
                     )
                 else:
-                    print(transformations_list)
                     raise ValueError(f"Eixo de rotação inválido: {axis}")
 
             composite_matrix = composite_matrix @ matrix
