@@ -115,15 +115,17 @@ class Model:
             d_depth=d_depth,
         )
         self.display_file_manager.set_all_objects_as_dirty()
-        
+
     @update_interface
-    def rotate_window(self, angle: float, axis: str) -> None:
+    def rotate_window(self, angle: float, rotation_type: str) -> None:
         """
         Rotaciona a janela de visualização para o ângulo especificado em graus.
         @param angle: Ângulo de rotação em graus.
-        @param axis: Eixo de rotação.
+        @param rotation_type: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         """
-        self.window.apply_rotation(angle, axis)
+
+        print(f"Rotating window by {angle} degrees. Type: {rotation_type}")
+        self.window.apply_rotation(angle, rotation_type)
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface

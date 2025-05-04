@@ -27,9 +27,7 @@ class Window:
         # O eixo y indica a direção "cima", e o eixo "x" aponta para a esquerda
         self.vup = np.array([0.0, 1.0, 0.0, 1.0])
         self.vright = np.array([-1.0, 0.0, 0.0, 1.0])
-        self.view_plane_normal = np.array(
-            [0.0, 0.0, 1.0, 1.0]
-        )
+        self.view_plane_normal = np.array([0.0, 0.0, 1.0, 1.0])
 
         height = 20  # Valor default
         width = height * aspect_ratio
@@ -44,9 +42,9 @@ class Window:
         )
 
         self.zoom_level = 1.0
-        self.angle_x = 0.0
-        self.angle_y = 0.0
-        self.angle_z = 0.0
+        self.angle_horizontal = 0.0
+        self.angle_vertical = 0.0
+        self.angle_spin = 0.0
 
     def apply_zoom(self, zoom_level: float) -> None:
         """Aplica um zoom na janela de visualização baseado no nível de zoom."""
@@ -102,33 +100,87 @@ class Window:
         )
 
     def apply_rotation(self, angle_degrees: float, axis: str) -> None:
-        """Aplica uma rotação na janela de visualização.
+        """
+        Aplica uma rotação na janela de visualização. O algoritmo funciona da seguinte forma:
+        1 - A rotação será ou em torno do eixo horizontal, vertical ou em torno de si mesma (eixo que perfura a window).
+        Logo, a direção do eixo será a mesma do vetor vup, do vright ou do vpn, dependendo do tipo de rotação.
+        Portanto, precisamos "copiar" o vetor correspondente e fazer a cópia passar pelo centro da janela. Isto requer
+        uma translação.
+        2 - Quando o eixo estiver na posição certa, aplicamos a rotação em torno dele.
+        3 - Por fim, atualizamos os bounds e também os vetores de direção (pois dois deles vão mudar de direção).
         @param angle_degrees: Ângulo final da rotação
         @param axis: Eixo de rotação
         """
-        
-        # Salva o angulo atual para calcular a diferença
-        if axis == "X":
-            angle_delta = angle_degrees - self.angle_x
-            self.angle_x = angle_degrees
-        elif axis == "Y":
-            angle_delta = angle_degrees - self.angle_y
-            self.angle_y = angle_degrees
-        elif axis == "Z":
-            angle_delta = angle_degrees - self.angle_z
-            self.angle_z = angle_degrees
-        else:
+
+        print(f"window center before: {self.window_center}")
+
+        axis_vector = {
+            "horizontal": self.vup,
+            "vertical": self.vright,
+            "spin": self.view_plane_normal,
+        }.get(axis)
+
+        if axis_vector is None:
             return
-   
-        # Pega a matriz de rotação em torno do eixo escolhido
-        rotation_matrix = TransformationGenerator.get_rotation_matrix(angle_delta, axis)
 
-        # Rotaciona a posição do centro da janela em torno da origem do mundo
-        self.window_center = self.window_center @ rotation_matrix
+        angle_attr = f"angle_{axis}"
+        angle_delta = angle_degrees - getattr(self, angle_attr)
+        setattr(self, angle_attr, angle_degrees)
 
-        self.vup = self.vup @ rotation_matrix
-        self.vright = self.vright @ rotation_matrix
-        self.view_plane_normal = self.view_plane_normal @ rotation_matrix
+        p1 = self.window_center[::]
+        p2 = [
+            self.window_center[0] + axis_vector[0],
+            self.window_center[1] + axis_vector[1],
+            self.window_center[2] + axis_vector[2],
+            1.0,
+        ]
+
+        print(f"p1: {p1}, p2: {p2}")
+
+        rotation_matrix = TransformationGenerator.get_arbitrary_rotation_matrix(
+            angle_degrees=angle_delta,
+            p1=p1,
+            p2=p2,
+        )
+
+        self.window_bounds.lower_left_point = (
+            self.window_bounds.lower_left_point @ rotation_matrix
+        )
+        self.window_bounds.upper_right_point = (
+            self.window_bounds.upper_right_point @ rotation_matrix
+        )
+
+        # Os vetores de direção também precisam ser rotacionados, mas não ao redor do eixo
+        # que foi escolhido para a rotação. Eles devem ser rotacionados em torno do eixo
+        # de direção de referência.
+        direction_vectors_rotation_axis = [
+            (0, 0, 0, 1),
+            (axis_vector[0], axis_vector[1], axis_vector[2], 1),
+        ]
+        direction_vectors_rotation_matrix = (
+            TransformationGenerator.get_arbitrary_rotation_matrix(
+                angle_degrees=angle_delta,
+                p1=direction_vectors_rotation_axis[0],
+                p2=direction_vectors_rotation_axis[1],
+            )
+        )
+
+        if not np.array_equal(self.vup, axis_vector):
+            self.vup = self.vup @ direction_vectors_rotation_matrix
+
+        if not np.array_equal(self.vright, axis_vector):
+            self.vright = self.vright @ direction_vectors_rotation_matrix
+
+        if not np.array_equal(self.view_plane_normal, axis_vector):
+            self.view_plane_normal = (
+                self.view_plane_normal @ direction_vectors_rotation_matrix
+            )
+
+        print("view_plane_normal:", self.view_plane_normal)
+        print("vup:", self.vup)
+        print("vright:", self.vright)
+        print("window_bounds:", self.window_bounds)
+        print("window_center:", self.window_center)
 
     def get_width(self) -> float:
         """Retorna a largura da janela de visualização."""

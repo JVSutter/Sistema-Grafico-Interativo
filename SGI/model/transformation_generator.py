@@ -137,66 +137,86 @@ class TransformationGenerator:
 
     @staticmethod
     def get_arbitrary_rotation_matrix(
-        angle_degrees: float, x: float, y: float, z: float
+        angle_degrees: float,
+        p1: tuple[float, float, float],
+        p2: tuple[float, float, float],
     ) -> np.ndarray:
         """
         Obtém a matriz de rotação em torno de um eixo arbitrário que passa pela origem e pelo ponto (x, y, z).
         @param angle_degrees: Ângulo de rotação em graus.
-        @param x: Coordenada x do ponto que define o eixo de rotação.
-        @param y: Coordenada y do ponto que define o eixo de rotação.
-        @param z: Coordenada z do ponto que define o eixo de rotação.
+        @param p1: Ponto 1 (x, y, z) que define o eixo de rotação.
+        @param p2: Ponto 2 (x, y, z) que define o eixo de rotação. Forma uma reta com p1.
         @return: Matriz de rotação em torno do eixo arbitrário.
         """
-        # Normaliza o vetor diretor do eixo
-        magnitude = np.sqrt(x**2 + y**2 + z**2)
-        if magnitude == 0:
-            return np.identity(4)
 
-        x, y, z = x / magnitude, y / magnitude, z / magnitude
+        x1, y1, z1, _ = p1
+        x2, y2, z2, _ = p2
 
-        # Passo 1. Foi pulado pois o eixo já passa pela origem por definição
+        # Passo 1. Translação do sistema objeto/eixo de forma que um ponto do eixo fique sobre a origem
+        translate_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-x1, dy=-y1, dz=-z1
+        )
 
-        # Passo 2. Rotação Rx em torno do eixo x por θx de forma a trazer o eixo A sobre o plano xy
+        print(f"translate_to_origin: {translate_to_origin}")
+
+        # Passo 2. Rotação Rx em torno do eixo x por θx de forma a trazer o eixo sobre o plano xy
         # Calcula o ângulo entre o eixo arbitrário projetado no plano xz e o plano xy
-        theta_x = np.arctan2(z, np.sqrt(x**2 + y**2))
+        theta_x = np.arctan2(z2 - z1, y2 - y1)
 
-        Rx = TransformationGenerator.get_x_axis_rotation_matrix(-np.degrees(theta_x))
+        rotate_x = TransformationGenerator.get_x_axis_rotation_matrix(
+            -np.degrees(theta_x)
+        )
 
-        # Passo 3. Rotação Rz em torno do eixo z por θz de forma a alinhar o eixo A com o eixo y
+        print(f"rotate_x: {rotate_x}")
+
+        # Passo 3. Rotação Rz em torno do eixo z por θz de forma a alinhar o eixo com o eixo y
         # Calcula o ângulo entre a projeção do eixo no plano xy e o eixo y
-        theta_z = np.arctan2(x, y)
-        Rz = TransformationGenerator.get_z_axis_rotation_matrix(-np.degrees(theta_z))
+        theta_z = np.arctan2(x2 - x1, y2 - y1)
+        rotate_z = TransformationGenerator.get_z_axis_rotation_matrix(
+            -np.degrees(theta_z)
+        )
+
+        print(f"rotate_z: {rotate_z}")
 
         # Passo 4. Rotação Ry em torno do eixo y pelo ângulo dado pelo usuário
-        Ry = TransformationGenerator.get_y_axis_rotation_matrix(angle_degrees)
+        rotate_y = TransformationGenerator.get_y_axis_rotation_matrix(angle_degrees)
+
+        print(f"rotate_y: {rotate_y}")
 
         # Passo 5. Desfaz a rotação do passo 3
-        Rz_inv = TransformationGenerator.get_z_axis_rotation_matrix(np.degrees(theta_z))
+        revert_z_rotation = TransformationGenerator.get_z_axis_rotation_matrix(
+            np.degrees(theta_z)
+        )
+
+        print(f"revert_z_rotation: {revert_z_rotation}")
 
         # Passo 6. Desfaz a rotação do passo 2
-        Rx_inv = TransformationGenerator.get_x_axis_rotation_matrix(np.degrees(theta_x))
+        revert_x_rotation = TransformationGenerator.get_x_axis_rotation_matrix(
+            np.degrees(theta_x)
+        )
+
+        print(f"revert_x_rotation: {revert_x_rotation}")
+
+        # Passo 7. Translação de volta para a posição original
+        translate_back = TransformationGenerator.get_translation_matrix(
+            dx=x1, dy=y1, dz=z1
+        )
+
+        print(f"translate_back: {translate_back}")
 
         # Composição das transformações
-        return Rx @ Rz @ Ry @ Rz_inv @ Rx_inv
-    
-    @staticmethod
-    def get_rotation_matrix(angle: float, axis: str) -> np.ndarray:
-        """
-        Obtém a matriz de rotação.
-        @param angle: Ângulo de rotação em graus.
-        @param axis: Eixo de rotação.
-        @return: Matriz de rotação.
-        """
-        
-        if axis == "X":
-            return TransformationGenerator.get_x_axis_rotation_matrix(angle)
-        elif axis == "Y":
-            return TransformationGenerator.get_y_axis_rotation_matrix(angle)
-        elif axis == "Z":
-            return TransformationGenerator.get_z_axis_rotation_matrix(angle)
-        else:
-            raise ValueError(f"Eixo de rotação inválido: {axis}")
-        
+        transformation = (
+            translate_to_origin
+            @ rotate_x
+            @ rotate_z
+            @ rotate_y
+            @ revert_z_rotation
+            @ revert_x_rotation
+            @ translate_back
+        )
+
+        return transformation
+
     @staticmethod
     def get_pan_matrix(
         d_vertical: float,

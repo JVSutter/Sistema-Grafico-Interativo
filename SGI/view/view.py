@@ -212,7 +212,7 @@ class View(QtWidgets.QMainWindow):
             return
 
         self.windowRotationLabel.setText(f"{self.window_rotation}º")
-        self.controller.handle_window_rotation(self.window_rotation)
+        self.controller.handle_spin_rotation(self.window_rotation)
 
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
@@ -238,9 +238,11 @@ class View(QtWidgets.QMainWindow):
     def on_horizontal_rotation(self) -> None:
         """Trata as requisições de rotação horizontal."""
 
-        self.controller.handle_horizontal_rotation(self.horizontalRotationSlider.value())
+        self.controller.handle_horizontal_rotation(
+            self.horizontalRotationSlider.value()
+        )
         print(f"Horizontal rotation: {self.horizontalRotationSlider.value()}")
-        
+
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""
 
