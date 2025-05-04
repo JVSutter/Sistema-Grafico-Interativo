@@ -115,6 +115,16 @@ class Model:
             d_depth=d_depth,
         )
         self.display_file_manager.set_all_objects_as_dirty()
+        
+    @update_interface
+    def rotate_window(self, angle: float, axis: str) -> None:
+        """
+        Rotaciona a janela de visualização para o ângulo especificado em graus.
+        @param angle: Ângulo de rotação em graus.
+        @param axis: Eixo de rotação.
+        """
+        self.window.apply_rotation(angle, axis)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def handle_transformations(
@@ -197,15 +207,6 @@ class Model:
             f.write(obj_str)
 
         self.view.add_log(f"Objects successfully exported to {filepath}")
-
-    @update_interface
-    def rotate_window(self, angle: float) -> None:
-        """
-        Rotaciona a janela de visualização para o ângulo especificado em graus.
-        @param angle: Ângulo de rotação em graus.
-        """
-        self.window.apply_rotation(angle)
-        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def change_clipping_mode(self, mode: str) -> None:

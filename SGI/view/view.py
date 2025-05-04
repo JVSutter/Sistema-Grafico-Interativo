@@ -197,8 +197,8 @@ class View(QtWidgets.QMainWindow):
 
         rotation_step = 10
         window_rotation = self.windowRotationSlider.value()
-        min_rotation = 0
-        max_rotation = 360
+        min_rotation = -180
+        max_rotation = 180
 
         if mode == "slider":
             self.window_rotation = window_rotation
@@ -232,15 +232,15 @@ class View(QtWidgets.QMainWindow):
     def on_vertical_rotation(self) -> None:
         """Trata as requisições de rotação vertical."""
 
-        print("TODO: Vertical rotation")
-        pass
+        self.controller.handle_vertical_rotation(self.verticalRotationSlider.value())
+        print(f"Vertical rotation: {self.verticalRotationSlider.value()}")
 
     def on_horizontal_rotation(self) -> None:
         """Trata as requisições de rotação horizontal."""
 
-        print("TODO: Horizontal rotation")
-        pass
-
+        self.controller.handle_horizontal_rotation(self.horizontalRotationSlider.value())
+        print(f"Horizontal rotation: {self.horizontalRotationSlider.value()}")
+        
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""
 

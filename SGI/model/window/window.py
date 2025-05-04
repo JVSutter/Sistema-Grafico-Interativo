@@ -44,7 +44,9 @@ class Window:
         )
 
         self.zoom_level = 1.0
-        self.angle = 0.0
+        self.angle_x = 0.0
+        self.angle_y = 0.0
+        self.angle_z = 0.0
 
     def apply_zoom(self, zoom_level: float) -> None:
         """Aplica um zoom na janela de visualização baseado no nível de zoom."""
@@ -99,20 +101,34 @@ class Window:
             self.window_bounds.lower_left_point @ pan_mtx
         )
 
-    def apply_rotation(self, angle_degrees: float) -> None:
-        """Aplica uma rotação na janela de visualização."""
+    def apply_rotation(self, angle_degrees: float, axis: str) -> None:
+        """Aplica uma rotação na janela de visualização.
+        @param angle_degrees: Ângulo final da rotação
+        @param axis: Eixo de rotação
+        """
+        
+        # Salva o angulo atual para calcular a diferença
+        if axis == "X":
+            angle_delta = angle_degrees - self.angle_x
+            self.angle_x = angle_degrees
+        elif axis == "Y":
+            angle_delta = angle_degrees - self.angle_y
+            self.angle_y = angle_degrees
+        elif axis == "Z":
+            angle_delta = angle_degrees - self.angle_z
+            self.angle_z = angle_degrees
+        else:
+            return
+   
+        # Pega a matriz de rotação em torno do eixo escolhido
+        rotation_matrix = TransformationGenerator.get_rotation_matrix(angle_delta, axis)
 
-        self.angle = np.radians(angle_degrees)
+        # Rotaciona a posição do centro da janela em torno da origem do mundo
+        self.window_center = self.window_center @ rotation_matrix
 
-        # Rotaciona o vup para o novo ângulo
-        rotation_matrix = np.array(
-            [
-                [np.cos(self.angle), -np.sin(self.angle)],
-                [np.sin(self.angle), np.cos(self.angle)],
-            ]
-        )
-
-        self.vup = rotation_matrix @ np.array([0.0, 1.0])
+        self.vup = self.vup @ rotation_matrix
+        self.vright = self.vright @ rotation_matrix
+        self.view_plane_normal = self.view_plane_normal @ rotation_matrix
 
     def get_width(self) -> float:
         """Retorna a largura da janela de visualização."""

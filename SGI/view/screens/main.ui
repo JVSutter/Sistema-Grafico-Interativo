@@ -1029,10 +1029,10 @@
       <item>
        <widget class="QSlider" name="windowRotationSlider">
         <property name="minimum">
-         <number>0</number>
+         <number>-180</number>
         </property>
         <property name="maximum">
-         <number>360</number>
+         <number>180</number>
         </property>
         <property name="singleStep">
          <number>1</number>
@@ -1040,14 +1040,17 @@
         <property name="pageStep">
          <number>1</number>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="tickPosition">
-         <enum>QSlider::TickPosition::NoTicks</enum>
+         <enum>QSlider::TickPosition::TicksAbove</enum>
         </property>
         <property name="tickInterval">
-         <number>0</number>
+         <number>180</number>
         </property>
        </widget>
       </item>
@@ -1082,11 +1085,14 @@
        <height>112</height>
       </rect>
      </property>
+     <property name="minimum">
+      <number>-180</number>
+     </property>
      <property name="maximum">
-      <number>360</number>
+      <number>180</number>
      </property>
      <property name="value">
-      <number>180</number>
+      <number>0</number>
      </property>
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -1139,11 +1145,14 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="minimum">
+      <number>-180</number>
+     </property>
      <property name="maximum">
-      <number>360</number>
+      <number>180</number>
      </property>
      <property name="value">
-      <number>180</number>
+      <number>0</number>
      </property>
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>

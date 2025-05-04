@@ -178,7 +178,25 @@ class TransformationGenerator:
 
         # Composição das transformações
         return Rx @ Rz @ Ry @ Rz_inv @ Rx_inv
-
+    
+    @staticmethod
+    def get_rotation_matrix(angle: float, axis: str) -> np.ndarray:
+        """
+        Obtém a matriz de rotação.
+        @param angle: Ângulo de rotação em graus.
+        @param axis: Eixo de rotação.
+        @return: Matriz de rotação.
+        """
+        
+        if axis == "X":
+            return TransformationGenerator.get_x_axis_rotation_matrix(angle)
+        elif axis == "Y":
+            return TransformationGenerator.get_y_axis_rotation_matrix(angle)
+        elif axis == "Z":
+            return TransformationGenerator.get_z_axis_rotation_matrix(angle)
+        else:
+            raise ValueError(f"Eixo de rotação inválido: {axis}")
+        
     @staticmethod
     def get_pan_matrix(
         d_vertical: float,
