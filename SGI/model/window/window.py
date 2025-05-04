@@ -23,18 +23,20 @@ class Window:
         self.window_center = np.array([0.0, 0.0, 0.0, 1.0])
 
         # Vetores da window: um apontando pra cima, um apontando pra direita e um apontando pra frente
+        # Window começa sobre o plano xy, olhando em direção a z positivo
+        # O eixo y indica a direção "cima", e o eixo "x" aponta para a esquerda
         self.vup = np.array([0.0, 1.0, 0.0, 1.0])
-        self.vright = np.array([1.0, 0.0, 0.0, 1.0])
+        self.vright = np.array([-1.0, 0.0, 0.0, 1.0])
         self.view_plane_normal = np.array(
             [0.0, 0.0, 1.0, 1.0]
-        )  # Window começa sobre o plano xy, olhando em direção a z positivo
+        )
 
         height = 20  # Valor default
         width = height * aspect_ratio
 
         self.window_bounds = WindowBounds(
-            x_lower_left=-width,
-            x_upper_right=width,
+            x_lower_left=width,
+            x_upper_right=-width,
             y_lower_left=-height,
             y_upper_right=height,
             z_lower_left=0.0,

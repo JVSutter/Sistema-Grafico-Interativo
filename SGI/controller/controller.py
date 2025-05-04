@@ -130,8 +130,7 @@ class Controller:
     def handle_add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
 
-        # self.model.add_test_objects()
-        print("TODO: handle_add_test_objects")
+        self.model.add_test_objects()
 
     def handle_remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""

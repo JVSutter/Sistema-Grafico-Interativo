@@ -5,7 +5,7 @@ class TransformationGenerator:
     """
     Classe responsável por gerar matrizes de transformação.
     """
-        
+
     @staticmethod
     def get_composite_transformation_matrix(
         transformations_list: list[dict], obj_center: tuple[float, float, float]
@@ -60,15 +60,18 @@ class TransformationGenerator:
                 z = transformation["z"]
                 axis = transformation["axis"]
 
-                if axis == "X":
+                if axis == "x":
                     matrix = TransformationGenerator.get_x_axis_rotation_matrix(angle)
-                elif axis == "Y":
+                elif axis == "y":
                     matrix = TransformationGenerator.get_y_axis_rotation_matrix(angle)
-                elif axis == "Z":
+                elif axis == "z":
                     matrix = TransformationGenerator.get_z_axis_rotation_matrix(angle)
                 elif axis == "arbitrary":
-                    matrix = TransformationGenerator.get_arbitrary_rotation_matrix(angle, x, y, z)
+                    matrix = TransformationGenerator.get_arbitrary_rotation_matrix(
+                        angle, x, y, z
+                    )
                 else:
+                    print(transformations_list)
                     raise ValueError(f"Eixo de rotação inválido: {axis}")
 
             composite_matrix = composite_matrix @ matrix
@@ -132,9 +135,11 @@ class TransformationGenerator:
                 [0, 0, 0, 1],
             ]
         )
-        
+
     @staticmethod
-    def get_arbitrary_rotation_matrix(angle_degrees: float, x: float, y: float, z: float) -> np.ndarray:
+    def get_arbitrary_rotation_matrix(
+        angle_degrees: float, x: float, y: float, z: float
+    ) -> np.ndarray:
         """
         Obtém a matriz de rotação em torno de um eixo arbitrário que passa pela origem e pelo ponto (x, y, z).
         @param angle_degrees: Ângulo de rotação em graus.
@@ -147,31 +152,31 @@ class TransformationGenerator:
         magnitude = np.sqrt(x**2 + y**2 + z**2)
         if magnitude == 0:
             return np.identity(4)
-        
-        x, y, z = x/magnitude, y/magnitude, z/magnitude
-        
+
+        x, y, z = x / magnitude, y / magnitude, z / magnitude
+
         # Passo 1. Foi pulado pois o eixo já passa pela origem por definição
-        
+
         # Passo 2. Rotação Rx em torno do eixo x por θx de forma a trazer o eixo A sobre o plano xy
         # Calcula o ângulo entre o eixo arbitrário projetado no plano xz e o plano xy
         theta_x = np.arctan2(z, np.sqrt(x**2 + y**2))
-        
+
         Rx = TransformationGenerator.get_x_axis_rotation_matrix(-np.degrees(theta_x))
-        
+
         # Passo 3. Rotação Rz em torno do eixo z por θz de forma a alinhar o eixo A com o eixo y
         # Calcula o ângulo entre a projeção do eixo no plano xy e o eixo y
         theta_z = np.arctan2(x, y)
         Rz = TransformationGenerator.get_z_axis_rotation_matrix(-np.degrees(theta_z))
-        
+
         # Passo 4. Rotação Ry em torno do eixo y pelo ângulo dado pelo usuário
         Ry = TransformationGenerator.get_y_axis_rotation_matrix(angle_degrees)
-        
+
         # Passo 5. Desfaz a rotação do passo 3
         Rz_inv = TransformationGenerator.get_z_axis_rotation_matrix(np.degrees(theta_z))
-        
+
         # Passo 6. Desfaz a rotação do passo 2
         Rx_inv = TransformationGenerator.get_x_axis_rotation_matrix(np.degrees(theta_x))
-        
+
         # Composição das transformações
         return Rx @ Rz @ Ry @ Rz_inv @ Rx_inv
 
