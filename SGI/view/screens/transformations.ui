@@ -553,7 +553,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="translation">
     <attribute name="title">
@@ -916,9 +916,9 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>31</x>
+       <x>26</x>
        <y>60</y>
-       <width>266</width>
+       <width>281</width>
        <height>152</height>
       </rect>
      </property>
@@ -930,8 +930,8 @@
        <rect>
         <x>30</x>
         <y>60</y>
-        <width>209</width>
-        <height>33</height>
+        <width>221</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -961,7 +961,7 @@ through the origin:</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>190</x>
         <y>20</y>
         <width>72</width>
         <height>32</height>
@@ -983,13 +983,13 @@ through the origin:</string>
        </property>
       </item>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>15</x>
         <y>110</y>
-        <width>238</width>
-        <height>25</height>
+        <width>251</width>
+        <height>37</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_12">
