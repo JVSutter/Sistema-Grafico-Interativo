@@ -553,7 +553,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="translation">
     <attribute name="title">
@@ -917,9 +917,9 @@
      <property name="geometry">
       <rect>
        <x>26</x>
-       <y>60</y>
+       <y>57</y>
        <width>281</width>
-       <height>152</height>
+       <height>191</height>
       </rect>
      </property>
      <property name="title">
@@ -936,7 +936,7 @@
       </property>
       <property name="text">
        <string>...an arbitrary axis passing 
-through the origin:</string>
+through the points:</string>
       </property>
       <property name="checked">
        <bool>false</bool>
@@ -986,9 +986,9 @@ through the origin:</string>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>15</x>
-        <y>110</y>
-        <width>251</width>
+        <x>18</x>
+        <y>107</y>
+        <width>243</width>
         <height>37</height>
        </rect>
       </property>
@@ -1076,6 +1076,99 @@ through the origin:</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="layoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>147</y>
+        <width>244</width>
+        <height>37</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_13">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>X</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationXInput2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_15">
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Y</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationYInput2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_16">
+         <item>
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Z</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="rotationZInput2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <double>-1000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QLabel" name="title_3">
      <property name="geometry">
@@ -1097,7 +1190,7 @@ through the origin:</string>
      <property name="geometry">
       <rect>
        <x>53</x>
-       <y>290</y>
+       <y>310</y>
        <width>211</width>
        <height>32</height>
       </rect>
@@ -1113,7 +1206,7 @@ through the origin:</string>
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>240</y>
+       <y>270</y>
        <width>56</width>
        <height>21</height>
       </rect>
@@ -1129,7 +1222,7 @@ through the origin:</string>
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>240</y>
+       <y>270</y>
        <width>141</width>
        <height>24</height>
       </rect>

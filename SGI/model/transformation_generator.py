@@ -55,9 +55,14 @@ class TransformationGenerator:
 
             elif transformation_type == "rotation":
                 angle = transformation["angle"]
-                x = transformation["x"]
-                y = transformation["y"]
-                z = transformation["z"]
+                x1 = transformation["x1"]
+                y1 = transformation["y1"]
+                z1 = transformation["z1"]
+                print(f"x1, y1, z1: {x1}, {y1}, {z1}")
+                x2 = transformation["x2"]
+                y2 = transformation["y2"]
+                z2 = transformation["z2"]
+                print(f"x2, y2, z2: {x2}, {y2}, {z2}")
                 axis = transformation["axis"]
 
                 if axis == "X":
@@ -68,7 +73,7 @@ class TransformationGenerator:
                     matrix = TransformationGenerator.get_z_axis_rotation_matrix(angle)
                 elif axis == "arbitrary":
                     matrix = TransformationGenerator.get_arbitrary_rotation_matrix(
-                        angle, x, y, z
+                        angle, (x1, y1, z1), (x2, y2, z2)
                     )
                 else:
                     raise ValueError(f"Eixo de rotação inválido: {axis}")
@@ -149,8 +154,13 @@ class TransformationGenerator:
         @return: Matriz de rotação em torno do eixo arbitrário.
         """
 
-        x1, y1, z1, _ = p1
-        x2, y2, z2, _ = p2
+        x1 = p1[0]
+        y1 = p1[1]
+        z1 = p1[2]
+        
+        x2 = p2[0]
+        y2 = p2[1]
+        z2 = p2[2]
 
         # Passo 1. Translação do sistema objeto/eixo de forma que um ponto do eixo fique sobre a origem
         translate_to_origin = TransformationGenerator.get_translation_matrix(

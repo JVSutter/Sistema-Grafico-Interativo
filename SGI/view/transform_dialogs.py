@@ -37,6 +37,9 @@ class TransformationDialog(QtWidgets.QDialog):
         self.rotationXInput.setEnabled(checked)
         self.rotationYInput.setEnabled(checked)
         self.rotationZInput.setEnabled(checked)
+        self.rotationXInput2.setEnabled(checked)
+        self.rotationYInput2.setEnabled(checked)
+        self.rotationZInput2.setEnabled(checked)
 
     def get_transformations(self) -> list[dict] | None:
         """Exibe o diálogo e retorna a lista de transformações ou None se cancelado."""
@@ -105,16 +108,22 @@ class TransformationDialog(QtWidgets.QDialog):
         if angle == 0:
             return
 
-        x, y, z = 0, 0, 0
+        x1, y1, z1 = 0, 0, 0
+        x2, y2, z2 = 0, 0, 0
         axis = None
 
         if self.axisBtn.isChecked():  # eixo X, Y ou Z
             axis = self.axisCombo.currentText()
 
         elif self.arbitraryAxisBtn.isChecked():  # eixo arbitrario (a partir da origem)
-            x = self.rotationXInput.value()
-            y = self.rotationYInput.value()
-            z = self.rotationZInput.value()
+            x1 = self.rotationXInput.value()
+            y1 = self.rotationYInput.value()
+            z1 = self.rotationZInput.value()
+            
+            x2 = self.rotationXInput2.value()
+            y2 = self.rotationYInput2.value()
+            z2 = self.rotationZInput2.value()
+            
             axis = "arbitrary"
 
         else:
@@ -123,13 +132,18 @@ class TransformationDialog(QtWidgets.QDialog):
         transformation = {
             "type": "rotation",
             "angle": angle,
-            "x": x,
-            "y": y,
-            "z": z,
+            "x1": x1,
+            "y1": y1,
+            "z1": z1,
+            "x2": x2,
+            "y2": y2,
+            "z2": z2,
             "axis": axis,
         }
         self.transformations.append(transformation)
         self.transformationsList.addItem(f"Rotate: {angle:.2f}° about {axis} axis")
+
+        print(f"Adicionou rotação: {x1}, {y1}, {z1}, {x2}, {y2}, {z2}")
 
         # reseta o angulo
         self.angleInput.setValue(0.0)
