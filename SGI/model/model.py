@@ -223,6 +223,9 @@ class Model:
         """Adiciona objetos de teste ao mundo."""
 
         self.display_file_manager.add_test_objects()
+        
+        # Aplica uma rotação no primeiro objeto
+        # self.handle_transformations(0, [{"type": "rotation", "angle": 180, "x1": 10, "y1": -10, "z1": 40, "x2": -10, "y2": 10, "z2": 60, "axis": "arbitrary"}])
 
     @update_interface
     def remove_test_objects(self) -> None:

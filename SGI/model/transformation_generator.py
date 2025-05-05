@@ -96,8 +96,8 @@ class TransformationGenerator:
         return np.array(
             [
                 [1, 0, 0, 0],
-                [0, cos_r, -sin_r, 0],
-                [0, sin_r, cos_r, 0],
+                [0, cos_r, sin_r, 0],
+                [0, -sin_r, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -114,9 +114,9 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, 0, sin_r, 0],
+                [cos_r, 0, -sin_r, 0],
                 [0, 1, 0, 0],
-                [-sin_r, 0, cos_r, 0],
+                [sin_r, 0, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -133,8 +133,8 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, -sin_r, 0, 0],
-                [sin_r, cos_r, 0, 0],
+                [cos_r, sin_r, 0, 0],
+                [-sin_r, cos_r, 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1],
             ]
@@ -181,9 +181,11 @@ class TransformationGenerator:
 
         # Passo 3. Rotação Rz em torno do eixo z por θz de forma a alinhar o eixo com o eixo y
         # Calcula o ângulo entre a projeção do eixo no plano xy e o eixo y
-        theta_z = np.arctan2(x2 - x1, y2 - y1)
+        axis_vector = np.array([x2 - x1, y2 - y1, z2 - z1, 0])
+        axis_after_rx = axis_vector @ rotate_x
+        theta_z = np.arctan2(axis_after_rx[0], axis_after_rx[1])
         rotate_z = TransformationGenerator.get_z_axis_rotation_matrix(
-            -np.degrees(theta_z)
+            np.degrees(theta_z)
         )
 
         print(f"rotate_z: {rotate_z}")
@@ -195,7 +197,7 @@ class TransformationGenerator:
 
         # Passo 5. Desfaz a rotação do passo 3
         revert_z_rotation = TransformationGenerator.get_z_axis_rotation_matrix(
-            np.degrees(theta_z)
+            -np.degrees(theta_z)
         )
 
         print(f"revert_z_rotation: {revert_z_rotation}")
