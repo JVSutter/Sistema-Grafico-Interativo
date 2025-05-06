@@ -96,8 +96,8 @@ class TransformationGenerator:
         return np.array(
             [
                 [1, 0, 0, 0],
-                [0, cos_r, sin_r, 0],
-                [0, -sin_r, cos_r, 0],
+                [0, cos_r, -sin_r, 0],
+                [0, sin_r, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -114,9 +114,9 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, 0, -sin_r, 0],
+                [cos_r, 0, sin_r, 0],
                 [0, 1, 0, 0],
-                [sin_r, 0, cos_r, 0],
+                [-sin_r, 0, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -133,8 +133,8 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, sin_r, 0, 0],
-                [-sin_r, cos_r, 0, 0],
+                [cos_r, -sin_r, 0, 0],
+                [sin_r, cos_r, 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1],
             ]
@@ -228,6 +228,33 @@ class TransformationGenerator:
         )
 
         return transformation
+
+    @staticmethod
+    def get_rotation_around_axis_through_origin(axis_vector: np.ndarray, angle_degrees: float) -> np.ndarray:
+        """
+        Obtém a matriz de rotação em torno de um eixo arbitrário que passa pela origem.
+        Usa a fórmula de Rodrigues.
+        @param axis_vector: Vetor (numpy array 3D) normalizado representando o eixo de rotação.
+        @param angle_degrees: Ângulo de rotação em graus.
+        @return: Matriz de rotação 4x4.
+        """
+        angle_radians = np.radians(angle_degrees)
+        ux, uy, uz = axis_vector[:3] # Extrai componentes x, y, z, ignora componente homogênea se houver
+        cos_a = np.cos(angle_radians)
+        sin_a = np.sin(angle_radians)
+        one_minus_cos_a = 1 - cos_a
+
+        # Matriz de rotação 3x3 pela fórmula de Rodrigues
+        rot_3x3 = np.array([
+            [cos_a + ux**2 * one_minus_cos_a, ux*uy*one_minus_cos_a - uz*sin_a, ux*uz*one_minus_cos_a + uy*sin_a],
+            [uy*ux*one_minus_cos_a + uz*sin_a, cos_a + uy**2 * one_minus_cos_a, uy*uz*one_minus_cos_a - ux*sin_a],
+            [uz*ux*one_minus_cos_a - uy*sin_a, uz*uy*one_minus_cos_a + ux*sin_a, cos_a + uz**2 * one_minus_cos_a]
+        ])
+
+        # Incorpora na matriz 4x4 homogênea
+        rot_4x4 = np.identity(4)
+        rot_4x4[:3, :3] = rot_3x3
+        return rot_4x4
 
     @staticmethod
     def get_pan_matrix(
@@ -347,66 +374,48 @@ class TransformationGenerator:
         window_vup: np.ndarray,
         window_width: float,
         window_height: float,
-    ):
+    ) -> np.ndarray:
         """
-        Retorna a matriz de projeção paralela.
-        @param window_center: Centro da janela, que será usado como view reference point (VRP).
-        @param view_plane_normal: Vetor normal ao plano de visão.
-        @param window_vup: Vetor Vup da janela (indicando a direção "para cima").
-        @param window_width: Largura da janela.
-        @param window_height: Altura da janela.
-        @return: Matriz de projeção paralela.
+        Retorna a matriz de projeção paralela ortogonal seguindo o algoritmo padrão,
+        usando o sistema UVN para respeitar o spin (roll) da câmera.
         """
-
-        window_cx, window_cy, window_cz, _ = window_center
-        vpn_x, vpn_y, vpn_z, _ = view_plane_normal
-        window_vup_x, window_vup_y, _, _ = window_vup
-
-        # Passo 1: Translação do centro da janela para a origem
-        translate_vrp_to_origin = TransformationGenerator.get_translation_matrix(
-            dx=-window_cx, dy=-window_cy, dz=-window_cz
+        # Passo 1: Translade VRP para a origem
+        cx, cy, cz, _ = window_center
+        T = TransformationGenerator.get_translation_matrix(
+            dx=-cx, dy=-cy, dz=-cz
         )
 
-        # Passo 2: Rotacionar o mundo em torno de x e de u de forma a alinhar VPN com o eixo z
-        angle_vpn_xz = np.degrees(
-            np.arctan2(vpn_z, vpn_x) - np.pi / 2
-        )  # Ângulo que falta para colocar VPN no plano zy
-        rotate_y = TransformationGenerator.get_y_axis_rotation_matrix(angle_vpn_xz)
+        # Passo 2: Determine UVN
+        # Normalize VPN e VUP, e calcule eixos U e V
+        vpn = view_plane_normal[:3]
+        vpn = vpn / np.linalg.norm(vpn)
+        vup_vec = window_vup[:3]
+        vup_vec = vup_vec / np.linalg.norm(vup_vec)
+        u = np.cross(vup_vec, vpn)
+        u = u / np.linalg.norm(u)
+        v = np.cross(vpn, u)
 
-        angle_vpn_yz = np.degrees(
-            np.arctan2(vpn_z, vpn_y) - np.pi / 2
-        )  # Ângulo que falta para alinhar VPN com o eixo z
-        rotate_x = TransformationGenerator.get_x_axis_rotation_matrix(angle_vpn_yz)
+        # Passo 3: Rotacione o mundo para alinhar UVN com XYZ
+        R = np.identity(4)
+        R[:3, 0] = u
+        R[:3, 1] = v
+        R[:3, 2] = vpn
 
-        # Passo 3: Ignorar a coordenada z
-        ignore_z = np.array(
-            [
-                [1, 0, 0, 0],
-                [0, 1, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 1],
-            ]
+        # Passo 4: Ignore todas as coordenadas Z dos objetos
+        P = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 0, 0],  
+            [0, 0, 0, 1],
+        ])
+
+        # Passo 5: Normalize o resto (coordenadas de window)
+        S = TransformationGenerator.get_scaling_matrix(
+            cx=0, cy=0, cz=0,
+            scale_x=2.0 / window_width,
+            scale_y=2.0 / window_height,
+            scale_z=1.0,
         )
 
-        # Passo 4: Rotacionar o mundo para alinhar Vup com o eixo y
-        angle_vup_y = np.degrees(np.arctan2(window_vup_y, window_vup_x) - np.pi / 2)
-        align_vup_with_y = TransformationGenerator.get_z_axis_rotation_matrix(
-            angle_vup_y
-        )
-
-        # Passo 5: Normalizar as coordenadas, realizando um escalonamento
-        scale_x = 2.0 / window_width
-        scale_y = 2.0 / window_height
-        scale_to_ncs = TransformationGenerator.get_scaling_matrix(
-            cx=0, cy=0, cz=0, scale_x=scale_x, scale_y=scale_y, scale_z=1
-        )
-
-        transformation = (
-            translate_vrp_to_origin
-            @ rotate_y
-            @ rotate_x
-            @ ignore_z
-            @ align_vup_with_y
-            @ scale_to_ncs
-        )
-        return transformation
+        # Composição final das transformações: T -> R -> P -> S
+        return T @ R @ P @ S

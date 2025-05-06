@@ -17,21 +17,21 @@ class WorldCurve(SCWorldObject, ABC):
             "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
         }
 
-    def update_normalized_points(self, norm_points: list[tuple[float, float]]):
+    def update_projection_points(self, projection_points: list[tuple[float, float]]):
         """
         Atualiza as coordenadas normalizadas (NCS) dos pontos de controle do objeto
         e recalcula os pontos da curva para o viewport.
         @param norm_points: Lista de pontos de controle normalizados.
         """
 
-        self.normalized_points = norm_points
-        self.curve_points = self._generate_normalized_curve_points()
-        self.viewport_points = self.transform_normalized_points_to_viewport(
+        self.projection_points = projection_points
+        self.curve_points = self._generate_projection_curve_points()
+        self.viewport_points = self.transform_projection_points_to_viewport(
             self.curve_points
         )
 
     @abstractmethod
-    def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
+    def _generate_projection_curve_points(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva usando a forma matricial em coordenadas normalizadas.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.
@@ -51,7 +51,7 @@ class WorldCurve(SCWorldObject, ABC):
         representations = []
 
         for part in clipped_parts:
-            viewport_points = self.transform_normalized_points_to_viewport(part)
+            viewport_points = self.transform_projection_points_to_viewport(part)
 
             representations.append(
                 GraphicalCurve(

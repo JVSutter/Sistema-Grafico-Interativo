@@ -1029,13 +1029,13 @@
       <item>
        <widget class="QSlider" name="windowRotationSlider">
         <property name="minimum">
-         <number>-180</number>
+         <number>-10</number>
         </property>
         <property name="maximum">
-         <number>180</number>
+         <number>10</number>
         </property>
         <property name="singleStep">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="pageStep">
          <number>1</number>
@@ -1086,10 +1086,10 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>-180</number>
+      <number>-10</number>
      </property>
      <property name="maximum">
-      <number>180</number>
+      <number>10</number>
      </property>
      <property name="value">
       <number>0</number>
@@ -1146,10 +1146,10 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>-180</number>
+      <number>-10</number>
      </property>
      <property name="maximum">
-      <number>180</number>
+      <number>10</number>
      </property>
      <property name="value">
       <number>0</number>

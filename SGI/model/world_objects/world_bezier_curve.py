@@ -10,7 +10,7 @@ class WorldBezierCurve(WorldCurve):
         super().__init__(points, name, color, viewport_bounds)
         self.obj_type = "bezier"
 
-    def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
+    def _generate_projection_curve_points(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva de Bézier usando a forma matricial em coordenadas normalizadas.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.
@@ -19,7 +19,7 @@ class WorldBezierCurve(WorldCurve):
         num_steps = 100
 
         # Faz o tratamento de pontos de controle para C(1)
-        pts = list(self.normalized_points)
+        pts = list(self.projection_points)
         for j in range(3, len(pts) - 3, 3):
             P2 = np.array(pts[j - 1])
             P3 = np.array(pts[j])

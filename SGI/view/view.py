@@ -22,6 +22,7 @@ class View(QtWidgets.QMainWindow):
         self.controller = controller
 
         self.connect_buttons()
+        self.setup_rotation_timers()
         self.setup_viewport()
         self.show()
 
@@ -46,8 +47,11 @@ class View(QtWidgets.QMainWindow):
 
         # Botão de rotação da janela
         self.windowRotationSlider.valueChanged.connect(
-            lambda: self.on_window_rotation(mode="slider")
+            lambda: self.on_window_rotation()
         )
+        # Sticky slider para rotação da janela
+        self.windowRotationSlider.sliderPressed.connect(self.start_window_rotation)
+        self.windowRotationSlider.sliderReleased.connect(self.stop_window_rotation)
 
         # Botões de navegação
         self.navUpButton.clicked.connect(lambda: self.on_pan(direction="up"))
@@ -64,6 +68,11 @@ class View(QtWidgets.QMainWindow):
         self.horizontalRotationSlider.valueChanged.connect(
             lambda: self.on_horizontal_rotation()
         )
+        # Sticky sliders para rotação vertical e horizontal
+        self.verticalRotationSlider.sliderPressed.connect(self.start_vertical_rotation)
+        self.verticalRotationSlider.sliderReleased.connect(self.stop_vertical_rotation)
+        self.horizontalRotationSlider.sliderPressed.connect(self.start_horizontal_rotation)
+        self.horizontalRotationSlider.sliderReleased.connect(self.stop_horizontal_rotation)
 
         # Botões de importação e exportação de arquivos
         self.importButton.clicked.connect(self.import_obj_file)
@@ -230,18 +239,17 @@ class View(QtWidgets.QMainWindow):
         self.controller.handle_pan(d_horizontal, d_vertical, d_depth)
 
     def on_vertical_rotation(self) -> None:
-        """Trata as requisições de rotação vertical."""
-
-        self.controller.handle_vertical_rotation(self.verticalRotationSlider.value())
-        print(f"Vertical rotation: {self.verticalRotationSlider.value()}")
+        """Trata as requisições de rotação vertical, chamadas pelo timer."""
+        angle_delta = self.verticalRotationSlider.value()
+        if angle_delta != 0: # Só rotaciona se o slider não estiver no centro (0)
+            self.controller.handle_vertical_rotation(angle_delta)
+            # O print foi removido pois seria muito verboso com o timer
 
     def on_horizontal_rotation(self) -> None:
-        """Trata as requisições de rotação horizontal."""
-
-        self.controller.handle_horizontal_rotation(
-            self.horizontalRotationSlider.value()
-        )
-        print(f"Horizontal rotation: {self.horizontalRotationSlider.value()}")
+        """Trata as requisições de rotação horizontal, chamadas pelo timer."""
+        angle_delta = self.horizontalRotationSlider.value()
+        if angle_delta != 0:
+            self.controller.handle_horizontal_rotation(angle_delta)
 
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""
@@ -333,3 +341,60 @@ class View(QtWidgets.QMainWindow):
             self.on_window_rotation(mode="right")
         else:
             super().keyPressEvent(event)
+
+    def setup_rotation_timers(self) -> None:
+        """Configura timers para rotação contínua enquanto o slider está pressionado."""
+        self.rotation_timer_interval = 50 # ms
+
+        # Cria timer para rotação vertical
+        self._vertical_timer = QtCore.QTimer(self)
+        self._vertical_timer.setInterval(self.rotation_timer_interval)
+        self._vertical_timer.timeout.connect(self.on_vertical_rotation)
+
+        # Cria timer para rotação horizontal
+        self._horizontal_timer = QtCore.QTimer(self)
+        self._horizontal_timer.setInterval(self.rotation_timer_interval)
+        self._horizontal_timer.timeout.connect(self.on_horizontal_rotation)
+
+        # Cria timer para rotação da janela (spin)
+        self._window_timer = QtCore.QTimer(self)
+        self._window_timer.setInterval(self.rotation_timer_interval)
+        self._window_timer.timeout.connect(self.on_window_rotation)
+
+    def start_vertical_rotation(self) -> None:
+        """Inicia a rotação vertical contínua."""
+        self._vertical_timer.start()
+
+    def stop_vertical_rotation(self) -> None:
+        """Para a rotação vertical e reseta o slider."""
+        self._vertical_timer.stop()
+        self.verticalRotationSlider.setValue(0)
+
+    def start_horizontal_rotation(self) -> None:
+        """Inicia a rotação horizontal contínua."""
+        self._horizontal_timer.start()
+
+    def stop_horizontal_rotation(self) -> None:
+        """Para a rotação horizontal e reseta o slider."""
+        self._horizontal_timer.stop()
+        self.horizontalRotationSlider.setValue(0)
+
+    def start_window_rotation(self) -> None:
+        """Inicia a rotação de spin contínua."""
+        self._window_timer.start()
+
+    def stop_window_rotation(self) -> None:
+        """Para a rotação de spin e reseta o slider."""
+        self._window_timer.stop()
+        # Chama uma última vez com o valor atual antes de resetar, caso tenha movido rápido
+        self.on_window_rotation()
+        self.windowRotationSlider.setValue(0)
+
+    def on_window_rotation(self) -> None:
+        """Trata as requisições de rotação da janela (spin), chamadas pelo timer."""
+        angle_delta = self.windowRotationSlider.value()
+        if angle_delta != 0:
+            self.controller.handle_spin_rotation(angle_delta)
+
+        # Remove a atualização do label, pois o slider volta a 0
+        # self.windowRotationLabel.setText(f"{angle_delta}º")

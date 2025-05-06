@@ -109,9 +109,7 @@ class WorldObject(ABC):
         obj_description += f"o {self.name}\n"
 
         for point in self.world_points:
-            obj_description += (
-                f"v {point[0]:.1f} {point[1]:.1f} 0.0\n"  # mudar quando implementar 3D
-            )
+            obj_description += f"v {point[0]:.1f} {point[1]:.1f} {point[2]:.1f}\n"
 
         obj_points = " ".join(
             str(i) for i in range(last_index, last_index + len(self.world_points))

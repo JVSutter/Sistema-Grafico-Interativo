@@ -64,15 +64,6 @@ class ObjectDialog(QtWidgets.QDialog):
             else:  # Se o diálogo de arestas foi cancelado, anula toda a criação
                 return None, None, None, None, None, None
 
-        # Ignora o eixo z para curvas, deixando-o como 0
-        elif object_type == "B-Spline" or object_type == "Bézier":
-            for i, point in enumerate(self.points):
-                self.points[i] = (point[0], point[1], 0)
-
-            self.show_error_message(
-                "Because you selected a Curve, the points will have Z = 0."
-            )
-
         # Retorna os dados (edges será None se não for Wireframe ou se cancelado)
         return self.points, self.name, self.color, is_filled, object_type, edges
 

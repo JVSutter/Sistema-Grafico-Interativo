@@ -47,7 +47,7 @@ class DisplayFileManager:
         color: tuple,
         is_filled: bool,
         object_type: type,
-        edges: list,
+        edges: list = [],
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.
@@ -204,97 +204,76 @@ class DisplayFileManager:
 
     def add_test_objects(self) -> None:
         """Adiciona objetos de teste ao display file com arte tangram e curvas artísticas."""
-        # Tangram-style triangles espalhados pelos quadrantes
-        # tangram_triangles = [
-        #     [(-4, 4), (4, 4), (0, 0)],
-        #     [(4, -4), (0, 0), (4, 4)],
-        #     [(-4, -4), (0, 0), (-4, 4)],
-        # ]
-        # colors = [
-        #     (255, 99, 71),  # tomate
-        #     (65, 105, 225),  # azul real
-        #     (238, 130, 238),  # violeta
-        #     (255, 215, 0),  # ouro
-        #     (0, 191, 255),  # azul turquesa
-        # ]
-        # for i, pts in enumerate(tangram_triangles):
-        #     self.add_object(
-        #         points=pts,
-        #         name=f"Test Triangle {i+1}",
-        #         color=colors[i],
-        #         is_filled=True if i % 2 == 0 else False,
-        #         object_type=WorldWireframe,
-        #     )
 
-        # # Linha diagonal decorativa
-        # self.add_object(
-        #     points=[(-8, 17), (12, 17)],
-        #     name="Test Line",
-        #     color=(70, 100, 255),
-        #     is_filled=False,
-        #     object_type=WorldLine,
-        # )
+        # Linha diagonal decorativa
+        self.add_object(
+            points=[(-8, 17, -15), (12, 17, 15)],
+            name="Test Line",
+            color=(70, 100, 255),
+            is_filled=False,
+            object_type=WorldLine,
+        )
 
-        # # Curva artística 1 - Bézier (13 pontos para 3n+1)
-        # curve1 = [
-        #     (-18, -10),
-        #     (-14, -4),
-        #     (-10, 2),
-        #     (-6, 8),
-        #     (-2, 12),
-        #     (4, 16),
-        #     (10, 12),
-        #     (14, 6),
-        #     (18, 2),
-        #     (14, -4),
-        #     (10, -8),
-        #     (4, -12),
-        #     (20, -16),
-        # ]
-        # self.add_object(
-        #     points=curve1,
-        #     name="Test Curve I",
-        #     color=(255, 20, 147),  # deep pink
-        #     is_filled=False,
-        #     object_type=WorldBezierCurve,
-        # )
+        # Curva artística 1 - Bézier (13 pontos para 3n+1)
+        curve1 = [
+            (-18, -10, 4),
+            (-14, -4, -10),
+            (-10, 2, 50),
+            (-6, 8, 1),
+            (-2, 12, 10),
+            (4, 16, 30),
+            (10, 12, 40),
+            (14, 6, 20),
+            (18, 2, 10),
+            (14, -4, 2),
+            (10, -8, -20),
+            (4, -12, 3),
+            (20, -16, 0),
+        ]
+        self.add_object(
+            points=curve1,
+            name="Test Curve I",
+            color=(255, 20, 147),  # deep pink
+            is_filled=False,
+            object_type=WorldBezierCurve,
+        )
 
-        # # Curva artística 2 - B-Spline
-        # curve2 = [
-        #     (-15, 20),
-        #     (-20, 15),
-        #     (-15, 45),
-        #     (-5, 0),
-        #     (10, 30),
-        #     (14, -5),
-        #     (0, -8),
-        #     (5, -9),
-        #     (0, -10),
-        #     (5, 20),
-        # ]
+        # Curva artística 2 - B-Spline
+        curve2 = [
+            (-15, 20, 10),
+            (-20, 15, 1),
+            (-15, 45, 4),
+            (-5, 0, 20),
+            (10, 30, 10),
+            (14, -5, 7),
+            (0, -8, 5),
+            (5, -9, 3),
+            (0, -10, 1),
+            (5, 20, 0),
+        ]
 
-        # self.add_object(
-        #     points=curve2,
-        #     name="Test Curve II",
-        #     color=(0, 206, 209),  # dark turquoise
-        #     is_filled=False,
-        #     object_type=WorldBSplineCurve,
-        # )
+        self.add_object(
+            points=curve2,
+            name="Test Curve II",
+            color=(0, 206, 209),  # dark turquoise
+            is_filled=False,
+            object_type=WorldBSplineCurve,
+        )
 
-        # # Pontos decorativos centrais
-        # decorative_points = [
-        #     ((0, 0), (255, 255, 255)),
-        #     ((10, 10), (128, 0, 128)),
-        #     ((-10, -10), (0, 128, 128)),
-        # ]
-        # for coord, col in decorative_points:
-        #     self.add_object(
-        #         points=[coord],
-        #         name=f"Test Point {coord}",
-        #         color=col,
-        #         is_filled=False,
-        #         object_type=WorldPoint,
-        #     )
+        # Pontos decorativos centrais
+        decorative_points = [
+            ((0, 0, 4), (255, 255, 255)),
+            ((10, 10, 10), (128, 0, 128)),
+            ((-10, -10, -20), (0, 128, 128)),
+        ]
+        for coord, col in decorative_points:
+            self.add_object(
+                points=[coord],
+                name=f"Test Point {coord}",
+                color=col,
+                is_filled=False,
+                object_type=WorldPoint,
+            )
 
         # Cubo
         cube_points = [
@@ -326,9 +305,37 @@ class DisplayFileManager:
             points=cube_points,
             name="Test Cube",
             color=(255, 0, 0),
-            is_filled=False,
+            is_filled=True,
             object_type=WorldWireframe,
             edges=cube_edges,
+        )
+        
+        
+        # Adiciona eixo X (vermelho) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (5, 0, 0)],
+            name="Test Axis X",
+            color=(255, 0, 0),
+            is_filled=False,
+            object_type=WorldLine,
+        )
+        
+        # Adiciona eixo Y (verde) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (0, 5, 0)],
+            name="Test Axis Y",
+            color=(0, 255, 0),
+            is_filled=False,
+            object_type=WorldLine,
+        )
+        
+        # Adiciona eixo Z (azul) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (0, 0, 5)],
+            name="Test Axis Z",
+            color=(0, 0, 255),
+            is_filled=False,
+            object_type=WorldLine,
         )
 
     def remove_test_objects(self) -> None:

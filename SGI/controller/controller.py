@@ -38,19 +38,14 @@ class Controller:
         @param edges_input: Lista de arestas que compõem o objeto
         """
 
-        if object_type in ("Point", "Wireframe", "Line"):
-            print(f"Adicionando objeto de nome {name_input} e do tipo {object_type}")
-            self.model.add_object(
-                points=points_input,
-                name=name_input,
-                color=color_input,
-                is_filled=is_filled,
-                object_type=object_type,
-                edges=edges_input,
-            )
-            return
-
-        print("Só ponto por enquanto")
+        self.model.add_object(
+            points=points_input,
+            name=name_input,
+            color=color_input,
+            is_filled=is_filled,
+            object_type=object_type,
+            edges=edges_input,
+        )
 
     def handle_remove_object(self, index: int) -> None:
         """
@@ -123,8 +118,7 @@ class Controller:
         @param mode: Modo de clipping.
         """
 
-        # self.model.change_clipping_mode(mode)
-        print("TODO: handle_clipping_change")
+        self.model.change_clipping_mode(mode)
 
     def handle_add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
@@ -134,8 +128,7 @@ class Controller:
     def handle_remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
 
-        # self.model.remove_test_objects()
-        print("TODO: handle_remove_test_objects")
+        self.model.remove_test_objects()
 
     def handle_vertical_rotation(self, angle: float) -> None:
         """Processa uma rotação vertical da janela de visualização."""
