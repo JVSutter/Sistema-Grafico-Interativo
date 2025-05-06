@@ -10,6 +10,7 @@ from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.viewport.viewport_bounds import ViewportBounds
+from model.world_objects.sc_world_object import SCWorldObject
 
 
 class DisplayFileManager:
@@ -199,7 +200,7 @@ class DisplayFileManager:
         """
 
         for obj in self.display_file:
-            if isinstance(obj, WorldLine):
+            if isinstance(obj, SCWorldObject):
                 obj.change_clipping_mode(mode)
 
     def add_test_objects(self) -> None:

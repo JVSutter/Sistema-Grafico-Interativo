@@ -8,15 +8,6 @@ from view.graphical_objects.graphical_curve import GraphicalCurve
 class WorldCurve(SCWorldObject, ABC):
     """Classe pertinente a curvas no mundo."""
 
-    def __init__(self, points, name, color, viewport_bounds):
-        super().__init__(points, name, color, viewport_bounds)
-
-        self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
-        self.clipping_modes = {
-            "cohen_sutherland": ClippingAlgorithms.cohen_sutherland_clipping,
-            "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
-        }
-
     def update_projection_points(self, projection_points: list[tuple[float, float]]):
         """
         Atualiza as coordenadas normalizadas (NCS) dos pontos de controle do objeto

@@ -15,11 +15,6 @@ class WorldLine(SCWorldObject):
         viewport_bounds: ViewportBounds,
     ):
         super().__init__(points, name, color, viewport_bounds)
-        self.clipping_modes = {
-            "cohen_sutherland": ClippingAlgorithms.cohen_sutherland_clipping,
-            "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
-        }
-        self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
         self.obj_type = "l"
 
     def get_clipped_representation(self) -> list:

@@ -123,8 +123,7 @@ class Model:
         @param angle: Ângulo de rotação em graus.
         @param rotation_type: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         """
-
-        print(f"Rotating window by {angle} degrees. Type: {rotation_type}")
+        
         self.window.apply_rotation(angle, rotation_type)
         self.display_file_manager.set_all_objects_as_dirty()
 

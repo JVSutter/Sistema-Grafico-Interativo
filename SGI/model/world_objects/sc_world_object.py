@@ -1,5 +1,6 @@
 from abc import ABC
 
+from model.clipping_algorithms import ClippingAlgorithms
 from model.world_objects.world_object import WorldObject
 
 
@@ -8,6 +9,15 @@ class SCWorldObject(WorldObject, ABC):
     SCWorldObject - Switchable Clipping World Object
     Classe para objetos cujo algoritmo de clipping pode ser alterado.
     """
+    
+    def __init__(self, points, name, color, viewport_bounds):
+        super().__init__(points, name, color, viewport_bounds)
+        
+        self.clipping_modes = {
+            "cohen_sutherland": ClippingAlgorithms.cohen_sutherland_clipping,
+            "liang_barsky": ClippingAlgorithms.liang_barsky_clipping,
+        }
+        self.clipping_mode = ClippingAlgorithms.cohen_sutherland_clipping
 
     def change_clipping_mode(self, mode: str) -> None:
         """

@@ -1,9 +1,8 @@
-from model.clipping_algorithms import ClippingAlgorithms
-from model.world_objects.world_object import WorldObject
 from view.graphical_objects.graphical_line import GraphicalLine
+from model.world_objects.sc_world_object import SCWorldObject
 
 
-class WorldWireframe(WorldObject):
+class WorldWireframe(SCWorldObject):
     """Classe pertinente a Wireframes no mundo."""
 
     def __init__(
@@ -28,7 +27,7 @@ class WorldWireframe(WorldObject):
         for index_1, index_2 in self.edges:
             p1 = self.projection_points[index_1]
             p2 = self.projection_points[index_2]
-            clipped_points = ClippingAlgorithms.cohen_sutherland_clipping(p1, p2)
+            clipped_points = self.clipping_mode(p1, p2)
 
             if clipped_points is not None:
                 viewport_points = self.transform_projection_points_to_viewport(
