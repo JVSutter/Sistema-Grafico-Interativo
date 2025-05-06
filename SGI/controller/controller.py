@@ -86,14 +86,6 @@ class Controller:
 
         self.model.handle_transformations(index, transformations_list)
 
-    def handle_spin_rotation(self, angle: float) -> None:
-        """
-        Processa uma rotação da janela de visualização.
-        @param angle: Ângulo de rotação.
-        """
-
-        self.model.rotate_window(angle, "spin")
-
     def handle_import_obj_file(self, filepath: str) -> None:
         """
         Importa um arquivo .obj.
@@ -130,12 +122,11 @@ class Controller:
 
         self.model.remove_test_objects()
 
-    def handle_vertical_rotation(self, angle: float) -> None:
-        """Processa uma rotação vertical da janela de visualização."""
+    def handle_window_rotation(self, rotation_mode: str, angle: float) -> None:
+        """
+        Processa uma rotação da window
+        @param rotation_mode: Modo de rotação (horizontal, vertical ou spin).
+        @param angle: Ângulo de rotação.
+        """
 
-        self.model.rotate_window(angle, "vertical")
-
-    def handle_horizontal_rotation(self, angle: float) -> None:
-        """Processa uma rotação horizontal da janela de visualização."""
-
-        self.model.rotate_window(angle, "horizontal")
+        self.model.rotate_window(rotation_mode, angle)

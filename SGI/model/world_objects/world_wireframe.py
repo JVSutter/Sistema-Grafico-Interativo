@@ -1,5 +1,5 @@
-from view.graphical_objects.graphical_line import GraphicalLine
 from model.world_objects.sc_world_object import SCWorldObject
+from view.graphical_objects.graphical_line import GraphicalLine
 
 
 class WorldWireframe(SCWorldObject):

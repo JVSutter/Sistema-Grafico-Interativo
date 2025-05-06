@@ -21,8 +21,8 @@ class Window:
 
         # Foco (pivot) em (0,0,0) e câmera inicial em (0,0,-40)
         self.focus = np.array([0.0, 0.0, 0.0, 1.0])
-        self.yaw = 0.0   # rotação horizontal (graus)
-        self.pitch = 0.0 # rotação vertical (graus)
+        self.yaw = 0.0  # rotação horizontal (graus)
+        self.pitch = 0.0  # rotação vertical (graus)
         self.roll = 0.0  # spin da câmera
 
         # Janela ortográfica (magnitudes locais)
@@ -52,7 +52,7 @@ class Window:
     def _update_camera_vectors(self) -> None:
         """
         Atualiza apenas os vetores da câmera sem modificar sua posição.
-        
+
         Calcula:
         - view_plane_normal (VPN): vetor normal ao plano de visualização
         - vup: vetor de orientação "para cima"
@@ -61,7 +61,7 @@ class Window:
         # Cálculo do VPN (view_plane_normal)
         vpn = self.focus[:3] - self.window_center[:3]
         vpn /= np.linalg.norm(vpn)
-        
+
         # Cálculo dos eixos UVN do sistema de coordenadas da câmera
         world_up = np.array([0.0, 1.0, 0.0])
         vright = np.cross(vpn, world_up)
@@ -70,16 +70,18 @@ class Window:
         vright /= np.linalg.norm(vright)
         vup = np.cross(vright, vpn)
         vup /= np.linalg.norm(vup)
-        
+
         # Aplica roll (rotação em torno do eixo VPN)
         if abs(self.roll) > 1e-3:
-            Rr = TransformationGenerator.get_rotation_around_axis_through_origin(vpn, self.roll)
+            Rr = TransformationGenerator.get_rotation_around_axis_through_origin(
+                vpn, self.roll
+            )
             vup4 = np.array([*vup, 0.0])
             vup = (vup4 @ Rr)[:3]
             vup /= np.linalg.norm(vup)
             vright = np.cross(vpn, vup)
             vright /= np.linalg.norm(vright)
-            
+
         # Armazena vetores homogêneos para uso na projeção
         self.vup = np.array([vup[0], vup[1], vup[2], 1.0])
         self.vright = np.array([vright[0], vright[1], vright[2], 1.0])
@@ -88,40 +90,40 @@ class Window:
     def apply_zoom(self, zoom_percent: float) -> None:
         """
         Aplica zoom ortográfico ajustando largura e altura da janela.
-        
-        No algoritmo de projeção paralela, o zoom afeta o tamanho da janela 
+
+        No algoritmo de projeção paralela, o zoom afeta o tamanho da janela
         usado na normalização (Passo 5).
-        
+
         @param zoom_percent: Percentual de zoom (100% = tamanho original)
         """
-        self.zoom_level = 1/ (zoom_percent / 100.0)
+        self.zoom_level = 1 / (zoom_percent / 100.0)
         self.width = self.initial_width * self.zoom_level
         self.height = self.initial_height * self.zoom_level
 
     def apply_pan(self, d_horizontal: float, d_vertical: float, d_depth: float) -> None:
         """
         Move a câmera na direção especificada.
-        
+
         No algoritmo de projeção paralela, isso afeta o VRP (window_center)
         usado no Passo 1 (translação para origem).
-        
+
         @param d_horizontal: Deslocamento horizontal
         @param d_vertical: Deslocamento vertical
         @param d_depth: Deslocamento em profundidade
         """
         # Calcula o vetor de deslocamento nas direções da câmera
         offset = (
-            d_horizontal * self.vright[:3] +
-            d_vertical   * -self.vup[:3]    +
-            d_depth      * self.view_plane_normal[:3]
+            d_horizontal * self.vright[:3]
+            + d_vertical * -self.vup[:3]
+            + d_depth * self.view_plane_normal[:3]
         )
-        
+
         # Move a câmera (window_center) diretamente
         self.window_center[:3] -= offset
-        
+
         # Move o foco para manter a mesma direção de visão
         self.focus[:3] -= offset
-        
+
         # A orientação (VPN, VUP, VRIGHT) não muda durante o pan.
         # Portanto, não chamamos _update_camera_vectors() aqui.
 
@@ -138,38 +140,41 @@ class Window:
         # Vetor direção da câmera (de focus para camera)
         dir_vec = self.window_center[:3] - self.focus[:3]
         # Seleciona eixo de rotação LOCAL (UVN)
-        if axis == 'horizontal':    # Rotação em torno do VUP local
+        if axis == "horizontal":  # Rotação em torno do VUP local
             axis_vec = self.vup[:3]
-        elif axis == 'vertical':    # Rotação em torno do VRIGHT local
+        elif axis == "vertical":  # Rotação em torno do VRIGHT local
             axis_vec = self.vright[:3]
-        elif axis == 'spin':        # Rotação em torno do VPN local
+        elif axis == "spin":  # Rotação em torno do VPN local
             axis_vec = self.view_plane_normal[:3]
         else:
             return
         # Normaliza o eixo para segurança
         axis_vec_norm = np.linalg.norm(axis_vec)
-        if axis_vec_norm < 1e-9: return # Evita divisão por zero se o vetor for nulo
+        if axis_vec_norm < 1e-9:
+            return  # Evita divisão por zero se o vetor for nulo
         axis_vec /= axis_vec_norm
-        
+
         # Calcula matriz de rotação em torno do eixo local
         R = TransformationGenerator.get_rotation_around_axis_through_origin(
             axis_vec, angle_delta
         )
-        
+
         # Spin: rotaciona vetores VUP e VRIGHT
-        if axis == 'spin':
+        if axis == "spin":
             vup4 = np.array([*self.vup[:3], 0.0])
             vright4 = np.array([*self.vright[:3], 0.0])
             new_vup = (vup4 @ R)[:3]
-            if np.linalg.norm(new_vup) > 1e-9: new_vup /= np.linalg.norm(new_vup)
+            if np.linalg.norm(new_vup) > 1e-9:
+                new_vup /= np.linalg.norm(new_vup)
             new_vright = (vright4 @ R)[:3]
-            if np.linalg.norm(new_vright) > 1e-9: new_vright /= np.linalg.norm(new_vright)
+            if np.linalg.norm(new_vright) > 1e-9:
+                new_vright /= np.linalg.norm(new_vright)
             self.vup = np.array([*new_vup, 1.0])
             self.vright = np.array([*new_vright, 1.0])
-            return # VPN não muda no spin
-        
+            return  # VPN não muda no spin
+
         # Rotação Vertical (em torno de VRIGHT): Rotaciona VUP, VPN e Posição
-        if axis == 'vertical':
+        if axis == "vertical":
             vpn4 = np.array([*self.view_plane_normal[:3], 0.0])
             vup4 = np.array([*self.vup[:3], 0.0])
             dir4 = np.array([*dir_vec, 0.0])
@@ -178,17 +183,19 @@ class Window:
             new_vup = (vup4 @ R)[:3]
             rotated_dir = (dir4 @ R)[:3]
 
-            if np.linalg.norm(new_vpn) > 1e-9: new_vpn /= np.linalg.norm(new_vpn)
-            if np.linalg.norm(new_vup) > 1e-9: new_vup /= np.linalg.norm(new_vup)
+            if np.linalg.norm(new_vpn) > 1e-9:
+                new_vpn /= np.linalg.norm(new_vpn)
+            if np.linalg.norm(new_vup) > 1e-9:
+                new_vup /= np.linalg.norm(new_vup)
 
             self.view_plane_normal = np.array([*new_vpn, 1.0])
             self.vup = np.array([*new_vup, 1.0])
             # VRIGHT (eixo de rotação) não muda
             self.window_center[:3] = self.focus[:3] + rotated_dir
             return
-            
+
         # Rotação Horizontal (em torno de VUP): Rotaciona VRIGHT, VPN e Posição
-        if axis == 'horizontal':
+        if axis == "horizontal":
             vpn4 = np.array([*self.view_plane_normal[:3], 0.0])
             vright4 = np.array([*self.vright[:3], 0.0])
             dir4 = np.array([*dir_vec, 0.0])
@@ -197,8 +204,10 @@ class Window:
             new_vright = (vright4 @ R)[:3]
             rotated_dir = (dir4 @ R)[:3]
 
-            if np.linalg.norm(new_vpn) > 1e-9: new_vpn /= np.linalg.norm(new_vpn)
-            if np.linalg.norm(new_vright) > 1e-9: new_vright /= np.linalg.norm(new_vright)
+            if np.linalg.norm(new_vpn) > 1e-9:
+                new_vpn /= np.linalg.norm(new_vpn)
+            if np.linalg.norm(new_vright) > 1e-9:
+                new_vright /= np.linalg.norm(new_vright)
 
             self.view_plane_normal = np.array([*new_vpn, 1.0])
             self.vright = np.array([*new_vright, 1.0])
@@ -209,7 +218,7 @@ class Window:
     def get_width(self) -> float:
         """
         Retorna a largura da janela.
-        
+
         Usado no Passo 5 do algoritmo de projeção paralela (normalização).
         """
         return self.width
@@ -217,7 +226,7 @@ class Window:
     def get_height(self) -> float:
         """
         Retorna a altura da janela.
-        
+
         Usado no Passo 5 do algoritmo de projeção paralela (normalização).
         """
         return self.height

@@ -1014,7 +1014,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Window Rotation Angle</string>
+     <string>Window Spin Angle</string>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -1027,7 +1027,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
-       <widget class="QSlider" name="windowRotationSlider">
+       <widget class="QSlider" name="spinRotationSlider">
         <property name="minimum">
          <number>-10</number>
         </property>

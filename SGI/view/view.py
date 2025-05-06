@@ -46,12 +46,10 @@ class View(QtWidgets.QMainWindow):
         )  # Quando altera o valor do zoom pela barra
 
         # Botão de rotação da janela
-        self.windowRotationSlider.valueChanged.connect(
-            lambda: self.on_window_rotation()
-        )
+        self.spinRotationSlider.valueChanged.connect(lambda: self.on_window_rotation())
         # Sticky slider para rotação da janela
-        self.windowRotationSlider.sliderPressed.connect(self.start_window_rotation)
-        self.windowRotationSlider.sliderReleased.connect(self.stop_window_rotation)
+        self.spinRotationSlider.sliderPressed.connect(self.start_window_rotation)
+        self.spinRotationSlider.sliderReleased.connect(self.stop_window_rotation)
 
         # Botões de navegação
         self.navUpButton.clicked.connect(lambda: self.on_pan(direction="up"))
@@ -71,8 +69,12 @@ class View(QtWidgets.QMainWindow):
         # Sticky sliders para rotação vertical e horizontal
         self.verticalRotationSlider.sliderPressed.connect(self.start_vertical_rotation)
         self.verticalRotationSlider.sliderReleased.connect(self.stop_vertical_rotation)
-        self.horizontalRotationSlider.sliderPressed.connect(self.start_horizontal_rotation)
-        self.horizontalRotationSlider.sliderReleased.connect(self.stop_horizontal_rotation)
+        self.horizontalRotationSlider.sliderPressed.connect(
+            self.start_horizontal_rotation
+        )
+        self.horizontalRotationSlider.sliderReleased.connect(
+            self.stop_horizontal_rotation
+        )
 
         # Botões de importação e exportação de arquivos
         self.importButton.clicked.connect(self.import_obj_file)
@@ -201,28 +203,6 @@ class View(QtWidgets.QMainWindow):
             self.zoomLabel.setText(f"{new_zoom_value}%")
             self.zoom_value = new_zoom_value
 
-    def on_window_rotation(self, mode: str) -> None:
-        """Trata as requisições de rotação da janela."""
-
-        rotation_step = 10
-        window_rotation = self.windowRotationSlider.value()
-        min_rotation = -180
-        max_rotation = 180
-
-        if mode == "slider":
-            self.window_rotation = window_rotation
-        elif mode == "right" and window_rotation + rotation_step <= max_rotation:
-            self.window_rotation = window_rotation + rotation_step
-            self.windowRotationSlider.setValue(self.window_rotation)
-        elif mode == "left" and window_rotation - rotation_step >= min_rotation:
-            self.window_rotation = window_rotation - rotation_step
-            self.windowRotationSlider.setValue(self.window_rotation)
-        else:
-            return
-
-        self.windowRotationLabel.setText(f"{self.window_rotation}º")
-        self.controller.handle_spin_rotation(self.window_rotation)
-
     def on_pan(self, direction: str) -> None:
         """Trata as requisições de pan."""
 
@@ -241,15 +221,15 @@ class View(QtWidgets.QMainWindow):
     def on_vertical_rotation(self) -> None:
         """Trata as requisições de rotação vertical, chamadas pelo timer."""
         angle_delta = self.verticalRotationSlider.value()
-        if angle_delta != 0: # Só rotaciona se o slider não estiver no centro (0)
-            self.controller.handle_vertical_rotation(angle_delta)
+        if angle_delta != 0:  # Só rotaciona se o slider não estiver no centro (0)
+            self.controller.handle_window_rotation("vertical", angle_delta)
             # O print foi removido pois seria muito verboso com o timer
 
     def on_horizontal_rotation(self) -> None:
         """Trata as requisições de rotação horizontal, chamadas pelo timer."""
         angle_delta = self.horizontalRotationSlider.value()
         if angle_delta != 0:
-            self.controller.handle_horizontal_rotation(angle_delta)
+            self.controller.handle_window_rotation("horizontal", angle_delta)
 
     def import_obj_file(self) -> None:
         """Importa um arquivo .obj."""
@@ -344,7 +324,7 @@ class View(QtWidgets.QMainWindow):
 
     def setup_rotation_timers(self) -> None:
         """Configura timers para rotação contínua enquanto o slider está pressionado."""
-        self.rotation_timer_interval = 50 # ms
+        self.rotation_timer_interval = 50  # ms
 
         # Cria timer para rotação vertical
         self._vertical_timer = QtCore.QTimer(self)
@@ -388,13 +368,13 @@ class View(QtWidgets.QMainWindow):
         self._window_timer.stop()
         # Chama uma última vez com o valor atual antes de resetar, caso tenha movido rápido
         self.on_window_rotation()
-        self.windowRotationSlider.setValue(0)
+        self.spinRotationSlider.setValue(0)
 
     def on_window_rotation(self) -> None:
         """Trata as requisições de rotação da janela (spin), chamadas pelo timer."""
-        angle_delta = self.windowRotationSlider.value()
+        angle_delta = self.spinRotationSlider.value()
         if angle_delta != 0:
-            self.controller.handle_spin_rotation(angle_delta)
+            self.controller.handle_window_rotation("spin", angle_delta)
 
         # Remove a atualização do label, pois o slider volta a 0
         # self.windowRotationLabel.setText(f"{angle_delta}º")

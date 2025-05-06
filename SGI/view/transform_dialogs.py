@@ -119,11 +119,11 @@ class TransformationDialog(QtWidgets.QDialog):
             x1 = self.rotationXInput.value()
             y1 = self.rotationYInput.value()
             z1 = self.rotationZInput.value()
-            
+
             x2 = self.rotationXInput2.value()
             y2 = self.rotationYInput2.value()
             z2 = self.rotationZInput2.value()
-            
+
             axis = "arbitrary"
 
         else:

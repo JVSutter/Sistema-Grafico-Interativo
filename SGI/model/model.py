@@ -117,14 +117,14 @@ class Model:
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
-    def rotate_window(self, angle: float, rotation_type: str) -> None:
+    def rotate_window(self, rotation_mode: str, angle: float) -> None:
         """
         Rotaciona a janela de visualização para o ângulo especificado em graus.
+        @param rotation_mode: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         @param angle: Ângulo de rotação em graus.
-        @param rotation_type: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         """
-        
-        self.window.apply_rotation(angle, rotation_type)
+
+        self.window.apply_rotation(angle, rotation_mode)
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
@@ -222,7 +222,7 @@ class Model:
         """Adiciona objetos de teste ao mundo."""
 
         self.display_file_manager.add_test_objects()
-        
+
         # Aplica uma rotação no primeiro objeto
         # self.handle_transformations(0, [{"type": "rotation", "angle": 180, "x1": 10, "y1": -10, "z1": 40, "x2": -10, "y2": 10, "z2": 60, "axis": "arbitrary"}])
 

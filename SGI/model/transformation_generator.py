@@ -157,7 +157,7 @@ class TransformationGenerator:
         x1 = p1[0]
         y1 = p1[1]
         z1 = p1[2]
-        
+
         x2 = p2[0]
         y2 = p2[1]
         z2 = p2[2]
@@ -230,7 +230,9 @@ class TransformationGenerator:
         return transformation
 
     @staticmethod
-    def get_rotation_around_axis_through_origin(axis_vector: np.ndarray, angle_degrees: float) -> np.ndarray:
+    def get_rotation_around_axis_through_origin(
+        axis_vector: np.ndarray, angle_degrees: float
+    ) -> np.ndarray:
         """
         Obtém a matriz de rotação em torno de um eixo arbitrário que passa pela origem.
         Usa a fórmula de Rodrigues.
@@ -239,17 +241,33 @@ class TransformationGenerator:
         @return: Matriz de rotação 4x4.
         """
         angle_radians = np.radians(angle_degrees)
-        ux, uy, uz = axis_vector[:3] # Extrai componentes x, y, z, ignora componente homogênea se houver
+        ux, uy, uz = axis_vector[
+            :3
+        ]  # Extrai componentes x, y, z, ignora componente homogênea se houver
         cos_a = np.cos(angle_radians)
         sin_a = np.sin(angle_radians)
         one_minus_cos_a = 1 - cos_a
 
         # Matriz de rotação 3x3 pela fórmula de Rodrigues
-        rot_3x3 = np.array([
-            [cos_a + ux**2 * one_minus_cos_a, ux*uy*one_minus_cos_a - uz*sin_a, ux*uz*one_minus_cos_a + uy*sin_a],
-            [uy*ux*one_minus_cos_a + uz*sin_a, cos_a + uy**2 * one_minus_cos_a, uy*uz*one_minus_cos_a - ux*sin_a],
-            [uz*ux*one_minus_cos_a - uy*sin_a, uz*uy*one_minus_cos_a + ux*sin_a, cos_a + uz**2 * one_minus_cos_a]
-        ])
+        rot_3x3 = np.array(
+            [
+                [
+                    cos_a + ux**2 * one_minus_cos_a,
+                    ux * uy * one_minus_cos_a - uz * sin_a,
+                    ux * uz * one_minus_cos_a + uy * sin_a,
+                ],
+                [
+                    uy * ux * one_minus_cos_a + uz * sin_a,
+                    cos_a + uy**2 * one_minus_cos_a,
+                    uy * uz * one_minus_cos_a - ux * sin_a,
+                ],
+                [
+                    uz * ux * one_minus_cos_a - uy * sin_a,
+                    uz * uy * one_minus_cos_a + ux * sin_a,
+                    cos_a + uz**2 * one_minus_cos_a,
+                ],
+            ]
+        )
 
         # Incorpora na matriz 4x4 homogênea
         rot_4x4 = np.identity(4)
@@ -381,9 +399,7 @@ class TransformationGenerator:
         """
         # Passo 1: Translade VRP para a origem
         cx, cy, cz, _ = window_center
-        T = TransformationGenerator.get_translation_matrix(
-            dx=-cx, dy=-cy, dz=-cz
-        )
+        T = TransformationGenerator.get_translation_matrix(dx=-cx, dy=-cy, dz=-cz)
 
         # Passo 2: Determine UVN
         # Normalize VPN e VUP, e calcule eixos U e V
@@ -402,16 +418,20 @@ class TransformationGenerator:
         R[:3, 2] = vpn
 
         # Passo 4: Ignore todas as coordenadas Z dos objetos
-        P = np.array([
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 0, 0],  
-            [0, 0, 0, 1],
-        ])
+        P = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+            ]
+        )
 
         # Passo 5: Normalize o resto (coordenadas de window)
         S = TransformationGenerator.get_scaling_matrix(
-            cx=0, cy=0, cz=0,
+            cx=0,
+            cy=0,
+            cz=0,
             scale_x=2.0 / window_width,
             scale_y=2.0 / window_height,
             scale_z=1.0,

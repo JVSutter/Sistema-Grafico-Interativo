@@ -1,6 +1,7 @@
 import numpy as np
 
 from model.transformation_generator import TransformationGenerator
+from model.world_objects.sc_world_object import SCWorldObject
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
@@ -10,7 +11,6 @@ from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.viewport.viewport_bounds import ViewportBounds
-from model.world_objects.sc_world_object import SCWorldObject
 
 
 class DisplayFileManager:
@@ -310,8 +310,7 @@ class DisplayFileManager:
             object_type=WorldWireframe,
             edges=cube_edges,
         )
-        
-        
+
         # Adiciona eixo X (vermelho) de tamanho 5
         self.add_object(
             points=[(0, 0, 0), (5, 0, 0)],
@@ -320,7 +319,7 @@ class DisplayFileManager:
             is_filled=False,
             object_type=WorldLine,
         )
-        
+
         # Adiciona eixo Y (verde) de tamanho 5
         self.add_object(
             points=[(0, 0, 0), (0, 5, 0)],
@@ -329,7 +328,7 @@ class DisplayFileManager:
             is_filled=False,
             object_type=WorldLine,
         )
-        
+
         # Adiciona eixo Z (azul) de tamanho 5
         self.add_object(
             points=[(0, 0, 0), (0, 0, 5)],
