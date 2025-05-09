@@ -37,3 +37,9 @@ class WorldWireframe(SCWorldObject):
                 clipped_representations.append(graphical_representation)
 
         return clipped_representations
+    
+    def get_edges_obj_file(self, last_index) -> list:
+        edges_obj_file = []
+        for index_1, index_2 in self.edges:
+            edges_obj_file.append(f"l {index_1+last_index} {index_2+last_index}")
+        return edges_obj_file

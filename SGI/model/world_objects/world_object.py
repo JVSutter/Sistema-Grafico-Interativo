@@ -115,10 +115,12 @@ class WorldObject(ABC):
             str(i) for i in range(last_index, last_index + len(self.world_points))
         )
 
-        if self.__class__.__name__ == "WorldWireframe" and not self.is_filled:
-            obj_points += " " + str(last_index)
-
-        obj_description += f"{self.obj_type} {obj_points}\n\n"
+        if self.__class__.__name__ == "WorldWireframe":
+            for edge in self.get_edges_obj_file(last_index):
+                obj_description += edge + "\n"
+            obj_description += "\n"
+        else:
+            obj_description += f"{self.obj_type} {obj_points}\n\n"
 
         return obj_description, last_index + len(self.world_points)
 

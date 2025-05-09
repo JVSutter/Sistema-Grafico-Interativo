@@ -687,16 +687,6 @@ background-color: rgb(0, 0, 0);</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="fillCheckBox">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Filled</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -746,7 +736,7 @@ background-color: rgb(0, 0, 0);</string>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>43</x>

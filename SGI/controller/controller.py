@@ -92,8 +92,7 @@ class Controller:
         @param filepath: Caminho do arquivo .obj.
         """
 
-        # self.model.import_obj_file(filepath)
-        print("TODO: handle_import_obj_file")
+        self.model.import_obj_file(filepath)
 
     def handle_export_obj_file(self, filepath: str) -> None:
         """
@@ -101,8 +100,7 @@ class Controller:
         @param filepath: Caminho do arquivo .obj.
         """
 
-        # self.model.export_obj_file(filepath)
-        print("TODO: handle_export_obj_file")
+        self.model.export_obj_file(filepath)
 
     def handle_clipping_change(self, mode: str) -> None:
         """

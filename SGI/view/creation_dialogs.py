@@ -23,7 +23,7 @@ class ObjectDialog(QtWidgets.QDialog):
         self.removeButton.clicked.connect(self.remove_selected_point)
         self.colorButton.clicked.connect(self.choose_color)
         self.batchPointsButton.clicked.connect(self.handle_add_points_in_batch)
-        self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
+        # self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
 
         # Criando o grupo de botões de tipo de objeto
         self.objectType = QtWidgets.QButtonGroup()
@@ -33,7 +33,7 @@ class ObjectDialog(QtWidgets.QDialog):
         self.objectType.addButton(self.curveRadio)
         self.objectType.addButton(self.bSplineRadio)
 
-        self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
+        # self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
 
     def create_object(self):
         """Cria um objeto, solicitando arestas se for um Wireframe."""
@@ -46,9 +46,11 @@ class ObjectDialog(QtWidgets.QDialog):
 
         # Obter dados básicos independentemente do tipo
         self.name = self.nameInput.text() if self.nameInput.text().strip() else None
-        is_filled = (
-            self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
-        )
+        # is_filled = (
+        #     self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
+        # )
+        is_filled = False  # TODO: Ajustar na proxima entrega
+        
         object_type = self.objectType.checkedButton().text()
         edges = None  # Inicializa edges
 
@@ -251,7 +253,7 @@ class ObjectDialog(QtWidgets.QDialog):
 
         self._update_object_type()
         self._update_points_number()
-        self._update_fill_checkbox_visibility()
+        # self._update_fill_checkbox_visibility()
 
 
 class EdgeDialog(QtWidgets.QDialog):

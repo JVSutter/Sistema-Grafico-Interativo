@@ -203,6 +203,9 @@ class Model:
         """
 
         obj_str = self.display_file_manager.convert_display_file_to_obj()
+        if obj_str == "":
+            self.view.add_log("No objects to export")
+            return
 
         with open(filepath, "w") as f:
             f.write(obj_str)
