@@ -5,7 +5,7 @@ from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from utils.bounds import Bounds
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class WorldObjectFactory:
@@ -13,7 +13,7 @@ class WorldObjectFactory:
     Uma classe de fábrica para instanciar objetos no mundo
     """
 
-    viewport_bounds: Bounds = None
+    viewport_bounds: ViewportBounds = None
 
     @classmethod
     def new_world_object(
@@ -24,13 +24,14 @@ class WorldObjectFactory:
         display_file: list,
         is_filled: bool,
         object_type: type,
+        edges: list,
     ):
         """
         Cria um novo objeto do mundo a partir de uma lista de pontos.
         """
 
         if any(
-            points == [(x, y) for x, y, *_ in objs.world_points]
+            points == [(x, y, z) for x, y, z, *_ in objs.world_points]
             for objs in display_file
         ):
             return None
@@ -41,8 +42,9 @@ class WorldObjectFactory:
             "viewport_bounds": cls.viewport_bounds,
         }
 
-        if object_type == WorldWireframe:
+        if object_type == WorldWireframe:  # Único que tem arestas e preenchimento
             kwargs["is_filled"] = is_filled
+            kwargs["edges"] = edges
 
         if not name:
             obj_type_name = object_type.__name__.replace("World", "")
@@ -92,12 +94,12 @@ class WorldObjectFactory:
                 elif current_command == "bspline":
                     obj_type = WorldBSplineCurve
 
-                if (
-                    obj_type == WorldWireframe
-                    and not current_fill_state
-                    and current_object_points[0] == current_object_points[-1]
-                ):  # Se o objeto não for preenchido, remove o último ponto
-                    current_object_points.pop()
+                # if (
+                #     obj_type == WorldWireframe
+                #     and not current_fill_state
+                #     and current_object_points[0] == current_object_points[-1]
+                # ):  # Se o objeto não for preenchido, remove o último ponto
+                #     current_object_points.pop()
 
                 objects_list.append(
                     [
@@ -105,6 +107,7 @@ class WorldObjectFactory:
                         current_object_points,
                         current_fill_state,
                         obj_type,
+                        edges_list,
                     ]
                 )
 
@@ -114,11 +117,15 @@ class WorldObjectFactory:
         current_object_points = []  # Pontos (x,y) do objeto atual
         current_fill_state = False  # Estado de preenchimento
         current_command = None
+        current_index = 0
+        edges_list = []
+        wireframe = False
 
         try:
             with open(filepath, "r") as f:
-                for line_num, line in enumerate(f, 1):
-                    line = line.strip()
+                all_lines = f.readlines()  # Ler todas as linhas aqui
+                for line_num, line_content in enumerate(all_lines, 1):  # Iterar sobre all_lines
+                    line = line_content.strip() # Usar line_content
                     if not line or line.startswith("#"):
                         continue
 
@@ -129,7 +136,8 @@ class WorldObjectFactory:
 
                         x = float(parts[1])
                         y = float(parts[2])
-                        vertices.append((x, y))
+                        z = float(parts[3])
+                        vertices.append((x, y, z))
 
                     elif command == "o":  # Define um novo objeto
 
@@ -141,8 +149,11 @@ class WorldObjectFactory:
                             else f"Object {len(objects_list) + 1}"
                         )
 
+                        current_index = len(vertices) + 1
                         current_fill_state = False
                         current_object_points = []
+                        wireframe = False
+                        edges_list = []
 
                     elif command in (
                         "f",
@@ -154,6 +165,11 @@ class WorldObjectFactory:
 
                         if command == "f":
                             current_fill_state = True
+                            
+                        # confere se o comando atual é l e se a proxima linha começa com l
+                        # Acessar all_lines e verificar os limites
+                        if command == "l" and (line_num < len(all_lines)) and all_lines[line_num].strip().startswith("l"): # é um wireframe
+                            wireframe = True
 
                         indices = []
                         for part in parts[1:]:
@@ -173,8 +189,11 @@ class WorldObjectFactory:
                                 raise ValueError(
                                     f"Índice de vértice inválido (0) na linha {line_num}"
                                 )
-
-                            current_object_points.append(vertices[vertex_index])
+                            
+                            if not vertices[vertex_index] in current_object_points:
+                                current_object_points.append(vertices[vertex_index])
+                        if wireframe:
+                            edges_list.append([x-current_index for x in indices])
                         current_command = command
 
             # Adiciona o último objeto lido se ele tiver pontos
@@ -207,7 +226,8 @@ class WorldObjectFactory:
             obj_points = obj_data[1]
             obj_is_filled = obj_data[2]
             obj_type = obj_data[3]
-
+            edges_list = obj_data[4]
+            
             world_object = cls.new_world_object(
                 points=obj_points,
                 name=obj_name,
@@ -215,8 +235,9 @@ class WorldObjectFactory:
                 display_file=display_file,
                 is_filled=obj_is_filled,
                 object_type=obj_type,
+                edges=edges_list,
             )
-
+                
             if world_object is None:
                 skipped_objects.append(obj_name)
             else:

@@ -1,5 +1,5 @@
 from model.display_file_manager import DisplayFileManager
-from model.window import Window
+from model.window.window import Window
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
@@ -26,8 +26,8 @@ class Model:
             self = args[0]
             result = func(*args, **kwargs)
 
-            # Recalcula as coordenadas normalizadas para todos os objetos
-            self._calculate_and_update_ncs()
+            # Atualiza as projeções
+            self.update_projections()
 
             # Atualiza a View
             graphical_representations = (
@@ -42,7 +42,13 @@ class Model:
 
     @update_interface
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: str
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        is_filled: bool,
+        object_type: str,
+        edges: list,
     ) -> None:
         """
         Adiciona um objeto gráfico ao mundo.
@@ -51,6 +57,7 @@ class Model:
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
         @param object_type: Tipo de objeto.
+        @param edges: Lista de arestas que compõem o objeto.
         """
 
         obj_types = {
@@ -61,14 +68,15 @@ class Model:
             "B-Spline": WorldBSplineCurve,
         }
 
-        obj_type = obj_types[object_type]
+        object_type_cls = obj_types[object_type]
 
         obj_name = self.display_file_manager.add_object(
             points=points,
             name=name,
             color=color,
             is_filled=is_filled,
-            object_type=obj_type,
+            object_type=object_type_cls,
+            edges=edges,
         )
         if obj_name is None:
             self.view.add_log("Object already exists, skipping...")
@@ -94,13 +102,29 @@ class Model:
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
-    def pan(self, dx: float, dy: float) -> None:
+    def pan(self, d_horizontal: float, d_vertical: float, d_depth: float) -> None:
         """
         Aplica um pan na janela de visualização.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_vertical: Deslocamento vertical.
+        @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
-        self.window.apply_pan(dx, dy)
+        self.window.apply_pan(
+            d_horizontal=d_horizontal,
+            d_vertical=d_vertical,
+            d_depth=d_depth,
+        )
+        self.display_file_manager.set_all_objects_as_dirty()
+
+    @update_interface
+    def rotate_window(self, rotation_mode: str, angle: float) -> None:
+        """
+        Rotaciona a janela de visualização para o ângulo especificado em graus.
+        @param rotation_mode: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
+        @param angle: Ângulo de rotação em graus.
+        """
+
+        self.window.apply_rotation(angle, rotation_mode)
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
@@ -123,11 +147,11 @@ class Model:
         for transformation in transformations_list:
             if transformation["type"] == "scaling":
                 self.view.add_log(
-                    f"Scaling object by factors {transformation['sx']}, {transformation['sy']}"
+                    f"Scaling object by factors {transformation['sx']}, {transformation['sy']}, {transformation['sz']}"
                 )
             elif transformation["type"] == "translation":
                 self.view.add_log(
-                    f"Translating object by ({transformation['dx']}, {transformation['dy']})"
+                    f"Translating object by ({transformation['dx']}, {transformation['dy']}, {transformation['dz']})"
                 )
             elif transformation["type"] == "rotation":
                 self.view.add_log(
@@ -137,19 +161,15 @@ class Model:
         obj_name = self.display_file_manager.get_obj_name(index)
         self.view.add_log(f"{obj_name}: transformations applied.")
 
-    def _calculate_and_update_ncs(self) -> None:
-        """Calcula as coordenadas normalizadas para todos os objetos."""
+    def update_projections(self) -> None:
+        """Método para recalcular as projeções de todos os objetos no display file."""
 
-        window_cx, window_cy = self.window.get_center()
-        window_width, window_height = self.window.get_width_height()
-        window_vup = self.window.vup
-
-        self.display_file_manager.update_ncs_coordinates(
-            window_cx=window_cx,
-            window_cy=window_cy,
-            window_width=window_width,
-            window_height=window_height,
-            window_vup=window_vup,
+        self.display_file_manager.update_projections(
+            window_center=self.window.window_center,
+            view_plane_normal=self.window.view_plane_normal,
+            window_vup=self.window.vup,
+            window_width=self.window.get_width(),
+            window_height=self.window.get_height(),
         )
 
     @update_interface
@@ -183,20 +203,14 @@ class Model:
         """
 
         obj_str = self.display_file_manager.convert_display_file_to_obj()
+        if obj_str == "":
+            self.view.add_log("No objects to export")
+            return
 
         with open(filepath, "w") as f:
             f.write(obj_str)
 
         self.view.add_log(f"Objects successfully exported to {filepath}")
-
-    @update_interface
-    def rotate_window(self, angle: float) -> None:
-        """
-        Rotaciona a janela de visualização para o ângulo especificado em graus.
-        @param angle: Ângulo de rotação em graus.
-        """
-        self.window.apply_rotation(angle)
-        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def change_clipping_mode(self, mode: str) -> None:
@@ -211,6 +225,9 @@ class Model:
         """Adiciona objetos de teste ao mundo."""
 
         self.display_file_manager.add_test_objects()
+
+        # Aplica uma rotação no primeiro objeto
+        # self.handle_transformations(0, [{"type": "rotation", "angle": 180, "x1": 10, "y1": -10, "z1": 40, "x2": -10, "y2": 10, "z2": 60, "axis": "arbitrary"}])
 
     @update_interface
     def remove_test_objects(self) -> None:

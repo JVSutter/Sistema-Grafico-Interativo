@@ -1,4 +1,5 @@
 import numpy as np
+
 from model.model import Model
 from view.view import View
 
@@ -25,6 +26,7 @@ class Controller:
         color_input: tuple,
         is_filled: bool,
         object_type: str,
+        edges_input: list,
     ) -> None:
         """
         Constrói um novo objeto no mundo.
@@ -33,6 +35,7 @@ class Controller:
         @param color_input: Cor do objeto
         @param is_filled: Se o objeto é preenchido ou não
         @param object_type: Tipo de objeto
+        @param edges_input: Lista de arestas que compõem o objeto
         """
 
         self.model.add_object(
@@ -41,6 +44,7 @@ class Controller:
             color=color_input,
             is_filled=is_filled,
             object_type=object_type,
+            edges=edges_input,
         )
 
     def handle_remove_object(self, index: int) -> None:
@@ -59,14 +63,17 @@ class Controller:
 
         self.model.zoom(new_zoom_value)
 
-    def handle_pan(self, dx: float, dy: float) -> None:
+    def handle_pan(
+        self, d_horizontal: float, d_vertical: float, d_depth: float
+    ) -> None:
         """
         Processa um deslocamento na janela de visualização.
-        @param dx: Deslocamento em x.
-        @param dy: Deslocamento em y.
+        @param d_horizontal: Deslocamento horizontal.
+        @param d_vertical: Deslocamento vertical.
+        @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
 
-        self.model.pan(dx, dy)
+        self.model.pan(d_horizontal, d_vertical, d_depth)
 
     def handle_transformations(
         self, index: int, transformations_list: list[dict]
@@ -78,14 +85,6 @@ class Controller:
         """
 
         self.model.handle_transformations(index, transformations_list)
-
-    def handle_window_rotation(self, angle: float) -> None:
-        """
-        Processa uma rotação da janela de visualização.
-        @param angle: Ângulo de rotação.
-        """
-
-        self.model.rotate_window(angle)
 
     def handle_import_obj_file(self, filepath: str) -> None:
         """
@@ -120,3 +119,12 @@ class Controller:
         """Remove objetos de teste do mundo."""
 
         self.model.remove_test_objects()
+
+    def handle_window_rotation(self, rotation_mode: str, angle: float) -> None:
+        """
+        Processa uma rotação da window
+        @param rotation_mode: Modo de rotação (horizontal, vertical ou spin).
+        @param angle: Ângulo de rotação.
+        """
+
+        self.model.rotate_window(rotation_mode, angle)

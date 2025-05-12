@@ -1,5 +1,7 @@
 import numpy as np
+
 from model.transformation_generator import TransformationGenerator
+from model.world_objects.sc_world_object import SCWorldObject
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
@@ -7,8 +9,8 @@ from model.world_objects.world_object import WorldObject
 from model.world_objects.world_object_factory import WorldObjectFactory
 from model.world_objects.world_point import WorldPoint
 from model.world_objects.world_wireframe import WorldWireframe
-from utils.bounds import Bounds
 from view.graphical_objects.graphical_object import GraphicalObject
+from view.viewport.viewport_bounds import ViewportBounds
 
 
 class DisplayFileManager:
@@ -16,7 +18,7 @@ class DisplayFileManager:
     Classe responsável por gerenciar o display file
     """
 
-    def __init__(self, viewport_bounds: Bounds):
+    def __init__(self, viewport_bounds: ViewportBounds):
         self.display_file: list[WorldObject] = []
         WorldObjectFactory.viewport_bounds = viewport_bounds
 
@@ -28,7 +30,7 @@ class DisplayFileManager:
 
         representations = []
         for obj in self.display_file:
-            representations.extend(obj.get_clipped_representation())
+            representations += obj.get_clipped_representation()
         return representations
 
     def get_obj_name(self, index: int) -> str:
@@ -40,7 +42,13 @@ class DisplayFileManager:
         return self.display_file[index].name
 
     def add_object(
-        self, points: list, name: str, color: tuple, is_filled: bool, object_type: type
+        self,
+        points: list,
+        name: str,
+        color: tuple,
+        is_filled: bool,
+        object_type: type,
+        edges: list = [],
     ) -> str | None:
         """
         Adiciona um objeto gráfico ao display file.
@@ -50,6 +58,7 @@ class DisplayFileManager:
         @param color: Cor do objeto.
         @param is_filled: Se o objeto é preenchido ou não.
         @param object_type: Tipo de objeto.
+        @param edges: Lista de arestas que compõem o objeto.
         @return: Retorna uma string com o nome do objeto adicionado ou None se o objeto já existir.
         Por 'já existir' entende-se que já existe um objeto com as mesmas coordenadas.
         """
@@ -61,6 +70,7 @@ class DisplayFileManager:
             display_file=self.display_file,
             is_filled=is_filled,
             object_type=object_type,
+            edges=edges,
         )
 
         if world_object is None:
@@ -109,8 +119,10 @@ class DisplayFileManager:
 
         obj = self.display_file[index]
         obj_center = obj.get_center()
-        transformation_mtx = TransformationGenerator.get_transformation_matrix(
-            transformations_list=transformations_list, obj_center=obj_center
+        transformation_mtx = (
+            TransformationGenerator.get_composite_transformation_matrix(
+                transformations_list=transformations_list, obj_center=obj_center
+            )
         )
 
         if transformation_mtx is None:
@@ -125,29 +137,29 @@ class DisplayFileManager:
         for obj in self.display_file:
             obj.dirty = True
 
-    def update_ncs_coordinates(
+    def update_projections(
         self,
-        window_cx: float,
-        window_cy: float,
+        window_center: np.ndarray,
+        view_plane_normal: np.ndarray,
+        window_vup: np.ndarray,
         window_width: float,
         window_height: float,
-        window_vup: np.ndarray,
     ) -> None:
         """
-        Atualiza as coordenadas do display file para o sistema de coordenadas da janela.
-        @param window_cx: Coordenada x do centro da janela.
-        @param window_cy: Coordenada y do centro da janela.
-        @param window_width: Largura da janela.
-        @param window_height: Altura da janela.
-        @param window_vup: Vetor de direção para cima da janela.
+        Atualiza as projeções dos objetos no display file.
+        @param window_center: Centro da janela de visualização.
+        @param view_plane_normal: Vetor normal ao plano de visualização.
+        @param window_vup: Vetor de orientação para cima da janela de visualização.
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
         """
 
-        ncs_conversion_mtx = TransformationGenerator.get_ncs_transformation_matrix(
-            window_cx=window_cx,
-            window_cy=window_cy,
+        projection_mtx = TransformationGenerator.get_parallel_projection_matrix(
+            window_center=window_center,
+            view_plane_normal=view_plane_normal,
             window_vup=window_vup,
-            window_height=window_height,
             window_width=window_width,
+            window_height=window_height,
         )
 
         for obj in self.display_file:
@@ -155,19 +167,15 @@ class DisplayFileManager:
                 continue
             obj.dirty = False
 
-            normalized_coords = []
+            projection_points = []
 
             for point_wc in obj.world_points:
-                point_ncs = (
-                    point_wc @ ncs_conversion_mtx
-                )  # Transforma o ponto WC para ncs
-
-                nx = point_ncs[0]
-                ny = point_ncs[1]
-
-                normalized_coords.append((nx, ny))
-
-            obj.update_normalized_points(normalized_coords)
+                projected_point = point_wc @ projection_mtx
+                normalized_x, normalized_y, _, _ = projected_point
+                projection_points.append(
+                    (normalized_x, normalized_y)
+                )  # Descarta z e w e converte em lista de tuplas
+            obj.update_projection_points(projection_points)
 
     def import_file_to_display_file(self, filepath: str) -> None:
         """
@@ -192,36 +200,15 @@ class DisplayFileManager:
         """
 
         for obj in self.display_file:
-            if isinstance(obj, WorldLine):
+            if isinstance(obj, SCWorldObject):
                 obj.change_clipping_mode(mode)
 
     def add_test_objects(self) -> None:
         """Adiciona objetos de teste ao display file com arte tangram e curvas artísticas."""
-        # Tangram-style triangles espalhados pelos quadrantes
-        tangram_triangles = [
-            [(-4, 4), (4, 4), (0, 0)],
-            [(4, -4), (0, 0), (4, 4)],
-            [(-4, -4), (0, 0), (-4, 4)],
-        ]
-        colors = [
-            (255, 99, 71),  # tomate
-            (65, 105, 225),  # azul real
-            (238, 130, 238),  # violeta
-            (255, 215, 0),  # ouro
-            (0, 191, 255),  # azul turquesa
-        ]
-        for i, pts in enumerate(tangram_triangles):
-            self.add_object(
-                points=pts,
-                name=f"Test Triangle {i+1}",
-                color=colors[i],
-                is_filled=True if i % 2 == 0 else False,
-                object_type=WorldWireframe,
-            )
 
         # Linha diagonal decorativa
         self.add_object(
-            points=[(-8, 17), (12, 17)],
+            points=[(-8, 17, -15), (12, 17, 15)],
             name="Test Line",
             color=(70, 100, 255),
             is_filled=False,
@@ -230,19 +217,19 @@ class DisplayFileManager:
 
         # Curva artística 1 - Bézier (13 pontos para 3n+1)
         curve1 = [
-            (-18, -10),
-            (-14, -4),
-            (-10, 2),
-            (-6, 8),
-            (-2, 12),
-            (4, 16),
-            (10, 12),
-            (14, 6),
-            (18, 2),
-            (14, -4),
-            (10, -8),
-            (4, -12),
-            (20, -16),
+            (-18, -10, 4),
+            (-14, -4, -10),
+            (-10, 2, 50),
+            (-6, 8, 1),
+            (-2, 12, 10),
+            (4, 16, 30),
+            (10, 12, 40),
+            (14, 6, 20),
+            (18, 2, 10),
+            (14, -4, 2),
+            (10, -8, -20),
+            (4, -12, 3),
+            (20, -16, 0),
         ]
         self.add_object(
             points=curve1,
@@ -254,16 +241,16 @@ class DisplayFileManager:
 
         # Curva artística 2 - B-Spline
         curve2 = [
-            (-15, 20),
-            (-20, 15),
-            (-15, 45),
-            (-5, 0),
-            (10, 30),
-            (14, -5),
-            (0, -8),
-            (5, -9),
-            (0, -10),
-            (5, 20),
+            (-15, 20, 10),
+            (-20, 15, 1),
+            (-15, 45, 4),
+            (-5, 0, 20),
+            (10, 30, 10),
+            (14, -5, 7),
+            (0, -8, 5),
+            (5, -9, 3),
+            (0, -10, 1),
+            (5, 20, 0),
         ]
 
         self.add_object(
@@ -276,9 +263,9 @@ class DisplayFileManager:
 
         # Pontos decorativos centrais
         decorative_points = [
-            ((0, 0), (255, 255, 255)),
-            ((10, 10), (128, 0, 128)),
-            ((-10, -10), (0, 128, 128)),
+            ((0, 0, 4), (255, 255, 255)),
+            ((10, 10, 10), (128, 0, 128)),
+            ((-10, -10, -20), (0, 128, 128)),
         ]
         for coord, col in decorative_points:
             self.add_object(
@@ -288,6 +275,68 @@ class DisplayFileManager:
                 is_filled=False,
                 object_type=WorldPoint,
             )
+
+        # Cubo
+        cube_points = [
+            (-10, 10, 40),
+            (10, 10, 40),
+            (10, -10, 40),
+            (-10, -10, 40),
+            (-10, 10, 60),
+            (10, 10, 60),
+            (10, -10, 60),
+            (-10, -10, 60),
+        ]
+
+        cube_edges = [
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 0),
+            (4, 5),
+            (5, 6),
+            (6, 7),
+            (7, 4),
+            (0, 4),
+            (1, 5),
+            (2, 6),
+            (3, 7),
+        ]
+        self.add_object(
+            points=cube_points,
+            name="Test Cube",
+            color=(255, 0, 0),
+            is_filled=True,
+            object_type=WorldWireframe,
+            edges=cube_edges,
+        )
+
+        # Adiciona eixo X (vermelho) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (5, 0, 0)],
+            name="Test Axis X",
+            color=(255, 0, 0),
+            is_filled=False,
+            object_type=WorldLine,
+        )
+
+        # Adiciona eixo Y (verde) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (0, 5, 0)],
+            name="Test Axis Y",
+            color=(0, 255, 0),
+            is_filled=False,
+            object_type=WorldLine,
+        )
+
+        # Adiciona eixo Z (azul) de tamanho 5
+        self.add_object(
+            points=[(0, 0, 0), (0, 0, 5)],
+            name="Test Axis Z",
+            color=(0, 0, 255),
+            is_filled=False,
+            object_type=WorldLine,
+        )
 
     def remove_test_objects(self) -> None:
         """Remove objetos de teste do display file."""

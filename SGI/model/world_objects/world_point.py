@@ -14,9 +14,12 @@ class WorldPoint(WorldObject):
         Apenda o ponto apenas se estiver dentro dos limites do Viewport
         """
 
-        x, y = self.normalized_points[0]
+        x, y = self.projection_points[0]
         if x < -1 or x > 1 or y < -1 or y > 1:
             return []
 
-        graphical_representation = GraphicalPoint(self.viewport_points, self.color)
+        viewport_points = self.transform_projection_points_to_viewport(
+            self.projection_points
+        )
+        graphical_representation = GraphicalPoint(viewport_points, self.color)
         return [graphical_representation]
