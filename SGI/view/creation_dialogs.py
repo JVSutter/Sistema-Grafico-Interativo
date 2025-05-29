@@ -7,23 +7,54 @@ import re
 from PyQt6 import QtWidgets, uic
 
 
-class ObjectDialog(QtWidgets.QDialog):
+class GenericDialog(QtWidgets.QDialog):
+    """Classe genérica para diálogos"""
+
+    def __init__(self, file_path: str):
+        super().__init__()
+        uic.loadUi(file_path, self)
+
+    def show_error_message(self, message: str):
+        """Mostra uma mensagem de erro"""
+
+        error_dialog = QtWidgets.QMessageBox()
+        error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+        error_dialog.setWindowTitle("Error")
+        error_dialog.setText(message)
+        error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+        error_dialog.exec()
+
+    def choose_color(self):
+        """Abre o diálogo de escolha de cor"""
+
+        color = QtWidgets.QColorDialog.getColor()
+        if color.isValid():
+            self.color = (color.red(), color.green(), color.blue())
+            self.colorPreview.setStyleSheet(
+                f"border: 2px solid white; border-radius: 16px; background-color: rgb{self.color};"
+            )
+
+        self.raise_()
+
+
+class ObjectDialog(GenericDialog):
     """Classe responsável por gerenciar o popup de criação de objeto"""
 
     def __init__(self):
-        super().__init__()
-        uic.loadUi("view/screens/newObject.ui", self)
+        super().__init__("view/screens/newObject.ui")
 
         self.points: list = []
         self.color: tuple = (0, 0, 0)  # Cor padrão preto
         self.name: str | None = None
         self.fill_state: bool = False  # Estado inicial do preenchimento
+        self.is_surface: bool = False
+        self.surface_type: str | None = None
 
         self.newPointButton.clicked.connect(self.add_point)
         self.removeButton.clicked.connect(self.remove_selected_point)
         self.colorButton.clicked.connect(self.choose_color)
         self.batchPointsButton.clicked.connect(self.handle_add_points_in_batch)
-        # self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
+        self.fillCheckBox.stateChanged.connect(self._handle_fill_checkbox)
 
         # Criando o grupo de botões de tipo de objeto
         self.objectType = QtWidgets.QButtonGroup()
@@ -32,25 +63,62 @@ class ObjectDialog(QtWidgets.QDialog):
         self.objectType.addButton(self.wireframeRadio)
         self.objectType.addButton(self.curveRadio)
         self.objectType.addButton(self.bSplineRadio)
+        self.objectType.addButton(self.polygonRadio)
 
-        # self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
+        self.createBezierSurfaceButton.clicked.connect(self.open_bezier_surface_dialog)
+        self.createBicubicSurfaceButton.clicked.connect(
+            self.open_bicubic_surface_dialog
+        )
+
+        self.objectType.buttonClicked.connect(self._update_fill_checkbox_visibility)
+
+    def open_bezier_surface_dialog(self):
+        """Abre o diálogo de criação de superfície de Bézier."""
+
+        bezier_surface_dialog = BezierSurfaceDialog()
+        dialog_result = bezier_surface_dialog.exec()
+        if dialog_result == QtWidgets.QDialog.DialogCode.Accepted:
+            self.points = bezier_surface_dialog.surface_points
+            self.name = bezier_surface_dialog.name
+            self.color = bezier_surface_dialog.color
+            self.is_surface = True
+            self.surface_type = "Bezier Surface"
+
+            self.result = QtWidgets.QDialog.DialogCode.Accepted
+            self.accept()
+
+    def open_bicubic_surface_dialog(self):
+        """Abre o diálogo de criação de superfície bicúbica."""
+
+        bicubic_surface_dialog = BicubicSurfaceDialog()
+        dialog_result = bicubic_surface_dialog.exec()
+        if dialog_result == QtWidgets.QDialog.DialogCode.Accepted:
+            self.points = bicubic_surface_dialog.surface_points
+            self.name = bicubic_surface_dialog.name
+            self.color = bicubic_surface_dialog.color
+            self.is_surface = True
+            self.surface_type = "Bicubic Surface"
+
+            self.result = QtWidgets.QDialog.DialogCode.Accepted
+            self.accept()
 
     def create_object(self):
         """Cria um objeto, solicitando arestas se for um Wireframe."""
         self.show()
-        result = self.exec()
+        self.result = self.exec()
 
         # Se o diálogo principal foi rejeitado
-        if result == QtWidgets.QDialog.DialogCode.Rejected:
+        if self.result == QtWidgets.QDialog.DialogCode.Rejected:
             return None, None, None, None, None, None  # Adiciona None para edges
+
+        if self.is_surface:
+            return self.points, self.name, self.color, None, self.surface_type, None
 
         # Obter dados básicos independentemente do tipo
         self.name = self.nameInput.text() if self.nameInput.text().strip() else None
-        # is_filled = (
-        #     self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
-        # )
-        is_filled = False  # TODO: Ajustar na proxima entrega
-        
+        is_filled = (
+            self.fillCheckBox.isChecked() if self.fillCheckBox.isEnabled() else False
+        )
         object_type = self.objectType.checkedButton().text()
         edges = None  # Inicializa edges
 
@@ -65,6 +133,15 @@ class ObjectDialog(QtWidgets.QDialog):
                 edges = edge_dialog.edges
             else:  # Se o diálogo de arestas foi cancelado, anula toda a criação
                 return None, None, None, None, None, None
+
+        # Ignora o eixo z para curvas, deixando-o como 0
+        elif object_type == "B-Spline" or object_type == "Bézier":
+            for i, point in enumerate(self.points):
+                self.points[i] = (point[0], point[1], 0)
+
+            self.show_error_message(
+                "Because you selected a Curve, the points will have Z = 0."
+            )
 
         # Retorna os dados (edges será None se não for Wireframe ou se cancelado)
         return self.points, self.name, self.color, is_filled, object_type, edges
@@ -145,16 +222,6 @@ class ObjectDialog(QtWidgets.QDialog):
 
         self.raise_()
 
-    def show_error_message(self, message: str):
-        """Mostra uma mensagem de erro"""
-
-        error_dialog = QtWidgets.QMessageBox()
-        error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
-        error_dialog.setWindowTitle("Error")
-        error_dialog.setText(message)
-        error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-        error_dialog.exec()
-
     def accept(self):
         """Sobrescreve o método accept para validar o número de pontos"""
 
@@ -173,11 +240,11 @@ class ObjectDialog(QtWidgets.QDialog):
 
     def _update_fill_checkbox_visibility(self):
         """Atualiza a habilitação do checkbox 'Filled' baseado no número de pontos.
-        O filled só é habilitado se o número de pontos for maior ou igual a 3 (Wireframe).
+        O filled só é habilitado se Polygon estiver selecionado e houver pelo menos 3 pontos.
         """
 
         num_points = len(self.points)
-        if num_points >= 3 and self.wireframeRadio.isChecked():
+        if num_points >= 3 and self.polygonRadio.isChecked():
             self.fillCheckBox.setEnabled(True)
             self.fillCheckBox.setChecked(self.fill_state)
 
@@ -188,7 +255,7 @@ class ObjectDialog(QtWidgets.QDialog):
     def _handle_fill_checkbox(self):
         """Gerencia o estado do checkbox 'Filled'"""
 
-        if self.wireframeRadio.isChecked():
+        if self.polygonRadio.isChecked():
             if self.fillCheckBox.isChecked():
                 self.fill_state = True
             else:
@@ -204,41 +271,32 @@ class ObjectDialog(QtWidgets.QDialog):
             self.wireframeRadio,
             self.curveRadio,
             self.bSplineRadio,
+            self.polygonRadio,
         ]
 
-        if num_points == 0:  # desabilita todos os botões
-            for button in radio_buttons:
-                button.setChecked(False)
-                button.setEnabled(False)
+        for button in radio_buttons:
+            button.setEnabled(False)
+            button.setChecked(False)
 
-        if num_points == 1:  # habilita apenas ponto
-            for button in radio_buttons:
-                button.setEnabled(False)
-
+        if num_points == 1:
             self.pointRadio.setEnabled(True)
             self.pointRadio.setChecked(True)
 
-        if num_points == 2:  # habilita linha
-            for button in radio_buttons:
-                button.setEnabled(False)
-
+        if num_points == 2:
             self.lineRadio.setEnabled(True)
             self.lineRadio.setChecked(True)
 
-        if num_points == 3:  # habilita wireframe
-            for button in radio_buttons:
-                button.setEnabled(False)
-
+        if num_points == 3:
             self.wireframeRadio.setEnabled(True)
+            self.polygonRadio.setEnabled(True)
             self.wireframeRadio.setChecked(True)
 
-        if num_points > 3:  # habilita curva e wireframe
-            for button in radio_buttons:
-                button.setEnabled(False)
-
+        if num_points > 3:
             self.curveRadio.setEnabled(True)
             self.bSplineRadio.setEnabled(True)
             self.wireframeRadio.setEnabled(True)
+            self.polygonRadio.setEnabled(True)
+            self.wireframeRadio.setChecked(True)
 
     def _update_points_number(self):
         """Atualiza o número de pontos"""
@@ -251,17 +309,16 @@ class ObjectDialog(QtWidgets.QDialog):
     def _update_interface(self):
         """Atualiza a interface baseado no tipo de objeto selecionado"""
 
-        self._update_object_type()
         self._update_points_number()
-        # self._update_fill_checkbox_visibility()
+        self._update_object_type()
+        self._update_fill_checkbox_visibility()
 
 
-class EdgeDialog(QtWidgets.QDialog):
+class EdgeDialog(GenericDialog):
     """Classe responsável por gerenciar o popup de criação de arestas para Wireframes."""
 
     def __init__(self, points: list[tuple[float, float, float]]):
-        super().__init__()
-        uic.loadUi("view/screens/addEdges.ui", self)
+        super().__init__("view/screens/addEdges.ui")
 
         self.points = points
         self.edges = (
@@ -390,16 +447,6 @@ class EdgeDialog(QtWidgets.QDialog):
             point_str = f"Point {idx} ({point[0]:.1f}, {point[1]:.1f}, {point[2]:.1f})"
             self.pointsWithoutEdgesList.addItem(point_str)
 
-    def show_error_message(self, message: str):
-        """Mostra uma mensagem de erro (reutilizada de ObjectDialog ou específica)."""
-
-        error_dialog = QtWidgets.QMessageBox()
-        error_dialog.setIcon(QtWidgets.QMessageBox.Icon.Critical)
-        error_dialog.setWindowTitle("Error")
-        error_dialog.setText(message)
-        error_dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
-        error_dialog.exec()
-
     def accept(self):
         """Sobrescreve o método accept para validar o número de arestas"""
 
@@ -408,3 +455,128 @@ class EdgeDialog(QtWidgets.QDialog):
             return
 
         super().accept()
+
+
+class SurfaceDialog(GenericDialog):
+    def __init__(self, ui_path: str):
+        super().__init__(ui_path)
+
+        self.color: tuple = (0, 0, 0)
+        self.colorButton.clicked.connect(self.choose_color)
+
+    def convert_string_to_matrix(self, string: str) -> list[list[list[float]]]:
+        """
+        ***
+        Método inteiramente gerado por IA
+        - Modelo utilizado: gemini-2.5-pro-exp-05-06
+        - URL da implementação do modelo: https://aistudio.google.com/
+        - Finalidade: Implementar a lógica de conversão de uma string formatada de pontos de controle (e.g., "(x1,y1,z1),(x2,y2,z2);(x3,y3,z3),...") em uma matriz 3D de pontos (lista de listas de pontos [x,y,z]).
+        - Prompt empregado: crie uma função capaz de converter uma string como (x11,y11,z11),(x12,y12,z12),(x13,y13,z13),(x14,y14,z14); (x21,y21,z21),(x22,y22,z22),(x23,y23,z23),(x24,y24,z24); (x31,y31,z31),(x32,y32,z32),(x33,y33,z33),(x34,y34,z34); (x41,y41,z41),(x42,y42,z42),(x43,y43,z43),(x44,y44,z44)   em uma matriz
+        ***
+        Converte uma string de pontos de controle em uma matriz de pontos.
+
+        A string deve seguir o formato:
+        "(x11,y11,z11),(x12,y12,z12),...; (x21,y21,z21),(x22,y22,z22),...; ..."
+        - Cada ponto é uma tupla de 3 coordenadas (x, y, z).
+        - Pontos dentro de uma mesma linha da matriz são separados por vírgulas.
+        - Linhas da matriz são separadas por ponto e vírgula.
+        - Espaços em branco e quebras de linha são ignorados.
+
+        @param string: A string contendo os pontos de controle.
+        @return: Uma lista de listas de pontos (list[list[list[float]]]), onde cada ponto é [x, y, z].
+                 Retorna uma lista vazia se a string de entrada for vazia ou contiver apenas espaços.
+        @raise ValueError: Se um ponto estiver malformado, não puder ser convertido para float,
+                         ou se uma linha não contiver pontos no formato esperado.
+        """
+        if not string.strip():
+            return []
+
+        matrix_of_points: list[list[list[float]]] = []
+        # Remove todos os espaços em branco e quebras de linha para simplificar o parsing
+        processed_string = string.replace(" ", "").replace("\n", "")
+
+        # Divide a string em representações de linha (separadas por ';')
+        row_strings = processed_string.split(";")
+
+        for row_str in row_strings:
+            # Ignora linhas que ficaram vazias após o split
+            if not row_str.strip():
+                continue
+
+            points_in_current_row: list[list[float]] = []
+            # Regex corrigida para encontrar pontos no formato (num,num,num)
+            point_matches = re.findall(r"\(([^,]+),([^,]+),([^)]+)\)", row_str)
+
+            # Se a string da linha não é vazia mas não encontrou nenhum ponto, é um erro de formato
+            if not point_matches and row_str.strip():
+                raise ValueError(
+                    f"Linha não contém pontos válidos no formato (x,y,z): '{row_str}'"
+                )
+
+            for match in point_matches:
+                # match é uma tupla de strings, ex: ('1.0', '-2.5', '3')
+                try:
+                    x = float(match[0])
+                    y = float(match[1])
+                    z = float(match[2])
+                    points_in_current_row.append([x, y, z])
+                except ValueError as e:
+                    # Levanta um erro mais informativo
+                    raise ValueError(
+                        f"Coordenada inválida no ponto '({match[0]},{match[1]},{match[2]})' na linha '{row_str}'. Erro original: {e}"
+                    ) from e
+
+            if points_in_current_row:
+                matrix_of_points.append(points_in_current_row)
+
+        return matrix_of_points
+
+    def verify_size(self, size: int | None = None):
+        """Verifica se o número de pontos é válido para a superfície."""
+
+        try:
+            matrix = self.convert_string_to_matrix(self.surfaceInput.toPlainText())
+
+            if size is None:
+                size = len(matrix)
+
+            if (
+                (not all(len(row) == size for row in matrix) or len(matrix) != size)
+                and size >= 4
+                and size <= 20
+            ):
+                self.show_error_message(f"The number of points must be {size}x{size}.")
+                return
+
+            self.name = self.nameInput.text()
+            self.surface_points = matrix
+
+        except ValueError as e:
+            self.show_error_message(str(e))
+            return
+
+        super().accept()
+
+
+class BezierSurfaceDialog(SurfaceDialog):
+    """Classe responsável por gerenciar o popup de criação de superfície de Bézier."""
+
+    def __init__(self):
+        super().__init__("view/screens/bezierSurface.ui")
+
+    def accept(self):
+        """Sobrescreve o método accept para validar o número de pontos"""
+
+        self.verify_size(4)
+
+
+class BicubicSurfaceDialog(SurfaceDialog):
+    """Classe responsável por gerenciar o popup de criação de superfície bicúbica."""
+
+    def __init__(self):
+        super().__init__("view/screens/bicubicSurface.ui")
+
+    def accept(self):
+        """Sobrescreve o método accept para validar o número de pontos"""
+
+        self.verify_size()

@@ -143,8 +143,6 @@ class TransformationDialog(QtWidgets.QDialog):
         self.transformations.append(transformation)
         self.transformationsList.addItem(f"Rotate: {angle:.2f}° about {axis} axis")
 
-        print(f"Adicionou rotação: {x1}, {y1}, {z1}, {x2}, {y2}, {z2}")
-
         # reseta o angulo
         self.angleInput.setValue(0.0)
 

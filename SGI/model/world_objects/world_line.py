@@ -1,4 +1,3 @@
-from model.clipping_algorithms import ClippingAlgorithms
 from model.world_objects.sc_world_object import SCWorldObject
 from view.graphical_objects.graphical_line import GraphicalLine
 from view.viewport.viewport_bounds import ViewportBounds

@@ -9,3 +9,7 @@ Seguem abaixo as instruções para rodar o SGI.
 #### Opção 2: instalação manual
 - Instale as dependências: `pip install -r requirements.txt`
 - Execute o arquivo `main.py`: `python main.py`
+
+
+### Como testar?
+No canto inferior direito da tela, existe um botão chamado "Add Test Objects". Ao pressioná-lo, uma série de objetos pré-definidos - como um cubo, alguns segmentos de reta, etc - serão adicionados ao mundo do sistema gráfico (ver display_file_manager.py). Você pode então testar as funcionalidades do SGI (rotação, zoom,  ransformações, etc) e observar os efeitos provocados nesses objetos, verificando se comportam-se da maneira esperada.

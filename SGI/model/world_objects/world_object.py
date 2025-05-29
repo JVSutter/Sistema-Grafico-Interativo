@@ -17,10 +17,15 @@ class WorldObject(ABC):
         viewport_bounds: ViewportBounds,
     ):
 
-        self.world_points: list[np.array] = []
-        for point in points:  # Converte os pontos para coordenadas homogêneas
-            x, y, z = point
-            self.world_points.append(np.array([x, y, z, 1]))
+        self.perceived_points: list[np.array] = []  # Lista de pontos percebidos
+        self.world_points: list[np.array] = []  # Lista de pontos reais
+
+        if points and isinstance(points[0], list) and isinstance(points[0][0], list):
+            pass
+        else:
+            for point in points:  # Converte os pontos para coordenadas homogêneas
+                x, y, z = point
+                self.perceived_points.append(np.array([x, y, z, 1]))
 
         self.projection_points: list[tuple[float, float]] = (
             []
@@ -36,7 +41,7 @@ class WorldObject(ABC):
     ) -> None:
         """
         Atualiza as coordenadas projetadas do objeto.
-        @param norm_points: Lista de pontos projetados em coordenadas normalizadas.
+        @param projection_points: Lista de pontos projetados em coordenadas normalizadas.
         """
 
         self.projection_points = projection_points
@@ -67,12 +72,21 @@ class WorldObject(ABC):
 
         return transformed_points
 
-    def update_coordinates(self, composite_matrix: np.ndarray) -> None:
+    def update_perceived_coordinates(self, composite_matrix: np.ndarray) -> None:
         """
-        Atualiza as coordenadas do objeto no mundo aplicando uma matriz de transformação composta.
+        Atualiza as coordenadas percebidas do objeto aplicando uma matriz de transformação composta.
         @param composite_matrix: Matriz de transformação composta.
         """
-        self.world_points = [point @ composite_matrix for point in self.world_points]
+        self.perceived_points = [
+            point @ composite_matrix for point in self.perceived_points
+        ]
+
+    def update_world_coordinates(self, conversion_mtx: np.ndarray) -> None:
+        """
+        Atualiza as coordenadas do mundo aplicando a matriz de conversão.
+        @param conversion_mtx: Matriz de conversão para coordenadas do mundo.
+        """
+        self.world_points = [point @ conversion_mtx for point in self.perceived_points]
 
     @abstractmethod
     def get_clipped_representation(self) -> list[GraphicalObject]:
@@ -88,12 +102,12 @@ class WorldObject(ABC):
         @return: Coordenadas (x, y) do centro geométrico.
         """
 
-        x_sum = sum(point[0] for point in self.world_points)
-        y_sum = sum(point[1] for point in self.world_points)
-        z_sum = sum(point[2] for point in self.world_points)
-        x_center = x_sum / len(self.world_points)
-        y_center = y_sum / len(self.world_points)
-        z_center = z_sum / len(self.world_points)
+        x_sum = sum(point[0] for point in self.perceived_points)
+        y_sum = sum(point[1] for point in self.perceived_points)
+        z_sum = sum(point[2] for point in self.perceived_points)
+        x_center = x_sum / len(self.perceived_points)
+        y_center = y_sum / len(self.perceived_points)
+        z_center = z_sum / len(self.perceived_points)
 
         return x_center, y_center, z_center
 
@@ -104,15 +118,13 @@ class WorldObject(ABC):
         @return: Tupla contendo a descrição do objeto e o índice do último ponto adicionado.
         """
 
-        obj_description = ""
+        obj_description = f"o {self.name}\n"
 
-        obj_description += f"o {self.name}\n"
-
-        for point in self.world_points:
+        for point in self.perceived_points:
             obj_description += f"v {point[0]:.1f} {point[1]:.1f} {point[2]:.1f}\n"
 
         obj_points = " ".join(
-            str(i) for i in range(last_index, last_index + len(self.world_points))
+            str(i) for i in range(last_index, last_index + len(self.perceived_points))
         )
 
         if self.__class__.__name__ == "WorldWireframe":
@@ -122,7 +134,7 @@ class WorldObject(ABC):
         else:
             obj_description += f"{self.obj_type} {obj_points}\n\n"
 
-        return obj_description, last_index + len(self.world_points)
+        return obj_description, last_index + len(self.perceived_points)
 
     def __str__(self):
         """
@@ -130,6 +142,6 @@ class WorldObject(ABC):
         <Tipo_do_objeto> <nome_do_objeto>: (x1, y1, z1), (x2, y2, z2), ...
         """
         formatted_points = ", ".join(
-            f"({x:.1f}, {y:.1f}, {z:.1f})" for x, y, z, _ in self.world_points
+            f"({x:.1f}, {y:.1f}, {z:.1f})" for x, y, z, _ in self.perceived_points
         )
         return f"{self.__class__.__name__.replace("World", "")} {self.name}: {formatted_points}"

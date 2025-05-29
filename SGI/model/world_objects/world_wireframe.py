@@ -11,14 +11,10 @@ class WorldWireframe(SCWorldObject):
         name: str,
         color: tuple,
         viewport_bounds,
-        is_filled: bool,
         edges: list,
     ):
         super().__init__(points, name, color, viewport_bounds)
-        self.is_filled = is_filled
-
         self.obj_type = "l"
-
         self.edges = edges
 
     def get_clipped_representation(self) -> list:
@@ -37,8 +33,12 @@ class WorldWireframe(SCWorldObject):
                 clipped_representations.append(graphical_representation)
 
         return clipped_representations
-    
+
     def get_edges_obj_file(self, last_index) -> list:
+        """
+        Obtém as arestas do objeto para serem escritas no arquivo .obj.
+        """
+
         edges_obj_file = []
         for index_1, index_2 in self.edges:
             edges_obj_file.append(f"l {index_1+last_index} {index_2+last_index}")
