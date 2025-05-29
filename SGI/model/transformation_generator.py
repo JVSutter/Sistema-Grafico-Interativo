@@ -58,11 +58,9 @@ class TransformationGenerator:
                 x1 = transformation["x1"]
                 y1 = transformation["y1"]
                 z1 = transformation["z1"]
-                print(f"x1, y1, z1: {x1}, {y1}, {z1}")
                 x2 = transformation["x2"]
                 y2 = transformation["y2"]
                 z2 = transformation["z2"]
-                print(f"x2, y2, z2: {x2}, {y2}, {z2}")
                 axis = transformation["axis"]
 
                 if axis == "X":
@@ -96,8 +94,8 @@ class TransformationGenerator:
         return np.array(
             [
                 [1, 0, 0, 0],
-                [0, cos_r, -sin_r, 0],
-                [0, sin_r, cos_r, 0],
+                [0, cos_r, sin_r, 0],
+                [0, -sin_r, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -114,9 +112,9 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, 0, sin_r, 0],
+                [cos_r, 0, -sin_r, 0],
                 [0, 1, 0, 0],
-                [-sin_r, 0, cos_r, 0],
+                [sin_r, 0, cos_r, 0],
                 [0, 0, 0, 1],
             ]
         )
@@ -133,8 +131,8 @@ class TransformationGenerator:
         sin_r = np.sin(angle_radians)
         return np.array(
             [
-                [cos_r, -sin_r, 0, 0],
-                [sin_r, cos_r, 0, 0],
+                [cos_r, sin_r, 0, 0],
+                [-sin_r, cos_r, 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1],
             ]
@@ -167,8 +165,6 @@ class TransformationGenerator:
             dx=-x1, dy=-y1, dz=-z1
         )
 
-        print(f"translate_to_origin: {translate_to_origin}")
-
         # Passo 2. Rotação Rx em torno do eixo x por θx de forma a trazer o eixo sobre o plano xy
         # Calcula o ângulo entre o eixo arbitrário projetado no plano xz e o plano xy
         theta_x = np.arctan2(z2 - z1, y2 - y1)
@@ -176,8 +172,6 @@ class TransformationGenerator:
         rotate_x = TransformationGenerator.get_x_axis_rotation_matrix(
             -np.degrees(theta_x)
         )
-
-        print(f"rotate_x: {rotate_x}")
 
         # Passo 3. Rotação Rz em torno do eixo z por θz de forma a alinhar o eixo com o eixo y
         # Calcula o ângulo entre a projeção do eixo no plano xy e o eixo y
@@ -188,33 +182,23 @@ class TransformationGenerator:
             np.degrees(theta_z)
         )
 
-        print(f"rotate_z: {rotate_z}")
-
         # Passo 4. Rotação Ry em torno do eixo y pelo ângulo dado pelo usuário
         rotate_y = TransformationGenerator.get_y_axis_rotation_matrix(angle_degrees)
-
-        print(f"rotate_y: {rotate_y}")
 
         # Passo 5. Desfaz a rotação do passo 3
         revert_z_rotation = TransformationGenerator.get_z_axis_rotation_matrix(
             -np.degrees(theta_z)
         )
 
-        print(f"revert_z_rotation: {revert_z_rotation}")
-
         # Passo 6. Desfaz a rotação do passo 2
         revert_x_rotation = TransformationGenerator.get_x_axis_rotation_matrix(
             np.degrees(theta_x)
         )
 
-        print(f"revert_x_rotation: {revert_x_rotation}")
-
         # Passo 7. Translação de volta para a posição original
         translate_back = TransformationGenerator.get_translation_matrix(
             dx=x1, dy=y1, dz=z1
         )
-
-        print(f"translate_back: {translate_back}")
 
         # Composição das transformações
         transformation = (
@@ -228,51 +212,6 @@ class TransformationGenerator:
         )
 
         return transformation
-
-    @staticmethod
-    def get_rotation_around_axis_through_origin(
-        axis_vector: np.ndarray, angle_degrees: float
-    ) -> np.ndarray:
-        """
-        Obtém a matriz de rotação em torno de um eixo arbitrário que passa pela origem.
-        Usa a fórmula de Rodrigues.
-        @param axis_vector: Vetor (numpy array 3D) normalizado representando o eixo de rotação.
-        @param angle_degrees: Ângulo de rotação em graus.
-        @return: Matriz de rotação 4x4.
-        """
-        angle_radians = np.radians(angle_degrees)
-        ux, uy, uz = axis_vector[
-            :3
-        ]  # Extrai componentes x, y, z, ignora componente homogênea se houver
-        cos_a = np.cos(angle_radians)
-        sin_a = np.sin(angle_radians)
-        one_minus_cos_a = 1 - cos_a
-
-        # Matriz de rotação 3x3 pela fórmula de Rodrigues
-        rot_3x3 = np.array(
-            [
-                [
-                    cos_a + ux**2 * one_minus_cos_a,
-                    ux * uy * one_minus_cos_a - uz * sin_a,
-                    ux * uz * one_minus_cos_a + uy * sin_a,
-                ],
-                [
-                    uy * ux * one_minus_cos_a + uz * sin_a,
-                    cos_a + uy**2 * one_minus_cos_a,
-                    uy * uz * one_minus_cos_a - ux * sin_a,
-                ],
-                [
-                    uz * ux * one_minus_cos_a - uy * sin_a,
-                    uz * uy * one_minus_cos_a + ux * sin_a,
-                    cos_a + uz**2 * one_minus_cos_a,
-                ],
-            ]
-        )
-
-        # Incorpora na matriz 4x4 homogênea
-        rot_4x4 = np.identity(4)
-        rot_4x4[:3, :3] = rot_3x3
-        return rot_4x4
 
     @staticmethod
     def get_pan_matrix(
@@ -386,39 +325,40 @@ class TransformationGenerator:
         return translate_to_origin @ scale_mtx @ translate_back
 
     @staticmethod
-    def get_parallel_projection_matrix(
-        window_center: np.ndarray,
-        view_plane_normal: np.ndarray,
-        window_vup: np.ndarray,
+    def get_ncs_matrix(
         window_width: float,
         window_height: float,
     ) -> np.ndarray:
         """
-        Retorna a matriz de projeção paralela ortogonal seguindo o algoritmo padrão,
-        usando o sistema UVN para respeitar o spin (roll) da câmera.
+        Obtém a matriz de transformação para o sistema de coordenadas normalizadas (NCS).
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
+        @return: Matriz de transformação para o sistema de coordenadas normalizadas.
         """
-        # Passo 1: Translade VRP para a origem
-        cx, cy, cz, _ = window_center
-        T = TransformationGenerator.get_translation_matrix(dx=-cx, dy=-cy, dz=-cz)
 
-        # Passo 2: Determine UVN
-        # Normalize VPN e VUP, e calcule eixos U e V
-        vpn = view_plane_normal[:3]
-        vpn = vpn / np.linalg.norm(vpn)
-        vup_vec = window_vup[:3]
-        vup_vec = vup_vec / np.linalg.norm(vup_vec)
-        u = np.cross(vup_vec, vpn)
-        u = u / np.linalg.norm(u)
-        v = np.cross(vpn, u)
+        scale_x = -2.0 / window_width  # Negativo pois o positivo fica à esquerda
+        scale_y = 2.0 / window_height
+        scale_to_ncs = TransformationGenerator.get_scaling_matrix(
+            cx=0, cy=0, cz=0, scale_x=scale_x, scale_y=scale_y, scale_z=1
+        )
 
-        # Passo 3: Rotacione o mundo para alinhar UVN com XYZ
-        R = np.identity(4)
-        R[:3, 0] = u
-        R[:3, 1] = v
-        R[:3, 2] = vpn
+        return scale_to_ncs
 
-        # Passo 4: Ignore todas as coordenadas Z dos objetos
-        P = np.array(
+    @staticmethod
+    def get_parallel_projection_points(
+        window_width: float,
+        window_height: float,
+        **kwargs,
+    ):
+        """
+        Método para obter a matriz de projeção paralela.
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
+        @return: Matriz de projeção paralela.
+        """
+
+        # Passo 1: Ignorar z
+        ignore_z = np.array(
             [
                 [1, 0, 0, 0],
                 [0, 1, 0, 0],
@@ -427,15 +367,56 @@ class TransformationGenerator:
             ]
         )
 
-        # Passo 5: Normalize o resto (coordenadas de window)
-        S = TransformationGenerator.get_scaling_matrix(
-            cx=0,
-            cy=0,
-            cz=0,
-            scale_x=2.0 / window_width,
-            scale_y=2.0 / window_height,
-            scale_z=1.0,
+        # Passo 2: Escalonar para o sistema de coordenadas normalizadas
+        scale_to_ncs = TransformationGenerator.get_ncs_matrix(
+            window_width=window_width,
+            window_height=window_height,
         )
 
-        # Composição final das transformações: T -> R -> P -> S
-        return T @ R @ P @ S
+        return ignore_z @ scale_to_ncs
+
+    @staticmethod
+    def get_perspective_projection_points(
+        window_width: float,
+        window_height: float,
+        **kwargs,
+    ):
+        """
+        Método para obter a matriz de projeção perspectiva.
+        @param center_of_projection: Centro de projeção (COP).
+        @param window_width: Largura da janela de visualização.
+        @param window_height: Altura da janela de visualização.
+        @return: Matriz de projeção perspectiva.
+        """
+
+        center_of_projection = kwargs["center_of_projection"]
+
+        # Passo 1: Translação do centro de projeção (COP) para a origem
+        translate_cop_to_origin = TransformationGenerator.get_translation_matrix(
+            dx=-center_of_projection[0],
+            dy=-center_of_projection[1],
+            dz=-center_of_projection[2],
+        )
+
+        # Passo 2: Cálculo da distância do COP ao plano de visualização e geração da matriz
+        # que obtém o fator z/d
+        distance_to_view_plane = np.linalg.norm(
+            center_of_projection[:3] - np.array([0, 0, 0])
+        )
+
+        perspective_matrix = np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 1 / distance_to_view_plane],
+                [0, 0, 0, 0],
+            ]
+        )
+
+        # Passo 3: Escalonamento para o sistema de coordenadas normalizadas
+        scale_to_ncs = TransformationGenerator.get_ncs_matrix(
+            window_width=window_width,
+            window_height=window_height,
+        )
+
+        return translate_cop_to_origin @ perspective_matrix @ scale_to_ncs

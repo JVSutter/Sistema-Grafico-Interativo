@@ -10,7 +10,13 @@ class SCWorldObject(WorldObject, ABC):
     Classe para objetos cujo algoritmo de clipping pode ser alterado.
     """
 
-    def __init__(self, points, name, color, viewport_bounds):
+    def __init__(
+        self,
+        points: list,
+        name: str,
+        color: tuple[int, int, int],
+        viewport_bounds: object,
+    ) -> None:
         super().__init__(points, name, color, viewport_bounds)
 
         self.clipping_modes = {

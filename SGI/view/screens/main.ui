@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>912</width>
-    <height>939</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>912</width>
-    <height>939</height>
+    <height>1000</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>912</width>
-    <height>939</height>
+    <height>1000</height>
    </size>
   </property>
   <property name="palette">
@@ -695,7 +695,7 @@
      <x>18</x>
      <y>344</y>
      <width>371</width>
-     <height>479</height>
+     <height>531</height>
     </rect>
    </property>
    <property name="cursor">
@@ -720,7 +720,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>30</y>
+      <y>20</y>
       <width>121</width>
       <height>191</height>
      </rect>
@@ -850,7 +850,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>50</y>
+      <y>40</y>
       <width>171</width>
       <height>171</height>
      </rect>
@@ -866,7 +866,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>40</y>
+      <y>30</y>
       <width>123</width>
       <height>71</height>
      </rect>
@@ -900,7 +900,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>100</y>
+      <y>90</y>
       <width>81</width>
       <height>71</height>
      </rect>
@@ -934,7 +934,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>100</y>
+      <y>90</y>
       <width>91</width>
       <height>71</height>
      </rect>
@@ -974,7 +974,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>160</y>
+      <y>150</y>
       <width>151</width>
       <height>71</height>
      </rect>
@@ -1008,7 +1008,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>236</y>
+      <y>220</y>
       <width>321</width>
       <height>71</height>
      </rect>
@@ -1029,10 +1029,10 @@
       <item>
        <widget class="QSlider" name="spinRotationSlider">
         <property name="minimum">
-         <number>-10</number>
+         <number>-180</number>
         </property>
         <property name="maximum">
-         <number>10</number>
+         <number>180</number>
         </property>
         <property name="singleStep">
          <number>0</number>
@@ -1068,7 +1068,7 @@
     <property name="geometry">
      <rect>
       <x>18</x>
-      <y>316</y>
+      <y>300</y>
       <width>333</width>
       <height>148</height>
      </rect>
@@ -1086,10 +1086,10 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>-10</number>
+      <number>-180</number>
      </property>
      <property name="maximum">
-      <number>10</number>
+      <number>180</number>
      </property>
      <property name="value">
       <number>0</number>
@@ -1146,10 +1146,10 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>-10</number>
+      <number>-180</number>
      </property>
      <property name="maximum">
-      <number>10</number>
+      <number>180</number>
      </property>
      <property name="value">
       <number>0</number>
@@ -1276,7 +1276,7 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>657</y>
+     <y>740</y>
      <width>481</width>
      <height>252</height>
     </rect>
@@ -1401,7 +1401,7 @@
      <x>410</x>
      <y>10</y>
      <width>481</width>
-     <height>641</height>
+     <height>721</height>
     </rect>
    </property>
    <property name="title">
@@ -1426,10 +1426,10 @@
   <widget class="QGroupBox" name="clippingGroupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>838</y>
-     <width>371</width>
-     <height>69</height>
+     <x>30</x>
+     <y>880</y>
+     <width>181</width>
+     <height>110</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -1441,7 +1441,7 @@
    <property name="maximumSize">
     <size>
      <width>16777215</width>
-     <height>69</height>
+     <height>1351331</height>
     </size>
    </property>
    <property name="title">
@@ -1450,37 +1450,155 @@
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
-   <widget class="QWidget" name="layoutWidget_3">
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QRadioButton" name="cohenSutherlandRadioButton">
+        <property name="text">
+         <string>Cohen-Sutherland</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="liangBarskyRadioButton">
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Liang-Barsky</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="clippingGroupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>880</y>
+     <width>161</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>1351331</height>
+    </size>
+   </property>
+   <property name="title">
+    <string>Projection Algorithm</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_9">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QRadioButton" name="perspectiveRadioButton">
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Perspective</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="parallelRadioButton">
+        <property name="text">
+         <string>Parallel</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>800</y>
+     <width>301</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>COP distance</string>
+   </property>
+   <widget class="QSlider" name="copDistanceSlider">
     <property name="geometry">
      <rect>
-      <x>41</x>
-      <y>33</y>
-      <width>293</width>
-      <height>30</height>
+      <x>70</x>
+      <y>30</y>
+      <width>160</width>
+      <height>25</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
-     <item>
-      <widget class="QRadioButton" name="cohenSutherlandRadioButton">
-       <property name="text">
-        <string>Cohen-Sutherland</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="liangBarskyRadioButton">
-       <property name="layoutDirection">
-        <enum>Qt::LayoutDirection::RightToLeft</enum>
-       </property>
-       <property name="text">
-        <string>Liang-Barsky</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <property name="minimum">
+     <number>-180</number>
+    </property>
+    <property name="maximum">
+     <number>180</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Orientation::Horizontal</enum>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TickPosition::TicksAbove</enum>
+    </property>
+    <property name="tickInterval">
+     <number>180</number>
+    </property>
    </widget>
   </widget>
  </widget>

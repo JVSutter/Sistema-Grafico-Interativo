@@ -1,5 +1,6 @@
 # MacOS
 .DS_Store
+.cursor
 
 # Python
 __pycache__

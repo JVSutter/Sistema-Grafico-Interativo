@@ -12,7 +12,7 @@ class WorldBSplineCurve(WorldCurve):
         super().__init__(points, name, color, viewport_bounds)
         self.obj_type = "bspline"
 
-    def _generate_projection_curve_points(self) -> list[tuple[float, float]]:
+    def _generate_normalized_curve_points(self) -> list[tuple[float, float]]:
         """
         Gera pontos ao longo da curva B-spline usando a forma matricial em coordenadas normalizadas.
         @return: Lista de pontos (x, y) normalizados ao longo da curva.
@@ -22,9 +22,9 @@ class WorldBSplineCurve(WorldCurve):
             np.array([[-1, 3, -3, 1], [3, -6, 3, 0], [-3, 0, 3, 0], [1, 4, 1, 0]]) / 6
         )
 
-        num_steps = 100
+        num_steps = 25
         delta = 1.0 / num_steps
-        projection_points = []
+        normalized_points = []
 
         for i in range(len(self.projection_points) - 3):
             x0, y0 = self.projection_points[i]
@@ -61,10 +61,10 @@ class WorldBSplineCurve(WorldCurve):
 
                 current_segment.append((x, y))
 
-            projection_points.extend(current_segment)
+            normalized_points.extend(current_segment)
             current_segment = []
 
-        return projection_points
+        return normalized_points
 
     def _find_first_iteration_deltas(
         self, delta: float, coefficients_mtx: np.array

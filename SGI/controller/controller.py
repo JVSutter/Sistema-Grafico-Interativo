@@ -1,5 +1,3 @@
-import numpy as np
-
 from model.model import Model
 from view.view import View
 
@@ -16,7 +14,6 @@ class Controller:
 
     def run(self) -> None:
         """Executa a aplicação."""
-
         self.view.run()
 
     def handle_create_object(
@@ -86,12 +83,20 @@ class Controller:
 
         self.model.handle_transformations(index, transformations_list)
 
+    def handle_window_rotation(self, rotation_type: str, angle: float) -> None:
+        """
+        Processa uma rotação da janela de visualização.
+        @param rotation_type: Tipo de rotação ("spin", "vertical" ou "horizontal").
+        @param angle: Ângulo de rotação.
+        """
+
+        self.model.rotate_window(angle, rotation_type)
+
     def handle_import_obj_file(self, filepath: str) -> None:
         """
         Importa um arquivo .obj.
         @param filepath: Caminho do arquivo .obj.
         """
-
         self.model.import_obj_file(filepath)
 
     def handle_export_obj_file(self, filepath: str) -> None:
@@ -99,32 +104,33 @@ class Controller:
         Exporta um arquivo .obj.
         @param filepath: Caminho do arquivo .obj.
         """
-
         self.model.export_obj_file(filepath)
+
+    def handle_cop_distance_change(self, new_distance: float) -> None:
+        """
+        Muda a distância do centro de projeção.
+        @param new_distance: Nova distância do centro de projeção.
+        """
+        self.model.change_cop_distance(new_distance)
 
     def handle_clipping_change(self, mode: str) -> None:
         """
         Muda o modo de clipping.
         @param mode: Modo de clipping.
         """
-
         self.model.change_clipping_mode(mode)
 
     def handle_add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
-
         self.model.add_test_objects()
 
     def handle_remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
-
         self.model.remove_test_objects()
 
-    def handle_window_rotation(self, rotation_mode: str, angle: float) -> None:
+    def handle_projection_change(self, mode: str) -> None:
         """
-        Processa uma rotação da window
-        @param rotation_mode: Modo de rotação (horizontal, vertical ou spin).
-        @param angle: Ângulo de rotação.
+        Muda o modo de projeção.
+        @param mode: Modo de projeção.
         """
-
-        self.model.rotate_window(rotation_mode, angle)
+        self.model.change_projection_mode(mode)

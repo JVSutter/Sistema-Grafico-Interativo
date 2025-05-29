@@ -1,9 +1,12 @@
 from model.display_file_manager import DisplayFileManager
-from model.window.window import Window
+from model.window import Window
 from model.world_objects.world_bezier_curve import WorldBezierCurve
+from model.world_objects.world_bezier_surface import WorldBezierSurface
+from model.world_objects.world_bicubic_surface import WorldBicubicSurface
 from model.world_objects.world_bspline_curve import WorldBSplineCurve
 from model.world_objects.world_line import WorldLine
 from model.world_objects.world_point import WorldPoint
+from model.world_objects.world_polygon import WorldPolygon
 from model.world_objects.world_wireframe import WorldWireframe
 from view.view import View
 
@@ -64,13 +67,16 @@ class Model:
             "Wireframe": WorldWireframe,
             "Point": WorldPoint,
             "Line": WorldLine,
-            "Bézier": WorldBezierCurve,
-            "B-Spline": WorldBSplineCurve,
+            "Bézier Curve": WorldBezierCurve,
+            "B-Spline Curve": WorldBSplineCurve,
+            "Bezier Surface": WorldBezierSurface,
+            "Bicubic Surface": WorldBicubicSurface,
+            "Polygon": WorldPolygon,
         }
 
         object_type_cls = obj_types[object_type]
 
-        obj_name = self.display_file_manager.add_object(
+        obj = self.display_file_manager.add_object(
             points=points,
             name=name,
             color=color,
@@ -78,11 +84,12 @@ class Model:
             object_type=object_type_cls,
             edges=edges,
         )
-        if obj_name is None:
+        if obj is None:
             self.view.add_log("Object already exists, skipping...")
             return
 
-        self.view.add_log(f"{object_type} {obj_name} added: {points}")
+        self.view.add_log(f"{object_type} {obj.name} added: {points}")
+        self.window.add_subscriber(obj)
 
     @update_interface
     def remove_object(self, index: int) -> None:
@@ -91,6 +98,7 @@ class Model:
         @param index: Índice do objeto a ser removido. Coincide com o índice na lista de objetos da interface.
         """
         self.display_file_manager.remove_object(index)
+        self.window.remove_subscriber(index)
 
     @update_interface
     def zoom(self, new_zoom_value: float) -> None:
@@ -109,6 +117,7 @@ class Model:
         @param d_vertical: Deslocamento vertical.
         @param d_depth: Deslocamento em profundidade ("para fora" ou "para trás").
         """
+
         self.window.apply_pan(
             d_horizontal=d_horizontal,
             d_vertical=d_vertical,
@@ -117,14 +126,14 @@ class Model:
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
-    def rotate_window(self, rotation_mode: str, angle: float) -> None:
+    def rotate_window(self, angle: float, rotation_type: str) -> None:
         """
         Rotaciona a janela de visualização para o ângulo especificado em graus.
-        @param rotation_mode: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         @param angle: Ângulo de rotação em graus.
+        @param rotation_type: Tipo de rotação (horizontal, vertical ou em torno de si mesma)
         """
 
-        self.window.apply_rotation(angle, rotation_mode)
+        self.window.apply_rotation(angle, rotation_type)
         self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
@@ -142,6 +151,7 @@ class Model:
         self.display_file_manager.apply_transformation(
             index=index,
             transformations_list=transformations_list,
+            conversion_mtx=self.window.conversion_mtx,
         )
 
         for transformation in transformations_list:
@@ -165,9 +175,7 @@ class Model:
         """Método para recalcular as projeções de todos os objetos no display file."""
 
         self.display_file_manager.update_projections(
-            window_center=self.window.window_center,
-            view_plane_normal=self.window.view_plane_normal,
-            window_vup=self.window.vup,
+            center_of_projection=self.window.center_of_projection,
             window_width=self.window.get_width(),
             window_height=self.window.get_height(),
         )
@@ -180,13 +188,16 @@ class Model:
         """
 
         try:
-            skipped_objects = self.display_file_manager.import_file_to_display_file(
-                filepath=filepath
+            added_objects, skipped_objects = (
+                self.display_file_manager.import_file_to_display_file(filepath=filepath)
             )
 
             self.view.add_log(f"Objects successfully imported from {filepath}")
             if skipped_objects:
                 self.view.add_log(f"Skipped objects: {", ".join(skipped_objects)}")
+
+            for obj in added_objects:
+                self.window.add_subscriber(obj)
 
         except FileNotFoundError:
             self.view.add_log(f"File not found: {filepath}")
@@ -203,14 +214,20 @@ class Model:
         """
 
         obj_str = self.display_file_manager.convert_display_file_to_obj()
-        if obj_str == "":
-            self.view.add_log("No objects to export")
-            return
 
         with open(filepath, "w") as f:
             f.write(obj_str)
 
         self.view.add_log(f"Objects successfully exported to {filepath}")
+
+    @update_interface
+    def change_cop_distance(self, distance: float) -> None:
+        """
+        Altera a distância do centro de projeção (COP) em relação ao plano de projeção.
+        @param distance: Valor da nova distância do COP
+        """
+        self.window.change_cop_distance(distance)
+        self.display_file_manager.set_all_objects_as_dirty()
 
     @update_interface
     def change_clipping_mode(self, mode: str) -> None:
@@ -224,12 +241,19 @@ class Model:
     def add_test_objects(self) -> None:
         """Adiciona objetos de teste ao mundo."""
 
-        self.display_file_manager.add_test_objects()
-
-        # Aplica uma rotação no primeiro objeto
-        # self.handle_transformations(0, [{"type": "rotation", "angle": 180, "x1": 10, "y1": -10, "z1": 40, "x2": -10, "y2": 10, "z2": 60, "axis": "arbitrary"}])
+        test_objects = self.display_file_manager.add_test_objects()
+        for obj in test_objects:
+            self.window.add_subscriber(obj)
 
     @update_interface
     def remove_test_objects(self) -> None:
         """Remove objetos de teste do mundo."""
         self.display_file_manager.remove_test_objects()
+
+    @update_interface
+    def change_projection_mode(self, mode: str) -> None:
+        """
+        Muda o modo de projeção.
+        @param mode: Modo de projeção.
+        """
+        self.display_file_manager.change_projection_mode(mode)
