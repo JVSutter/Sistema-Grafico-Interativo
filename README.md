@@ -16,6 +16,12 @@ A seguinte tabela lista todos os exercícios completados durante o curso, em ord
 | [Trabalho 1.4](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.4) | Expansão do Sistema Gráfico Interativo 2D para suportar clipping de polígonos e criação de polígonos aramados ou preenchidos.  |
 | [Trabalho 1.5](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.5) | Expansão do Sistema Gráfico Interativo 2D para suportar curvas de Bézier com blending functions.  |
 | [Trabalho 1.6](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.6) | Expansão do Sistema Gráfico Interativo 2D para inclusão de curvas B-Spline, utilizando Forward Differences para discretização.  |
+| [Trabalho 1.7](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.10) | Modificação do Sistema Gráfico, transitando para o 3D. Projeção ortogonal.  |
+| [Trabalho 1.8](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.10) | Modificação do Sistema Gráfico 3D, suportando projeção paralela.  |
+| [Trabalho 1.9](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.10) | Modificação do Sistema Gráfico 3D, adicionando suporte a superfícies bicúbicas de Bézier.  |
+| [Trabalho 1.10](https://github.com/JVSutter/computacao-grafica/releases/tag/trabalho-1.10) | Finalização do sistema gráfico 3D, com suporte a superfícies bicúbicas com diferenças adiante.  |
+
+
 
 ## Projeto Final - Jogo em Unity
 
