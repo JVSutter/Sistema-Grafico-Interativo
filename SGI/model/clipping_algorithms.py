@@ -97,9 +97,9 @@ class ClippingAlgorithms:
             return [(x1, y1), (x2, y2)]
         return None
 
-    @classmethod
+    @staticmethod
     def liang_barsky_clipping(
-        cls, p1: tuple[float, float], p2: tuple[float, float]
+        p1: tuple[float, float], p2: tuple[float, float]
     ) -> tuple | None:
         """
         Algoritmo de Liang-Barsky para recorte de linhas.
@@ -146,8 +146,8 @@ class ClippingAlgorithms:
 
         return [(clipped_start_x, clipped_start_y), (clipped_end_x, clipped_end_y)]
 
-    @classmethod
-    def sutherland_hodgman_clipping(cls, points: list) -> list | None:
+    @staticmethod
+    def sutherland_hodgman_clipping(points: list) -> list | None:
         """
         Algoritmo de Sutherland-Hodgman para recorte de polígonos.
         @param points: Lista de pontos do polígono.
@@ -227,8 +227,8 @@ class ClippingAlgorithms:
             return clipped_polygon
         return None
 
-    @classmethod
-    def curve_clipping(cls, points: list, line_clipper: callable) -> list | None:
+    @staticmethod
+    def curve_clipping(points: list, line_clipper: callable) -> list | None:
         """
         Algoritmo de recorte de curvas.
         @param points: Lista de pontos da curva (representação discretizada).

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.viewport.viewport_bounds import ViewportBounds
 

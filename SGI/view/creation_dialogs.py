@@ -466,13 +466,6 @@ class SurfaceDialog(GenericDialog):
 
     def convert_string_to_matrix(self, string: str) -> list[list[list[float]]]:
         """
-        ***
-        Método inteiramente gerado por IA
-        - Modelo utilizado: gemini-2.5-pro-exp-05-06
-        - URL da implementação do modelo: https://aistudio.google.com/
-        - Finalidade: Implementar a lógica de conversão de uma string formatada de pontos de controle (e.g., "(x1,y1,z1),(x2,y2,z2);(x3,y3,z3),...") em uma matriz 3D de pontos (lista de listas de pontos [x,y,z]).
-        - Prompt empregado: crie uma função capaz de converter uma string como (x11,y11,z11),(x12,y12,z12),(x13,y13,z13),(x14,y14,z14); (x21,y21,z21),(x22,y22,z22),(x23,y23,z23),(x24,y24,z24); (x31,y31,z31),(x32,y32,z32),(x33,y33,z33),(x34,y34,z34); (x41,y41,z41),(x42,y42,z42),(x43,y43,z43),(x44,y44,z44)   em uma matriz
-        ***
         Converte uma string de pontos de controle em uma matriz de pontos.
 
         A string deve seguir o formato:

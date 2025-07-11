@@ -1,7 +1,6 @@
 import re
 
 import numpy as np
-
 from model.world_objects.world_bezier_curve import WorldBezierCurve
 from model.world_objects.world_bezier_surface import WorldBezierSurface
 from model.world_objects.world_bicubic_surface import WorldBicubicSurface

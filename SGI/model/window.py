@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.transformation_generator import TransformationGenerator
 from model.world_objects.world_point import WorldObject
 from view.viewport.viewport_bounds import ViewportBounds
@@ -14,7 +13,7 @@ class Window:
 
     No sistema real:
     1 - A janela está centrada na origem do mundo.
-    2 - O foco da janela se desloca sobre a parte negativa do eixo Z
+    2 - O COP da janela se desloca sobre a parte negativa do eixo Z
     3 - O foco permanece fixo em (0, 0, 10)
     4 - y é positivo para cima, x é positivo para a esquerda e z é positivo para frente
     """

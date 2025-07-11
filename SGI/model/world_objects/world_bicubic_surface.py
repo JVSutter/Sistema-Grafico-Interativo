@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.world_objects.sc_world_object import SCWorldObject
 from view.graphical_objects.graphical_line import GraphicalLine
 

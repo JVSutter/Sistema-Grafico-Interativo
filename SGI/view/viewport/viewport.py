@@ -1,5 +1,4 @@
 from PyQt6 import QtGui, QtWidgets
-
 from view.graphical_objects.graphical_object import GraphicalObject
 from view.viewport.viewport_bounds import ViewportBounds
 

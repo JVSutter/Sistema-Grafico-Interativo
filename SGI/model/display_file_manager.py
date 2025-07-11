@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.transformation_generator import TransformationGenerator
 from model.world_objects.sc_world_object import SCWorldObject
 from model.world_objects.world_bezier_curve import WorldBezierCurve

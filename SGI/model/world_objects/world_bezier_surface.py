@@ -1,5 +1,4 @@
 import numpy as np
-
 from model.world_objects.sc_world_object import SCWorldObject
 from view.graphical_objects.graphical_line import GraphicalLine
 
@@ -67,13 +66,6 @@ class WorldBezierSurface(SCWorldObject):
         """
         Sobrescreve o método update_coordinates da classe base WorldObject. Para tratar transformações.
         @param composite_matrix: Matriz de transformação composta.
-        ***
-        Método inteiramente gerado por IA
-        - Modelo utilizado: gemini-2.5-pro-exp-05-06
-        - URL da implementação do modelo: https://aistudio.google.com/
-        - Finalidade: Implementar a lógica de atualização das coordenadas dos pontos de controle da superfície de Bézier.
-        - Prompt empregado: crie um método que atualize as coordenadas dos pontos de controle da superfície de Bézier aplicando uma matriz de transformação composta.
-        ***
         """
 
         new_control_points_3d_matrix = np.zeros_like(self.control_points_3d_matrix)
@@ -181,13 +173,6 @@ class WorldBezierSurface(SCWorldObject):
         Retorna a representação gráfica para desenho.
         O clipping 2D da malha (se necessário) seria idealmente feito aqui antes de criar o GraphicalObject.
         Por simplicidade, esta versão passa a grade completa para GraphicalBezierSurface.
-        ***
-        Método parcialmente gerado por IA
-        - Modelo utilizado: gemini-2.5-pro-exp-05-06
-        - URL da implementação do modelo: https://aistudio.google.com/
-        - Finalidade: Implementar a lógica de geração e clipping da grade de pontos da superfície de Bézier.
-        - Prompt empregado: Implemente o método get_clipped_representation para a classe WorldBezierSurface.
-        ***
         """
 
         self._generate_project_and_transform_grid()

@@ -4,7 +4,7 @@ from view.graphical_objects.graphical_wireframe import GraphicalWireframe
 
 
 class WorldPolygon(WorldObject):
-    """Classe pertinente a Wireframes no mundo."""
+    """Classe pertinente a polígonos no mundo."""
 
     def __init__(
         self, points: list, name: str, color: tuple, viewport_bounds, is_filled: bool
